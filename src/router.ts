@@ -1,3 +1,7 @@
+// router.ts
+/**
+ * This has the router
+ */
 import Router from "koa-router";
 
 const router = new Router();
