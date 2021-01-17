@@ -4,6 +4,7 @@
   "description": "Cyclists of Madison REST API",
   "main": "src/app.ts",
   "scripts": {
+    "start": "ts-node src/app.ts",
     "dev": "npx nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
