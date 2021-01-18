@@ -5,8 +5,7 @@
     "preserveConstEnums": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true
+    "noFallthroughCasesInSwitch": true
   },
 
   "include": ["src"]

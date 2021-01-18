@@ -1,12 +1,14 @@
 // router.ts
 /**
- * This has the router
+ * This has the routes defined.
  */
 import Router from "koa-router";
+import { ImageController } from "./controllers/image.controller";
 
 const router = new Router();
-router.get("/", (ctx) => {
-  ctx.body = "Hello World";
+router.get("/images", ImageController.getImageList);
+router.get("/images/:id", (ctx) => {
+  ImageController.getOneImage(ctx, ctx.params.id);
 });
 
 export default router;
