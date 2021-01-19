@@ -6,7 +6,9 @@ import Router from "koa-router";
 import { imageController } from "./controllers/image.controller";
 
 export const router = new Router();
-router.get("/images", imageController.getImageList);
-router.get("/images/:id", (ctx) => {
+router.get("/images", async (ctx) => {
+  await imageController.getImageList(ctx);
+});
+router.get("/images/:id", async (ctx) => {
   imageController.getOneImage(ctx, ctx.params.id);
 });

@@ -1,17 +1,21 @@
 import { Context } from "koa";
-import fs from "fs";
-const folder = "/home/tsandee/CyclistsOfMadison/photos";
+import { getConnection, Repository } from "typeorm";
+import { Image } from "../entity/Image";
 
 class ImageController {
-  public async getImageList(ctx: Context): Promise<void> {
-    ctx.body = [new ImageInfo(), new ImageInfo()];
+  #repository: Repository<Image> | undefined;
+
+  get repository(): Repository<Image> {
+    return (this.#repository ??= getConnection().getRepository(Image));
   }
 
-  public async getOneImage(ctx: Context, id: number): Promise<void> {}
+  public async getImageList(ctx: Context) {
+    ctx.body = await this.repository.find();
+  }
+
+  public async getOneImage(ctx: Context, id: number) {
+    ctx.body = await this.repository.findOne(id);
+  }
 }
 
 export const imageController = new ImageController();
-export class ImageInfo {
-  id = 0;
-  filename = "";
-}
