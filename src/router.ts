@@ -3,12 +3,10 @@
  * This has the routes defined.
  */
 import Router from "koa-router";
-import { ImageController } from "./controllers/image.controller";
+import { imageController } from "./controllers/image.controller";
 
-const router = new Router();
-router.get("/images", ImageController.getImageList);
+export const router = new Router();
+router.get("/images", imageController.getImageList);
 router.get("/images/:id", (ctx) => {
-  ImageController.getOneImage(ctx, ctx.params.id);
+  imageController.getOneImage(ctx, ctx.params.id);
 });
-
-export default router;
