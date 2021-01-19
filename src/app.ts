@@ -1,13 +1,12 @@
 import Koa from "koa";
 import logger from "koa-logger";
 import { router } from "./router";
-import { doConnect } from "./connection";
-import { Image } from "./entity/Image";
+import { databaseConnect } from "./connection";
+import { scan } from "./scan";
 
-doConnect().then(async (connection) => {
-  const newImage = new Image();
-  newImage.path = "blarg";
-  connection.getRepository(Image).insert(newImage);
+databaseConnect().then(async (connection) => {
+  scan(connection);
+
   const app = new Koa();
   app.use(logger());
   app.use(router.routes());

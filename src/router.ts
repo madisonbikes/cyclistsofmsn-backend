@@ -10,5 +10,5 @@ router.get("/images", async (ctx) => {
   await imageController.getImageList(ctx);
 });
 router.get("/images/:id", async (ctx) => {
-  imageController.getOneImage(ctx, ctx.params.id);
+  await imageController.getOneImage(ctx, ctx.params.id);
 });

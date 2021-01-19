@@ -6,5 +6,5 @@ export class Image {
   id!: number;
 
   @Column()
-  path!: string;
+  filename!: string;
 }

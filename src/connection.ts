@@ -1,5 +1,5 @@
 import { Connection, createConnection } from "typeorm";
 
-export function doConnect(): Promise<Connection> {
+export function databaseConnect(): Promise<Connection> {
   return createConnection();
 }
