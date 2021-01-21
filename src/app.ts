@@ -4,6 +4,8 @@ import { router } from "./router";
 import { databaseConnect } from "./connection";
 import { scan } from "./scan";
 
+const PORT = process.env.PORT || 3001;
+
 databaseConnect().then(async (connection) => {
   scan(connection);
 
@@ -11,5 +13,7 @@ databaseConnect().then(async (connection) => {
   app.use(logger());
   app.use(router.routes());
   app.use(router.allowedMethods());
-  app.listen(3000);
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
+  });
 });
