@@ -13,6 +13,7 @@ class ImageController {
   }
 
   public async getImageList(ctx: Context) {
+    ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
     ctx.body = await this.repository.find();
   }
 
@@ -21,6 +22,7 @@ class ImageController {
     if (filename) {
       const resolved = `${PHOTOS_DIR}/${filename}`;
       ctx.type = path.parse(resolved).ext;
+      ctx.set("Cache-Control", "max-age=3600, s-max-age=36000");
       ctx.body = createReadStream(resolved);
     }
   }
