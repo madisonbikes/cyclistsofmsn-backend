@@ -1,19 +1,19 @@
 import { Context } from "koa";
-import { getConnection, Repository } from "typeorm";
+import { Repository } from "typeorm";
+import { getRepository } from "../connection";
 import { Image } from "../entity/Image";
 import { PHOTOS_DIR } from "../env";
 import sharp from "sharp";
 
 class ImageController {
-  #repository: Repository<Image> | undefined;
-
-  get repository(): Repository<Image> {
-    return (this.#repository ??= getConnection().getRepository(Image));
+  async repository(): Promise<Repository<Image>> {
+    return getRepository(Image);
   }
 
   public async getImageList(ctx: Context) {
     ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-    ctx.body = await this.repository.find();
+    const repository = await this.repository();
+    ctx.body = await repository.find();
   }
 
   private parseIntWithUndefined(str: string | undefined) {
@@ -23,8 +23,11 @@ class ImageController {
       return undefined;
     }
   }
+
+  // FIXME no caching at all right now
   public async getOneImage(ctx: Context, id: number) {
-    const filename = (await this.repository.findOne(id))?.filename;
+    const repository = await this.repository();
+    const filename = (await repository.findOne(id))?.filename;
     if (filename) {
       const resolved = `${PHOTOS_DIR}/${filename}`;
       let width = this.parseIntWithUndefined(ctx.query.width);
