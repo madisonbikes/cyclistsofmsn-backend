@@ -2,7 +2,7 @@ import { Context } from "koa";
 import { Repository } from "typeorm";
 import { getRepository } from "../connection";
 import { Image } from "../entity/Image";
-import { PHOTOS_DIR } from "../env";
+import env from "../env";
 import sharp from "sharp";
 
 class ImageController {
@@ -29,7 +29,7 @@ class ImageController {
     const repository = await this.repository();
     const filename = (await repository.findOne(id))?.filename;
     if (filename) {
-      const resolved = `${PHOTOS_DIR}/${filename}`;
+      const resolved = `${env.photos_dir}/${filename}`;
       let width = this.parseIntWithUndefined(ctx.query.width);
       const height = this.parseIntWithUndefined(ctx.query.height);
       if (!width && !height) {
