@@ -1,18 +1,13 @@
 import { Context } from "koa";
-import { Repository } from "typeorm";
-import { getRepository } from "../connection";
 import { Image } from "../entity/Image";
-import env from "../env";
+import { configuration } from "../config";
+import { database } from "../database";
 import sharp from "sharp";
 
 class ImageController {
-  async repository(): Promise<Repository<Image>> {
-    return getRepository(Image);
-  }
-
   public async getImageList(ctx: Context) {
     ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-    const repository = await this.repository();
+    const repository = await database.getRepository(Image);
     ctx.body = await repository.find();
   }
 
@@ -26,10 +21,10 @@ class ImageController {
 
   // FIXME no caching at all right now
   public async getOneImage(ctx: Context, id: number) {
-    const repository = await this.repository();
+    const repository = await database.getRepository(Image);
     const filename = (await repository.findOne(id))?.filename;
     if (filename) {
-      const resolved = `${env.photos_dir}/${filename}`;
+      const resolved = `${configuration.photos_dir}/${filename}`;
       let width = this.parseIntWithUndefined(ctx.query.width);
       const height = this.parseIntWithUndefined(ctx.query.height);
       if (!width && !height) {

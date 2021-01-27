@@ -1,13 +1,20 @@
 import axios from "axios";
-import config from "./env";
+import { configuration } from "./config";
 import path from "path";
-const photos = path.resolve(__dirname, "../test_photos");
-config.photos_dir = photos;
+import { database } from "./database";
 
-import server from "./server";
+const photos = path.resolve(__dirname, "../test_photos");
+configuration.photos_dir = photos;
+configuration.database_definition = "test";
+
+import { server } from "./server";
 
 afterAll(() => {
   server.close();
+});
+
+afterEach(() => {
+  database.close();
 });
 
 test("hit image list api", async () => {

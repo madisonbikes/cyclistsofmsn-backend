@@ -2,10 +2,10 @@ import { Connection } from "typeorm";
 import { Image } from "./entity/Image";
 import fs from "fs";
 import path from "path";
-import config from "./env";
+import { configuration } from "./config";
 
 export async function scan(connection: Connection): Promise<void> {
-  fs.readdir(config.photos_dir, (err, files) => {
+  fs.readdir(configuration.photos_dir, (err, files) => {
     const filteredFiles = files.filter((value) => {
       const extension = path.parse(value).ext.toLowerCase();
       return [".jpg", ".png"].includes(extension);
