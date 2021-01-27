@@ -17,7 +17,7 @@ class Database {
     const connection = await createConnection(
       configuration.database_definition
     );
-    scan(connection);
+    await scan(connection);
     this.connection = connection;
     return connection;
   }
