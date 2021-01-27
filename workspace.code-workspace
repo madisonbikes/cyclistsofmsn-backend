@@ -3,10 +3,5 @@
 		{
 			"path": "."
 		}
-	],
-	"settings": {
-		"prettier.packageManager": "yarn",
-		"eslint.codeActionsOnSave.mode": "problems",
-		"eslint.packageManager": "yarn"
-	}
+	]
 }

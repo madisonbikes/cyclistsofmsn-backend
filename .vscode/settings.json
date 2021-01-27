@@ -4,8 +4,5 @@
   },
   "files.exclude": {
     "node_modules": true
-  },
-  "prettier.packageManager": "yarn",
-  "eslint.codeActionsOnSave.mode": "problems",
-  "eslint.packageManager": "yarn"
+  }
 }
