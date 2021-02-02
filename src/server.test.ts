@@ -5,10 +5,8 @@ import { database } from "./database";
 import { server } from "./server";
 
 beforeAll(async () => {
-  const photos = path.resolve(__dirname, "../test_photos");
-
-  configuration.photos_dir = photos;
-  configuration.mongo_uri = "mongodb://localhost:27017/test";
+  configuration.photos_dir = path.resolve(__dirname, "../test_photos");;
+  configuration.mongo_uri = process.env.MONGO_URL!;
 
   await database.connect();
   server.start();
