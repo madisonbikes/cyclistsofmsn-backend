@@ -2,19 +2,21 @@ import axios from "axios";
 import { configuration } from "./config";
 import path from "path";
 import { database } from "./database";
-
-const photos = path.resolve(__dirname, "../test_photos");
-configuration.photos_dir = photos;
-configuration.database_definition = "test";
-
 import { server } from "./server";
 
-afterAll(() => {
-  server.close();
+beforeAll(async () => {
+  const photos = path.resolve(__dirname, "../test_photos");
+
+  configuration.photos_dir = photos;
+  configuration.mongo_uri = "mongodb://localhost:27017/test";
+
+  await database.connect();
+  server.start();
 });
 
-afterEach(() => {
-  database.close();
+afterAll(async () => {
+  server.stop();
+  await database.disconnect();
 });
 
 test("hit image list api", async () => {

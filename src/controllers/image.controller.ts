@@ -1,14 +1,15 @@
 import { Context } from "koa";
-import { Image } from "../entity/Image";
 import { configuration } from "../config";
-import { database } from "../database";
 import sharp from "sharp";
+import { Image } from "../schema/images.model";
 
 class ImageController {
   public async getImageList(ctx: Context) {
     ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-    const repository = await database.getRepository(Image);
-    ctx.body = await repository.find();
+    const images = await Image.find().exec();
+    ctx.body = images.map(doc => {
+      return { id: doc.id, filename: doc.filename };
+    });
   }
 
   private parseIntWithUndefined(str: string | undefined) {
@@ -20,9 +21,8 @@ class ImageController {
   }
 
   // FIXME no caching at all right now
-  public async getOneImage(ctx: Context, id: number) {
-    const repository = await database.getRepository(Image);
-    const filename = (await repository.findOne(id))?.filename;
+  public async getOneImage(ctx: Context, id: string) {
+    const filename = (await Image.findById(id))?.filename;
     if (filename) {
       const resolved = `${configuration.photos_dir}/${filename}`;
       let width = this.parseIntWithUndefined(ctx.query.width);

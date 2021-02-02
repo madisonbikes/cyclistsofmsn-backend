@@ -1,24 +1,23 @@
-import { Connection } from "typeorm";
-import { Image } from "./entity/Image";
 import fs from "fs";
 import path from "path";
 import { configuration } from "./config";
 import { promisify } from "util";
+import { Image } from "./schema/images.model";
 
 const readdir = promisify(fs.readdir);
 
-export async function scan(connection: Connection): Promise<void> {
+export async function scan(): Promise<void> {
   const files = await readdir(configuration.photos_dir);
   const filteredFiles = files.filter((value) => {
     const extension = path.parse(value).ext.toLowerCase();
     return [".jpg", ".png"].includes(extension);
   });
-  await handleImages(connection, filteredFiles);
+  await handleImages(filteredFiles);
 }
 
-async function handleImages(connection: Connection, files: string[]) {
-  const repository = connection.getRepository(Image);
-  const dbFiles = await repository.find();
+async function handleImages(files: string[]) {
+
+  const dbFiles = await Image.find().exec();
   const matchedFiles: string[] = [];
   const filesToAdd: string[] = [];
 
@@ -39,15 +38,14 @@ async function handleImages(connection: Connection, files: string[]) {
   // actually remove cruft
   for await (const element of dbCruft) {
     console.log(`removing cruft db image ${element.filename}`);
-    await repository.delete(element.id);
+    await Image.deleteOne({ _id: element.id });
   }
 
   // insert new items
   for await (const newItem of filesToAdd) {
     console.log(`adding new image ${newItem}`);
-    const newImage = new Image();
-    newImage.filename = newItem;
-    await repository.insert(newImage);
+    const newImage = new Image({ filename: newItem })
+    await newImage.save();
   }
   console.log("Scan complete");
 }

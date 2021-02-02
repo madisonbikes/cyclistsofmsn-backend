@@ -1,49 +1,32 @@
-import {
-  Connection,
-  createConnection,
-  Repository,
-  EntityTarget,
-} from "typeorm";
-
 import { scan } from "./scan";
 import { configuration } from "./config";
+import mongoose, { Mongoose } from "mongoose";
 
 class Database {
-  connection: Connection | undefined;
+  private connection: Mongoose | undefined;
 
-  async connect(): Promise<Connection> {
-    this.close();
-
-    const connection = await createConnection(
-      configuration.database_definition
-    );
-    await scan(connection);
-    this.connection = connection;
-    return connection;
+  async reconnect() {
+    await this.disconnect()
+    await this.connect()
   }
 
-  close(): void {
-    this.connection?.close();
-    this.connection = undefined;
+  async connect() {
+    if(this.connection) return
+    this.connection = await mongoose.connect(configuration.mongo_uri, {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+      useUnifiedTopology: true
+    });
+    await scan();
   }
 
-  async getRepository<Entity>(
-    target: EntityTarget<Entity>
-  ): Promise<Repository<Entity>> {
-    const connection = await this.ensureConnected();
-    return connection.getRepository(target);
-  }
-
-  private async ensureConnected(): Promise<Connection> {
-    let connection: Connection;
-    if (!this.connection || !this.connection.isConnected) {
+  async disconnect() {
+    if (this.connection) {
+      await this.connection.disconnect();
       this.connection = undefined;
-      connection = await this.connect();
-    } else {
-      connection = this.connection;
     }
-    return connection;
   }
 }
 
-export const database = new Database();
+export const database = new Database()
