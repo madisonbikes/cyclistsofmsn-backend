@@ -12,7 +12,7 @@ class Database {
 
   async connect() {
     if(this.connection) return
-    this.connection = await mongoose.connect(configuration.mongo_uri, {
+    this.connection = await mongoose.connect(configuration.mongodb_uri, {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,

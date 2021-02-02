@@ -6,7 +6,7 @@ class ServerConfiguration {
   public photos_dir = process.env.PHOTOS_DIR || "photos";
   public react_static_root_dir: string | undefined =
     process.env.STATIC_ROOT_DIR;
-  public mongo_uri = process.env.MONGO_URI || "mongodb://localhost:27017/cyclists_of_msn";
+  public mongodb_uri = process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
 }
 
 // from dotenv samples:

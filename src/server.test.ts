@@ -6,7 +6,7 @@ import { server } from "./server";
 
 beforeAll(async () => {
   configuration.photos_dir = path.resolve(__dirname, "../test_photos");;
-  configuration.mongo_uri = process.env.MONGO_URL!;
+  configuration.mongodb_uri = process.env.MONGO_URL!;
 
   await database.connect();
   server.start();
