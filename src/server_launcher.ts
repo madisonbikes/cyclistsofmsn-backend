@@ -1,10 +1,10 @@
 import { database } from "./database";
-import { startupServer } from "./server";
-
-function handleError(e: unknown) {
-  console.log(e);
-}
+import { server } from "./server";
 
 database.connect()
-  .then(startupServer)
-  .catch(handleError);
+  .then(() => {
+    server.start()
+  })
+  .catch((error) => {
+    console.log(error);
+  });
