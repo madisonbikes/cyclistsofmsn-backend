@@ -6,5 +6,5 @@ database.connect()
     server.start()
   })
   .catch((error) => {
-    console.log(error);
+    console.error(error);
   });

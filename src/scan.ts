@@ -37,15 +37,15 @@ async function handleImages(files: string[]) {
 
   // actually remove cruft
   for await (const element of dbCruft) {
-    console.log(`removing cruft db image ${element.filename}`);
+    console.debug(`removing cruft db image ${element.filename}`);
     await Image.deleteOne({ _id: element.id });
   }
 
   // insert new items
   for await (const newItem of filesToAdd) {
-    console.log(`adding new image ${newItem}`);
+    console.debug(`adding new image ${newItem}`);
     const newImage = new Image({ filename: newItem })
     await newImage.save();
   }
-  console.log("Scan complete");
+  console.info("Scan complete");
 }
