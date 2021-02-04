@@ -1,10 +1,8 @@
 {
-  "extends": "@tsconfig/node10/tsconfig.json",
+  "extends": "@tsconfig/node14/tsconfig.json",
 
   "compilerOptions": {
     "preserveConstEnums": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true

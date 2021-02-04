@@ -12,6 +12,7 @@ class Database {
 
   async connect() {
     if(this.connection) return
+    console.debug(`connecting to mongodb at ${configuration.mongodb_uri}`)
     this.connection = await mongoose.connect(configuration.mongodb_uri, {
       useNewUrlParser: true,
       useCreateIndex: true,
