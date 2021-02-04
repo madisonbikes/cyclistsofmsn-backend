@@ -1,13 +1,10 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { configuration } from "./config";
-import { promisify } from "util";
 import { Image } from "./schema/images.model";
 
-const readdir = promisify(fs.readdir);
-
 export async function scan(): Promise<void> {
-  const files = await readdir(configuration.photos_dir);
+  const files = await fs.readdir(configuration.photos_dir);
   const filteredFiles = files.filter((value) => {
     const extension = path.parse(value).ext.toLowerCase();
     return [".jpg", ".png"].includes(extension);
