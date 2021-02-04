@@ -13,6 +13,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 12,
   },
-  plugins: ["@typescript-eslint"],
-  rules: {},
+  plugins: ["@typescript-eslint", "no-autofix"],
+  rules: {
+      "prefer-const": "off",
+      "no-autofix/prefer-const": "error"
+  },
 };
