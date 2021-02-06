@@ -1,1 +1,1 @@
-import { IImageDocument, IImageModel} from "./images.types";
+import { ImageDocument, ImageModel } from "./images.types";

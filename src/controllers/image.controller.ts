@@ -6,14 +6,14 @@ import { Image } from "../schema/images.model";
 class ImageController {
   public async getImageList(ctx: Context) {
     ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-    const images = await Image.find().exec();
+    const images = await Image.find({deleted: false});
     ctx.body = images.map(doc => {
       return { id: doc.id, filename: doc.filename };
     });
   }
 
-  private parseIntWithUndefined(str: string | undefined) {
-    if (str) {
+  private static parseIntWithUndefined(str: string | undefined) {
+    if (str !== undefined) {
       return parseInt(str);
     } else {
       return undefined;
@@ -22,11 +22,15 @@ class ImageController {
 
   // FIXME no caching at all right now
   public async getOneImage(ctx: Context, id: string) {
-    const filename = (await Image.findById(id))?.filename;
-    if (filename) {
+    const filename = (await
+      Image.findById(id)
+        .and([{deleted: false}])
+    )
+      ?.filename;
+    if (filename !== undefined) {
       const resolved = `${configuration.photos_dir}/${filename}`;
-      let width = this.parseIntWithUndefined(ctx.query.width);
-      const height = this.parseIntWithUndefined(ctx.query.height);
+      let width = ImageController.parseIntWithUndefined(ctx.query.width);
+      const height = ImageController.parseIntWithUndefined(ctx.query.height);
       if (!width && !height) {
         width = 1024;
       }
