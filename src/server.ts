@@ -6,7 +6,7 @@ import { configuration } from "./config";
 import { Server } from "http";
 
 class ApiServer {
-  private server: Server | undefined;
+  private server?: Server;
 
   start() {
     const app = new Koa();

@@ -3,7 +3,7 @@ import { configuration } from "./config";
 import mongoose, { Mongoose } from "mongoose";
 
 class Database {
-  private connection: Mongoose | undefined;
+  private connection?: Mongoose;
 
   async reconnect() {
     await this.disconnect()

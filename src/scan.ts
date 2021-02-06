@@ -2,7 +2,6 @@
 import { Image } from "./schema/images.model";
 import { ImageDocument } from "./schema/images.types";
 import { repository }  from "./fs_repository"
-import { Tags } from "exifreader";
 
 export async function scan(): Promise<void> {
   const files = await repository.imageFiles()
@@ -43,7 +42,7 @@ export async function scan(): Promise<void> {
     const filename = image.filename
 
     const newTimestamp = await repository.timestamp(filename)
-    if(image.timestamp?.getTime() != newTimestamp.getTime()) {
+    if(image.timestamp?.getTime() !== newTimestamp.getTime()) {
       console.debug(`updating existing image ${filename}`)
       image.timestamp = newTimestamp
       image.exif = await repository.exif(filename)
@@ -57,6 +56,6 @@ export async function scan(): Promise<void> {
 async function markImageRemoved(image: ImageDocument) {
   console.debug(`marking cruft db image ${image.filename}`);
   image.deleted = true;
-  image.timestamp = null;
+  image.timestamp = undefined;
   await image.save()
 }

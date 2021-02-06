@@ -5,7 +5,7 @@ export type ImageExifTags = Tags & IccTags & XmpTags;
 
 export interface Image {
   filename: string,
-  timestamp: Date | null,
+  timestamp?: Date,
   exif: ImageExifTags,
   deleted: boolean
 }

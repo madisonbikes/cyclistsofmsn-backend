@@ -34,7 +34,7 @@ class FilesystemRepository {
     return stat.mtime;
   }
 
-  private photoPath(baseFilename: string): string {
+  photoPath(baseFilename: string): string {
     return `${this.baseDirectory}/${baseFilename}`;
   }
 }
