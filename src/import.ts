@@ -40,25 +40,35 @@ async function perform_import() {
 
   await database.connect();
 
-  let count = 0
-  let placeholders = 0
+  let count = 0;
+  let placeholders = 0;
   for await (const p of posts) {
     let image = await Image.findOne({ filename: p.filename });
     if (!image) {
-      const newImage = new Image()
-      newImage.filename = p.filename
-      newImage.deleted = true
-      image = await newImage.save()
+      // create a deleted, placeholder image
+      const newImage = new Image();
+      newImage.filename = p.filename;
+      newImage.deleted = true;
+      image = await newImage.save();
       placeholders++;
     }
+    // delete any existing posts that match this exactly
     await PostHistory.deleteMany({ image_id: image.id, timestamp: p.date });
-    const newDoc = new PostHistory({ image_id: image.id, timestamp: p.date });
+
+    const newDoc = new PostHistory();
+    newDoc.image_id = image.id;
+    newDoc.timestamp = p.date;
+    newDoc.destination = { target: "twitter_legacy" };
     await newDoc.save();
-    count++
+
+    count++;
   }
-  console.info(`Imported ${count} posts, added ${placeholders} placeholder images.`)
-  await database.disconnect()
+  console.info(`Imported ${count} posts, added ${placeholders} placeholder images.`);
+
+  // and we're done
+  await database.disconnect();
   /*
+  // sample query to get list of posts
   const results = await PostHistory.aggregate([
     { $group: { _id: `$image_id`, count: { $sum: 1 } } },
     { $sort: { count: 1 } }
