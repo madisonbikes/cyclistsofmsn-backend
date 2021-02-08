@@ -1,9 +1,9 @@
-import { database } from "./database";
 import { server } from "./server";
 
-database.connect()
+/** launches server. this syntax allows server startup to run as async function */
+Promise.resolve()
   .then(() => {
-    server.start()
+    return server.start();
   })
   .catch((error) => {
     console.error(error);

@@ -4,11 +4,16 @@ import serve from "koa-static";
 import { router } from "./router";
 import { configuration } from "./config";
 import { Server } from "http";
+import { scan } from "./scan";
+import { database } from "./database";
 
 class ApiServer {
   private server?: Server;
 
-  start() {
+  async start() {
+    await database.connect()
+    await scan()
+
     const app = new Koa();
     app.use(logger());
 

@@ -23,8 +23,8 @@ class FilesystemRepository {
     const path = this.photoPath(baseFilename);
     const fileData = await fs.readFile(path);
     const retval = exifReader.load(fileData);
-    delete retval.MakerNote
-    delete retval["Thumbnail"]
+    delete retval.MakerNote;
+    delete retval["Thumbnail"];
     return retval;
   }
 
@@ -39,5 +39,6 @@ class FilesystemRepository {
   }
 }
 
-
-export const repository = new FilesystemRepository(configuration.photos_dir);
+export function repository(): FilesystemRepository {
+  return new FilesystemRepository(configuration.photos_dir);
+}

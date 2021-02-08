@@ -21,7 +21,7 @@ class ImageController {
       ?.filename;
     if (filename === undefined) return;
 
-    const imageFile = repository.photoPath(filename);
+    const imageFile = repository().photoPath(filename);
 
     let width = safeParseInt(ctx.query.width);
     const height = safeParseInt(ctx.query.height);

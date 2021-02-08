@@ -5,11 +5,10 @@ import { database } from "./database";
 import { server } from "./server";
 
 beforeAll(async () => {
-  configuration.photos_dir = path.resolve(__dirname, "../test_photos");;
+  configuration.photos_dir = path.resolve(__dirname, "../test_resources");;
   configuration.mongodb_uri = process.env.MONGO_URL!;
 
-  await database.connect();
-  server.start();
+  await server.start();
 });
 
 afterAll(async () => {

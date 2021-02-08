@@ -1,7 +1,7 @@
-import { scan } from "./scan";
 import { configuration } from "./config";
 import mongoose, { Mongoose } from "mongoose";
 
+/** provide unified access to database connection */
 class Database {
   private connection?: Mongoose;
 
@@ -19,7 +19,6 @@ class Database {
       useFindAndModify: false,
       useUnifiedTopology: true
     });
-    await scan();
   }
 
   async disconnect() {
