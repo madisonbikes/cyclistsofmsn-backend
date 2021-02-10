@@ -1,7 +1,8 @@
 import { Document, Model, ObjectId } from "mongoose";
+import { Image } from "./images.types";
 
 export interface PostHistory {
-  image_id: ObjectId,
+  image: ObjectId | Image,
   timestamp: Date,
   destination: unknown
 }

@@ -53,10 +53,10 @@ async function perform_import() {
       placeholders++;
     }
     // delete any existing posts that match this exactly
-    await PostHistory.deleteMany({ image_id: image.id, timestamp: p.date });
+    await PostHistory.deleteMany({ image: image.id, timestamp: p.date });
 
     const newDoc = new PostHistory();
-    newDoc.image_id = image.id;
+    newDoc.image = image._id;
     newDoc.timestamp = p.date;
     newDoc.destination = { target: "twitter_legacy" };
     await newDoc.save();
@@ -70,7 +70,7 @@ async function perform_import() {
   /*
   // sample query to get list of posts
   const results = await PostHistory.aggregate([
-    { $group: { _id: `$image_id`, count: { $sum: 1 } } },
+    { $group: { _id: `$image`, count: { $sum: 1 } } },
     { $sort: { count: 1 } }
   ]);
   console.log(JSON.stringify(results));

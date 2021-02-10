@@ -2,7 +2,6 @@ import { Context } from "koa";
 import sharp from "sharp";
 import { Image } from "../schema/images.model";
 import { repository } from "../fs_repository";
-import { PostHistory } from "../schema/post_history.model";
 
 class ImageController {
   public async getImageList(ctx: Context) {
