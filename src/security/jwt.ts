@@ -1,7 +1,9 @@
+/** exposes a JWT-checking middleware that combines the JWT extraction and parsing along with an optional authorization check */
 import jwks from "jwks-rsa";
 import jwt_internal from "koa-jwt";
-import compose from 'koa-compose'
+import compose from "koa-compose";
 import { jwtAuthz } from "./koa-jwt-authz";
+import Koa from "koa";
 
 const secret = jwks.koaJwtSecret({
   cache: true,
@@ -20,4 +22,10 @@ const jwt_first = jwt_internal(
   }
 );
 
-export const jwt = compose([jwt_first, jwtAuthz(["create:post"])]);
+export function jwt(requiredScopes: string[] = []): Koa.Middleware {
+  if (requiredScopes.length == 0) {
+    return jwt_first;
+  } else {
+    return compose([jwt_first, jwtAuthz(requiredScopes)]);
+  }
+}
