@@ -4,8 +4,8 @@ import path from "path";
 import parse from "date-fns/parse";
 
 import { database } from "./database";
-import { Image } from "./schema/images.model";
-import { PostHistory } from "./schema/post_history.model";
+import { Image } from "./database/images.model";
+import { PostHistory } from "./database/post_history.model";
 
 /** import post history from cyclists_of_msn logfile */
 Promise.resolve()

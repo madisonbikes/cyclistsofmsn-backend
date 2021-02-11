@@ -1,7 +1,7 @@
 import Koa from "koa";
 import logger from "koa-logger";
 import serve from "koa-static";
-import { router } from "./router";
+import { router } from "./routes";
 import { configuration } from "./config";
 import { Server } from "http";
 import { scan } from "./scan";

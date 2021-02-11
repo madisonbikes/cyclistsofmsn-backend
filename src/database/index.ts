@@ -1,4 +1,4 @@
-import { configuration } from "./config";
+import { configuration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
 
 /** provide unified access to database connection */

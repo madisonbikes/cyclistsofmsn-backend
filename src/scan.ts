@@ -1,5 +1,5 @@
-import { Image } from "./schema/images.model";
-import { ImageDocument } from "./schema/images.types";
+import { Image } from "./database/images.model";
+import { ImageDocument } from "./database/images.types";
 import { repository } from "./fs_repository";
 
 /** expose scanning operation.  requires database connection to be established */
