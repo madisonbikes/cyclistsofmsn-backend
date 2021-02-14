@@ -1,7 +1,7 @@
 import Router from "koa-router";
 import sharp from "sharp";
 import { Image } from "../../database/images.model";
-import { repository } from "../../fs_repository";
+import { photoPath } from "../../fs_repository"
 
 export const router = new Router({ prefix: "/images"});
 router.get("/", async (ctx) => {
@@ -20,7 +20,7 @@ router.get("/:id", async (ctx) => {
     ?.filename;
   if (filename === undefined) return;
 
-  const imageFile = repository().photoPath(filename);
+  const imageFile = photoPath(filename);
 
   let width = safeParseInt(ctx.query.width);
   const height = safeParseInt(ctx.query.height);

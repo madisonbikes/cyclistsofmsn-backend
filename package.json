@@ -8,7 +8,7 @@
     "start": "ts-node src/server_launcher.ts",
     "dev": "ts-node-dev src/server_launcher.ts",
     "test": "npx jest --watchAll",
-    "import": "ts-node src/import.ts test_resources/post_history.log"
+    "import": "ts-node src/legacy_import.ts test_resources/post_history.log"
   },
   "author": "Ben Sandee",
   "license": "Apache-2.0",

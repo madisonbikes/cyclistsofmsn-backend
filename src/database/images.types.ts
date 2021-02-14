@@ -1,12 +1,9 @@
 import { Document, Model } from "mongoose";
-import { IccTags, Tags, XmpTags } from "exifreader";
-
-export type ImageExifTags = Tags & IccTags & XmpTags;
 
 export interface Image {
   filename: string,
-  timestamp?: Date,
-  exif: ImageExifTags,
+  fs_timestamp?: Date,
+  exif_createdon?: Date,
   deleted: boolean
 }
 

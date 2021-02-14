@@ -1,3 +1,7 @@
+/**
+ * Standalone import tool for old posts from the old log file.
+ * This can be removed once old site is out of production.
+ */
 import rl from "readline";
 import fs from "fs";
 import path from "path";
@@ -6,6 +10,7 @@ import parse from "date-fns/parse";
 import { database } from "./database";
 import { Image } from "./database/images.model";
 import { PostHistory } from "./database/post_history.model";
+import { PostStatus } from "./database/post_history.types";
 
 /** import post history from cyclists_of_msn logfile */
 Promise.resolve()
@@ -58,7 +63,8 @@ async function perform_import() {
     const newDoc = new PostHistory();
     newDoc.image = image._id;
     newDoc.timestamp = p.date;
-    newDoc.destination = { target: "twitter_legacy" };
+    newDoc.status.flag = PostStatus.COMPLETE;
+    newDoc.status.uri = "twitter";
     await newDoc.save();
 
     count++;

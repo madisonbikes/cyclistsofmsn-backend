@@ -2,17 +2,21 @@ import axios from "axios";
 import { configuration } from "./config";
 import path from "path";
 import { database } from "./database";
-import { server } from "./server";
+import { startServer } from "./server";
+import { Server } from "http";
+
+let testServer: Server;
 
 beforeAll(async () => {
-  configuration.photos_dir = path.resolve(__dirname, "../test_resources");;
+  configuration.photos_dir = path.resolve(__dirname, "../test_resources");
   configuration.mongodb_uri = process.env.MONGO_URL!;
 
-  await server.start();
+  testServer = await startServer();
 });
 
 afterAll(async () => {
-  server.stop();
+  testServer.close();
+
   await database.disconnect();
 });
 

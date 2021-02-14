@@ -1,11 +1,12 @@
 import { Image } from "./database/images.model";
 import { ImageDocument } from "./database/images.types";
-import { repository } from "./fs_repository";
+import { timestamp, imageFiles, exif } from "./fs_repository";
+import { StringArrayTag } from "exifreader";
+import parseDate from "date-fns/parse";
 
 /** expose scanning operation.  requires database connection to be established */
 export async function scan(): Promise<void> {
-  const repo = repository()
-  const files = await repo.imageFiles();
+  const files = await imageFiles();
   const dbFiles = await Image.find().exec();
   const matchedFiles: ImageDocument[] = [];
   const filesToAdd: string[] = [];
@@ -34,19 +35,22 @@ export async function scan(): Promise<void> {
   for await (const filename of filesToAdd) {
     console.debug(`adding new image ${filename}`);
     const newImage = new Image({ filename: filename });
-    newImage.timestamp = await repo.timestamp(filename);
-    newImage.exif = await repo.exif(filename);
+    newImage.fs_timestamp = await timestamp(filename);
+    const dateTime = (await exif(filename)).DateTimeOriginal;
+    newImage.exif_createdon = parseImageTag(dateTime);
+    newImage.update()
     await newImage.save();
   }
 
   for await (const image of matchedFiles) {
     const filename = image.filename;
 
-    const newTimestamp = await repo.timestamp(filename);
-    if (image.timestamp?.getTime() !== newTimestamp.getTime()) {
+    const newTimestamp = await timestamp(filename);
+    if (image.fs_timestamp?.getTime() !== newTimestamp.getTime()) {
       console.debug(`updating existing image ${filename}`);
-      image.timestamp = newTimestamp;
-      image.exif = await repo.exif(filename);
+      image.fs_timestamp = newTimestamp;
+      const dateTime = (await exif(filename)).DateTimeOriginal;
+      image.exif_createdon = parseImageTag(dateTime);
       await image.save();
     }
 
@@ -54,9 +58,16 @@ export async function scan(): Promise<void> {
   console.info("Scan complete");
 }
 
+function parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
+  if (!tag || tag.value.length === 0) {
+    return undefined;
+  }
+  return parseDate(tag?.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
+}
+
 async function markImageRemoved(image: ImageDocument) {
   console.debug(`marking cruft db image ${image.filename}`);
   image.deleted = true;
-  image.timestamp = undefined;
+  image.fs_timestamp = undefined;
   await image.save();
 }
