@@ -6,22 +6,24 @@ import { configuration } from "./config";
 import { Server } from "http";
 import { scan } from "./scan";
 import { database } from "./database";
+import { scheduleNextPost } from "./scheduler";
 
 export async function startServer(): Promise<Server> {
   await database.connect();
   await scan();
+  await scheduleNextPost();
 
   const app = new Koa();
   app.use(logger());
 
   // in production mode, serve the production React app from here
-  if (configuration.react_static_root_dir) {
-    app.use(serve(configuration.react_static_root_dir));
+  if (configuration.reactStaticRootDir) {
+    app.use(serve(configuration.reactStaticRootDir));
   }
   app.use(router.routes());
   app.use(router.allowedMethods());
 
-  return app.listen(configuration.server_port, () => {
-    console.log(`Server is listening on port ${configuration.server_port}`);
+  return app.listen(configuration.serverPort, () => {
+    console.log(`Server is listening on port ${configuration.serverPort}`);
   });
 }

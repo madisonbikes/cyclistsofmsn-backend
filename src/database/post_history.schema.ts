@@ -24,6 +24,7 @@ export const PostHistorySchema = new Schema<PostHistoryDocument, PostHistoryMode
 
 PostHistorySchema.statics.findCurrentPost = async (): Promise<PostHistoryDocument | null> => {
   return PostHistory.findOne()
+    .where({ "status.flag": PostStatus.COMPLETE })
     .sort({ timestamp: "-1" })
     .populate("image", "deleted");
 };
@@ -38,4 +39,10 @@ PostHistorySchema.statics.findOrderedPosts = async () => {
       assert(post.image instanceof Image);
       return !post.image.deleted;
     });
+};
+
+PostHistorySchema.statics.findNextScheduledPost = async (): Promise<PostHistoryDocument | null> => {
+  return PostHistory.findOne()
+    .where({ "status.flag": PostStatus.PENDING })
+    .sort({ timestamp: "-1" })
 };

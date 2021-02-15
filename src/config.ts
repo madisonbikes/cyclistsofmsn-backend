@@ -2,10 +2,12 @@ import { config } from "dotenv";
 import { resolve } from "path";
 
 class ServerConfiguration {
-  public server_port = process.env.PORT || "3001";
-  public photos_dir = process.env.PHOTOS_DIR || "photos";
-  public react_static_root_dir?: string = process.env.STATIC_ROOT_DIR;
-  public mongodb_uri = process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
+  public serverPort = process.env.PORT || "3001";
+  public photosDir = process.env.PHOTOS_DIR || "photos";
+  public reactStaticRootDir?: string = process.env.STATIC_ROOT_DIR;
+  public mongodbUri = process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
+  public firstPostHour = 8
+  public lastPostHour = 16
 }
 
 // from dotenv samples:

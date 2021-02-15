@@ -8,8 +8,8 @@ import { Server } from "http";
 let testServer: Server;
 
 beforeAll(async () => {
-  configuration.photos_dir = path.resolve(__dirname, "../test_resources");
-  configuration.mongodb_uri = process.env.MONGO_URL!;
+  configuration.photosDir = path.resolve(__dirname, "../test_resources");
+  configuration.mongodbUri = process.env.MONGO_URL!;
 
   testServer = await startServer();
 });

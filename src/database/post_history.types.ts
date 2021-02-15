@@ -1,10 +1,11 @@
 import { Document, Model, ObjectId } from "mongoose";
-import { Image } from "./images.types";
+import { ImageDocument } from "./images.types";
 
 export enum PostStatus { PENDING = "pending", FAILED = "failed", COMPLETE = "complete" }
 
-export interface PostHistory {
-  image: ObjectId | Image,
+/** use "I" notation only to differentiate from model instance */
+interface IPostHistory {
+  image: ObjectId | ImageDocument,
   timestamp: Date,
   status: {
     flag: string,
@@ -13,11 +14,13 @@ export interface PostHistory {
   }
 }
 
-export interface PostHistoryDocument extends PostHistory, Document {
+export interface PostHistoryDocument extends IPostHistory, Document {
 }
 
 export interface PostHistoryModel extends Model<PostHistoryDocument> {
-  findCurrentPost(): PostHistoryDocument | undefined;
+  findCurrentPost(): Promise<PostHistoryDocument | undefined>;
 
-  findOrderedPosts(): PostHistoryDocument[];
+  findNextScheduledPost(): Promise<PostHistoryDocument | undefined>;
+
+  findOrderedPosts(): Promise<PostHistoryDocument[]>;
 }

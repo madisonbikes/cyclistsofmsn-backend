@@ -1,11 +1,12 @@
 import { Document, Model } from "mongoose";
 
-export interface Image {
+/** use "I" notation only to differentiate from model instance */
+interface IImage {
   filename: string,
   fs_timestamp?: Date,
   exif_createdon?: Date,
   deleted: boolean
 }
 
-export interface ImageDocument extends Image, Document {}
+export interface ImageDocument extends IImage, Document {}
 export type ImageModel = Model<ImageDocument>

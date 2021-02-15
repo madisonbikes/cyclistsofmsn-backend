@@ -3,7 +3,7 @@ import exifReader, { IccTags, Tags, XmpTags } from "exifreader";
 import fs from "fs/promises";
 import path from "path";
 
-const baseDirectory = configuration.photos_dir;
+const baseDirectory = configuration.photosDir;
 
 /** return list of base paths inside the fs repository. treat these as opaque tokens. */
 export async function imageFiles(): Promise<string[]> {
