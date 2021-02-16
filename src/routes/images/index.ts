@@ -1,9 +1,9 @@
 import Router from "koa-router";
 import sharp from "sharp";
 import { Image } from "../../database/images.model";
-import { photoPath } from "../../fs_repository"
+import { photoPath } from "../../fs_repository";
 
-export const router = new Router({ prefix: "/images"});
+export const router = new Router({ prefix: "/images" });
 router.get("/", async (ctx) => {
   ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
   const images = await Image.find({ deleted: false });

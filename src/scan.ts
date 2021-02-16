@@ -38,7 +38,7 @@ export async function scan(): Promise<void> {
     newImage.fs_timestamp = await timestamp(filename);
     const dateTime = (await exif(filename)).DateTimeOriginal;
     newImage.exif_createdon = parseImageTag(dateTime);
-    newImage.update()
+    newImage.update();
     await newImage.save();
   }
 
@@ -51,6 +51,7 @@ export async function scan(): Promise<void> {
       image.fs_timestamp = newTimestamp;
       const dateTime = (await exif(filename)).DateTimeOriginal;
       image.exif_createdon = parseImageTag(dateTime);
+      image.deleted = false;
       await image.save();
     }
 

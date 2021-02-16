@@ -18,7 +18,7 @@ export async function scheduleNextPost(): Promise<void> {
   if (!scheduledPost) {
     const newPost = await createNewScheduledPost();
     if(newPost.isRight()) {
-      console.error(`No scheduled post: ${newPost.value}`);
+      console.error(`No scheduled post: ${JSON.stringify(newPost.value)}`);
       return;
     }
     scheduledPost = newPost.value

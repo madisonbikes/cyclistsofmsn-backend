@@ -3,11 +3,13 @@ import exifReader, { IccTags, Tags, XmpTags } from "exifreader";
 import fs from "fs/promises";
 import path from "path";
 
-const baseDirectory = configuration.photosDir;
+function baseDirectory() {
+  return configuration.photosDir;
+}
 
 /** return list of base paths inside the fs repository. treat these as opaque tokens. */
 export async function imageFiles(): Promise<string[]> {
-  const files = await fs.readdir(baseDirectory);
+  const files = await fs.readdir(baseDirectory());
   const filteredFiles = files.filter((value) => {
     const extension = path.parse(value).ext.toLowerCase();
     return [".jpg", ".png"].includes(extension);
@@ -28,5 +30,5 @@ export async function timestamp(baseFilename: string): Promise<Date> {
 }
 
 export function photoPath(baseFilename: string): string {
-  return `${baseDirectory}/${baseFilename}`;
+  return `${baseDirectory()}/${baseFilename}`;
 }
