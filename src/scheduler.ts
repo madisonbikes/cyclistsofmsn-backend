@@ -9,15 +9,19 @@ import startOfToday from "date-fns/startOfToday";
 import { differenceInMinutes, isFuture, startOfTomorrow } from "date-fns";
 import { configuration } from "./config";
 import assert from "assert";
+import { Either, left, right } from "./either";
+
+type PostError = { message: string }
 
 export async function scheduleNextPost(): Promise<void> {
   let scheduledPost = await PostHistory.findNextScheduledPost();
   if (!scheduledPost) {
-    scheduledPost = await createNewScheduledPost();
-    if (!scheduledPost) {
-      console.error("No scheduled post.");
+    const newPost = await createNewScheduledPost();
+    if(newPost.isRight()) {
+      console.error(`No scheduled post: ${newPost.value}`);
       return;
     }
+    scheduledPost = newPost.value
     console.log(`Scheduled new post @ ${scheduledPost.timestamp}`);
   } else {
     console.log(`Using existing scheduled post @ ${scheduledPost.timestamp}`);
@@ -40,7 +44,6 @@ export async function scheduleNextPost(): Promise<void> {
 }
 
 let nextScheduledPost: PostHistoryDocument | undefined;
-
 async function doPost() {
   if (!nextScheduledPost) return;
 
@@ -54,35 +57,28 @@ async function doPost() {
   await scheduleNextPost();
 }
 
-async function createNewScheduledPost(): Promise<PostHistoryDocument | undefined> {
+async function createNewScheduledPost(): Promise<Either<PostHistoryDocument, PostError>> {
   const [lastPost, newImage] = await Promise.all([
     PostHistory.findCurrentPost(),
     selectNextPhoto()
-  ])
+  ]);
   const newPost = new PostHistory();
-  if (!newImage) {
-    return undefined;
+  if (newImage.isRight()) {
+    return right(newImage.value);
   }
-  newPost.image = newImage;
-
-  const newTime = await selectNextTime(lastPost?.timestamp);
-  if (!newTime) {
-    return undefined;
-  }
-
-  newPost.timestamp = newTime;
+  newPost.image = newImage.value;
+  newPost.timestamp = await selectNextTime(lastPost?.timestamp);
   newPost.status.flag = PostStatus.PENDING;
-  await newPost.save();
-  return newPost;
+  return left(await newPost.save());
 }
 
-async function selectNextPhoto(): Promise<ImageDocument | undefined> {
+async function selectNextPhoto(): Promise<Either<ImageDocument, PostError>> {
   const allImages = await Image.find().where({ deleted: false });
   if (allImages.length == 0) {
-    return undefined;
+    return right({ message: "no images" });
   }
   const randomIndex = randomInt(0, allImages.length);
-  return allImages[randomIndex];
+  return left(allImages[randomIndex]);
 }
 
 async function selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
