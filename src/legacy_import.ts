@@ -11,6 +11,7 @@ import { database } from "./database";
 import { Image } from "./database/images.model";
 import { PostHistory } from "./database/post_history.model";
 import { PostStatus } from "./database/post_history.types";
+import { logger } from "./utils/logger";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -35,7 +36,7 @@ type Post = { filename: string, date: Date }
 
 /** import post history from cyclists_of_msn logfile */
 export async function perform_import(logFile: string): Promise<number> {
-  console.info(`importing ${logFile}`);
+  logger.info(`importing ${logFile}`);
   const readInterface = rl.createInterface(fs.createReadStream(logFile));
   const posts: Post[] = [];
   readInterface.on("line", (data) => {
@@ -76,7 +77,7 @@ export async function perform_import(logFile: string): Promise<number> {
 
     count++;
   }
-  console.info(`Imported ${count} posts, added ${placeholders} placeholder images.`);
+  logger.info(`Imported ${count} posts, added ${placeholders} placeholder images.`);
 
   // and we're done
   await database.disconnect();

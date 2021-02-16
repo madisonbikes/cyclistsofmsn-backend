@@ -11,6 +11,7 @@ import { configuration } from "./config";
 import assert from "assert";
 import { Either, left, right } from "./utils/either";
 import { Cancellable, schedule } from "./utils/simple_scheduler";
+import { logger } from "./utils/logger";
 
 type PostError = { message: string }
 
@@ -19,13 +20,13 @@ export async function scheduleNextPost(now = new Date()): Promise<boolean> {
   if (!nextPost) {
     const createdPost = await createNewScheduledPost(now);
     if (createdPost.isRight()) {
-      console.error(`No scheduled post: ${JSON.stringify(createdPost.value)}`);
+      logger.error("No scheduled post", createdPost.value);
       return false;
     }
     nextPost = createdPost.value;
-    console.log(`Scheduled new post @ ${nextPost.timestamp}`);
+    logger.info(`Scheduled new post @ ${nextPost.timestamp}`);
   } else {
-    console.log(`Using existing scheduled post @ ${nextPost.timestamp}`);
+    logger.info(`Using existing scheduled post @ ${nextPost.timestamp}`);
   }
   await nextPost
     .populate("image")
@@ -36,10 +37,10 @@ export async function scheduleNextPost(now = new Date()): Promise<boolean> {
 
   let when = nextPost.timestamp.getTime() - Date.now();
   if (when <= 0) {
-    console.log(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, running in one minute`);
+    logger.info(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, running in one minute`);
     when = 60 * 1000;
   } else {
-    console.log(`Scheduling post of ${nextPost.image.filename} in ${Math.round(when / 1000 / 60)} minutes`);
+    logger.info(`Scheduling post of ${nextPost.image.filename} in ${Math.round(when / 1000 / 60)} minutes`);
   }
   scheduledPost = schedule(createPostFn(now, nextPost), when);
   return true;
@@ -57,7 +58,7 @@ let scheduledPost: Cancellable | undefined;
 function createPostFn(now: Date, post: PostHistoryDocument) {
   return async () => {
     assert(post.image instanceof Image);
-    console.log(`Posting ${post.image.filename} a new twitter!`);
+    logger.info(`Posting ${post.image.filename} a new twitter!`);
     post.status.flag = PostStatus.COMPLETE;
     await post.save();
 

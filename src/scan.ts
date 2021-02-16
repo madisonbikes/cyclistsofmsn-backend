@@ -3,6 +3,7 @@ import { ImageDocument } from "./database/images.types";
 import { timestamp, imageFiles, exif } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
 import parseDate from "date-fns/parse";
+import { logger } from "./utils/logger";
 
 /** expose scanning operation.  requires database connection to be established */
 export async function scan(): Promise<void> {
@@ -33,7 +34,7 @@ export async function scan(): Promise<void> {
 
   // insert new items
   for await (const filename of filesToAdd) {
-    console.debug(`adding new image ${filename}`);
+    logger.debug(`adding new image ${filename}`);
     const newImage = new Image({ filename: filename });
     newImage.fs_timestamp = await timestamp(filename);
     const dateTime = (await exif(filename)).DateTimeOriginal;
@@ -47,7 +48,7 @@ export async function scan(): Promise<void> {
 
     const newTimestamp = await timestamp(filename);
     if (image.fs_timestamp?.getTime() !== newTimestamp.getTime()) {
-      console.debug(`updating existing image ${filename}`);
+      logger.debug(`updating existing image ${filename}`);
       image.fs_timestamp = newTimestamp;
       const dateTime = (await exif(filename)).DateTimeOriginal;
       image.exif_createdon = parseImageTag(dateTime);
@@ -56,7 +57,7 @@ export async function scan(): Promise<void> {
     }
 
   }
-  console.info("Scan complete");
+  logger.info("Scan complete");
 }
 
 function parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
@@ -67,7 +68,7 @@ function parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
 }
 
 async function markImageRemoved(image: ImageDocument) {
-  console.debug(`marking cruft db image ${image.filename}`);
+  logger.debug(`marking cruft db image ${image.filename}`);
   image.deleted = true;
   image.fs_timestamp = undefined;
   await image.save();

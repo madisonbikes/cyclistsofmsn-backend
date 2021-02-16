@@ -1,5 +1,6 @@
 import { configuration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
+import { logger } from "../utils/logger";
 
 /** provide unified access to database connection */
 class Database {
@@ -12,10 +13,10 @@ class Database {
 
   async connect() {
     if(this.connection) {
-      console.debug(`already connected to mongodb at ${configuration.mongodbUri}`)
+      logger.debug(`already connected to mongodb at ${configuration.mongodbUri}`)
       return
     }
-    console.debug(`connecting to mongodb at ${configuration.mongodbUri}`)
+    logger.debug(`connecting to mongodb at ${configuration.mongodbUri}`)
     this.connection = await mongoose.connect(configuration.mongodbUri, {
       useNewUrlParser: true,
       useCreateIndex: true,
