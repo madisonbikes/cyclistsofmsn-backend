@@ -1,4 +1,5 @@
 import Koa from "koa";
+import koaQueryString from "koa-qs";
 import logger from "koa-logger";
 import serve from "koa-static";
 import { router } from "./routes";
@@ -14,6 +15,11 @@ export async function startServer(): Promise<Server> {
   await scheduleNextPost();
 
   const app = new Koa();
+
+  // for query strings, only the first value for the given parameter is passed
+  // to keep our APIs simple
+  koaQueryString(app, "first");
+
   app.use(logger());
 
   // in production mode, serve the production React app from here

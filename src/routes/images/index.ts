@@ -13,8 +13,9 @@ router.get("/", async (ctx) => {
 });
 
 router.get("/:id", async (ctx) => {
+  const id = ctx.params.id
   const filename = (await
-      Image.findById(ctx.params.id)
+      Image.findById(id)
         .and([{ deleted: false }])
   )
     ?.filename;
@@ -37,8 +38,8 @@ router.get("/:id", async (ctx) => {
   ctx.body = buffer;
 });
 
-function safeParseInt(value?: string): number | undefined {
-  if (value === undefined) {
+function safeParseInt(value: string | string[] | undefined): number | undefined {
+  if (!value) {
     return undefined;
   }
   const parsed = Number(value);
