@@ -55,10 +55,11 @@ async function doPost() {
 }
 
 async function createNewScheduledPost(): Promise<PostHistoryDocument | undefined> {
-  const lastPost = await PostHistory.findCurrentPost();
+  const [lastPost, newImage] = await Promise.all([
+    PostHistory.findCurrentPost(),
+    selectNextPhoto()
+  ])
   const newPost = new PostHistory();
-
-  const newImage = await selectNextPhoto();
   if (!newImage) {
     return undefined;
   }
