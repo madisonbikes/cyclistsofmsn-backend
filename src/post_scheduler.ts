@@ -9,55 +9,64 @@ import startOfToday from "date-fns/startOfToday";
 import { differenceInMinutes, isFuture, startOfTomorrow } from "date-fns";
 import { configuration } from "./config";
 import assert from "assert";
-import { Either, left, right } from "./either";
+import { Either, left, right } from "./utils/either";
+import { Cancellable, schedule } from "./utils/simple_scheduler";
 
 type PostError = { message: string }
 
-export async function scheduleNextPost(): Promise<void> {
-  let scheduledPost = await PostHistory.findNextScheduledPost();
-  if (!scheduledPost) {
-    const newPost = await createNewScheduledPost();
-    if(newPost.isRight()) {
-      console.error(`No scheduled post: ${JSON.stringify(newPost.value)}`);
-      return;
+export async function scheduleNextPost(now = new Date()): Promise<boolean> {
+  let nextPost = await PostHistory.findNextScheduledPost();
+  if (!nextPost) {
+    const createdPost = await createNewScheduledPost(now);
+    if (createdPost.isRight()) {
+      console.error(`No scheduled post: ${JSON.stringify(createdPost.value)}`);
+      return false;
     }
-    scheduledPost = newPost.value
-    console.log(`Scheduled new post @ ${scheduledPost.timestamp}`);
+    nextPost = createdPost.value;
+    console.log(`Scheduled new post @ ${nextPost.timestamp}`);
   } else {
-    console.log(`Using existing scheduled post @ ${scheduledPost.timestamp}`);
+    console.log(`Using existing scheduled post @ ${nextPost.timestamp}`);
   }
-  scheduledPost = await scheduledPost
+  await nextPost
     .populate("image")
     .execPopulate();
-  assert(scheduledPost.image instanceof Image);
+  assert(nextPost.image instanceof Image);
 
-  nextScheduledPost = scheduledPost;
-  const when = scheduledPost.timestamp.getTime() - Date.now();
+  clearSchedule();
+
+  let when = nextPost.timestamp.getTime() - Date.now();
   if (when <= 0) {
     console.log(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, running in one minute`);
-    setTimeout(doPost, 1000 * 60);
+    when = 60 * 1000;
   } else {
-    console.log(`Scheduling post of ${scheduledPost.image.filename} in ${Math.round(when / 1000 / 60)} minutes`);
-    setTimeout(doPost, when);
+    console.log(`Scheduling post of ${nextPost.image.filename} in ${Math.round(when / 1000 / 60)} minutes`);
   }
-
+  scheduledPost = schedule(createPostFn(now, nextPost), when);
+  return true;
 }
 
-let nextScheduledPost: PostHistoryDocument | undefined;
-async function doPost() {
-  if (!nextScheduledPost) return;
-
-  assert(nextScheduledPost.image instanceof Image);
-  console.log(`Posting ${nextScheduledPost.image.filename} a new twitter!`);
-  nextScheduledPost.status.flag = PostStatus.COMPLETE;
-  await nextScheduledPost.save();
-
-  nextScheduledPost = undefined;
-  // do the next post now
-  await scheduleNextPost();
+export function clearSchedule(): void {
+  if (scheduledPost) {
+    scheduledPost.cancel();
+    scheduledPost = undefined;
+  }
 }
 
-async function createNewScheduledPost(): Promise<Either<PostHistoryDocument, PostError>> {
+let scheduledPost: Cancellable | undefined;
+
+function createPostFn(now: Date, post: PostHistoryDocument) {
+  return async () => {
+    assert(post.image instanceof Image);
+    console.log(`Posting ${post.image.filename} a new twitter!`);
+    post.status.flag = PostStatus.COMPLETE;
+    await post.save();
+
+    // do the next post now
+    await scheduleNextPost(now);
+  };
+}
+
+async function createNewScheduledPost(now: Date): Promise<Either<PostHistoryDocument, PostError>> {
   const [lastPost, newImage] = await Promise.all([
     PostHistory.findCurrentPost(),
     selectNextPhoto()
@@ -67,7 +76,7 @@ async function createNewScheduledPost(): Promise<Either<PostHistoryDocument, Pos
     return right(newImage.value);
   }
   newPost.image = newImage.value;
-  newPost.timestamp = await selectNextTime(lastPost?.timestamp);
+  newPost.timestamp = await selectNextTime(lastPost?.timestamp, now);
   newPost.status.flag = PostStatus.PENDING;
   return left(await newPost.save());
 }
@@ -81,7 +90,7 @@ async function selectNextPhoto(): Promise<Either<ImageDocument, PostError>> {
   return left(allImages[randomIndex]);
 }
 
-async function selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
+async function selectNextTime(lastPostTime: Date | undefined, now: Date): Promise<Date> {
   const lastTimeToday = date_set(startOfToday(), { hours: configuration.lastPostHour });
 
   let startDate: Date;
@@ -94,7 +103,7 @@ async function selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
       startDate = startOfToday();
     }
   } else {
-    if (new Date() > lastTimeToday) {
+    if (now > lastTimeToday) {
       // can't post today any more, post tomorrow
       startDate = startOfTomorrow();
     } else {
@@ -106,7 +115,7 @@ async function selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
   const lastTime = date_set(startDate, { hours: configuration.lastPostHour });
 
   if (!isFuture(firstTime)) {
-    firstTime = new Date();
+    firstTime = now;
   }
   const diff = Math.abs(differenceInMinutes(firstTime, lastTime));
   const random_min = randomInt(0, diff);

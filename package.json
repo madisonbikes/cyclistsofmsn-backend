@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "description": "Cyclists of Madison REST API",
-  "main": "src/server_launcher.ts",
+  "main": "src/server.ts",
   "scripts": {
-    "start": "ts-node src/server_launcher.ts",
-    "dev": "ts-node-dev src/server_launcher.ts",
-    "test": "npx jest --watchAll",
+    "start": "ts-node src/server.ts",
+    "dev": "ts-node-dev src/server.ts",
+    "test": "npx jest --watchAll --detectOpenHandles",
     "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log"
   },
   "author": "Ben Sandee",

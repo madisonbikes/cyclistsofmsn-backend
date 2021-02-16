@@ -12,7 +12,7 @@ import { Image } from "./database/images.model";
 import { PostHistory } from "./database/post_history.model";
 import { PostStatus } from "./database/post_history.types";
 
-/** import post history from cyclists_of_msn logfile */
+/** expose command-line launcher */
 if (require.main === module) {
   if (process.argv.length != 3) {
     console.error("supply logfile as only argument");
@@ -28,12 +28,13 @@ if (require.main === module) {
     })
     .then(() => {
       process.exit(0);
-    })
+    });
 }
 
 type Post = { filename: string, date: Date }
 
-export async function perform_import(logFile: string): Promise<void> {
+/** import post history from cyclists_of_msn logfile */
+export async function perform_import(logFile: string): Promise<number> {
   console.info(`importing ${logFile}`);
   const readInterface = rl.createInterface(fs.createReadStream(logFile));
   const posts: Post[] = [];
@@ -87,4 +88,5 @@ export async function perform_import(logFile: string): Promise<void> {
   ]);
   console.log(JSON.stringify(results));
    */
+  return count;
 }

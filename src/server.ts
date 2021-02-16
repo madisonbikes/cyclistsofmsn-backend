@@ -7,9 +7,21 @@ import { configuration } from "./config";
 import { Server } from "http";
 import { scan } from "./scan";
 import { database } from "./database";
-import { scheduleNextPost } from "./scheduler";
+import { scheduleNextPost, clearSchedule } from "./post_scheduler";
 
-export async function startServer(): Promise<Server> {
+/** expose command-line launcher */
+if (require.main === module) {
+  /** launches server. this syntax allows server startup to run as async function */
+  Promise.resolve()
+    .then(() => {
+      return startServer();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+export async function startServer(): Promise<() => Promise<void>> {
   await database.connect();
   await scan();
   await scheduleNextPost();
@@ -29,7 +41,14 @@ export async function startServer(): Promise<Server> {
   app.use(router.routes());
   app.use(router.allowedMethods());
 
-  return app.listen(configuration.serverPort, () => {
+  const server = app.listen(configuration.serverPort, () => {
     console.log(`Server is listening on port ${configuration.serverPort}`);
   });
+
+  return async () => {
+    server.close()
+
+    await database.disconnect()
+    await clearSchedule()
+  }
 }
