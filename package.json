@@ -7,8 +7,8 @@
   "scripts": {
     "start": "ts-node src/server_launcher.ts",
     "dev": "ts-node-dev src/server_launcher.ts",
-    "test": "npx jest --watchAll --detectOpenHandles",
-    "import": "ts-node src/legacy_import.ts test_resources/post_history.log"
+    "test": "npx jest --watchAll",
+    "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log"
   },
   "author": "Ben Sandee",
   "license": "Apache-2.0",

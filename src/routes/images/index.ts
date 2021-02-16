@@ -38,7 +38,7 @@ router.get("/:id", async (ctx) => {
   ctx.body = buffer;
 });
 
-function safeParseInt(value: string | string[] | undefined): number | undefined {
+function safeParseInt(value: string | string[] | undefined) {
   if (!value) {
     return undefined;
   }
