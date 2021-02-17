@@ -2,7 +2,7 @@ import { PostHistory } from "./database/post_history.model";
 import { PostHistoryDocument, PostStatus } from "./database/post_history.types";
 import { ImageDocument } from "./database/images.types";
 import { Image } from "./database/images.model";
-import { randomInt } from "crypto";
+import { randomInt } from "./utils/random";
 import date_set from "date-fns/set";
 import date_add from "date-fns/add";
 import startOfToday from "date-fns/startOfToday";
