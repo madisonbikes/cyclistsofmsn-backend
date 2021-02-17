@@ -6,7 +6,7 @@ import { router } from "./routes";
 import { configuration } from "./config";
 import { scan } from "./scan";
 import { database } from "./database";
-import { scheduleNextPost, clearSchedule } from "./post_scheduler";
+import { startExecutor, stopExecutor } from "./post_executor";
 import { logger } from "./utils/logger";
 
 /** expose command-line launcher */
@@ -21,10 +21,11 @@ if (require.main === module) {
     });
 }
 
+/** returns async function that can be used to shutdown the server */
 export async function startServer(): Promise<() => Promise<void>> {
   await database.connect();
   await scan();
-  await scheduleNextPost();
+  await startExecutor();
 
   const app = new Koa();
 
@@ -53,8 +54,8 @@ export async function startServer(): Promise<() => Promise<void>> {
 
   return async () => {
     server.close();
+    await stopExecutor();
 
     await database.disconnect();
-    await clearSchedule();
   };
 }

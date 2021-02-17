@@ -8,94 +8,55 @@ import date_add from "date-fns/add";
 import startOfToday from "date-fns/startOfToday";
 import { differenceInMinutes, isFuture, startOfTomorrow } from "date-fns";
 import { configuration } from "./config";
-import assert from "assert";
-import { Either, left, right } from "./utils/either";
-import { Cancellable, schedule } from "./utils/simple_scheduler";
+import { Result, ok, error } from "./utils/result";
 import { logger } from "./utils/logger";
 
-type PostError = { message: string }
+export type PostResult = Result<PostHistoryDocument, PostError>
+export type PostError = { message: string }
 
-export async function scheduleNextPost(now = new Date()): Promise<boolean> {
-  let nextPost = await PostHistory.findNextScheduledPost();
-  if (!nextPost) {
-    const createdPost = await createNewScheduledPost(now);
-    if (createdPost.isRight()) {
-      logger.error("No scheduled post", createdPost.value);
-      return false;
-    }
-    nextPost = createdPost.value;
-    logger.info(`Scheduled new post @ ${nextPost.timestamp}`);
-  } else {
+export async function scheduleNextPost(now = new Date()): Promise<PostResult> {
+  const nextPost = await PostHistory.findNextScheduledPost();
+  if (nextPost != null) {
     logger.info(`Using existing scheduled post @ ${nextPost.timestamp}`);
+    return ok(nextPost);
   }
-  await nextPost
-    .populate("image")
-    .execPopulate();
-  assert(nextPost.image instanceof Image);
 
-  clearSchedule();
-
-  let when = nextPost.timestamp.getTime() - Date.now();
-  if (when <= 0) {
-    logger.info(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, running in one minute`);
-    when = 60 * 1000;
-  } else {
-    logger.info(`Scheduling post of ${nextPost.image.filename} in ${Math.round(when / 1000 / 60)} minutes`);
+  const createdPost = await createNewScheduledPost(now);
+  if (createdPost.isOk()) {
+    logger.info(`Scheduled new post @ ${createdPost.value.timestamp}`);
   }
-  scheduledPost = schedule(createPostFn(now, nextPost), when);
-  return true;
+  return createdPost;
 }
 
-export function clearSchedule(): void {
-  if (scheduledPost) {
-    scheduledPost.cancel();
-    scheduledPost = undefined;
-  }
-}
-
-let scheduledPost: Cancellable | undefined;
-
-function createPostFn(now: Date, post: PostHistoryDocument) {
-  return async () => {
-    assert(post.image instanceof Image);
-    logger.info(`Posting ${post.image.filename} a new twitter!`);
-    post.status.flag = PostStatus.COMPLETE;
-    await post.save();
-
-    // do the next post now
-    await scheduleNextPost(now);
-  };
-}
-
-async function createNewScheduledPost(now: Date): Promise<Either<PostHistoryDocument, PostError>> {
+async function createNewScheduledPost(now: Date): Promise<PostResult> {
   const [lastPost, newImage] = await Promise.all([
     PostHistory.findCurrentPost(),
     selectNextPhoto()
   ]);
   const newPost = new PostHistory();
-  if (newImage.isRight()) {
-    return right(newImage.value);
+  if (newImage.isError()) {
+    return error(newImage.value);
   }
   newPost.image = newImage.value;
   newPost.timestamp = await selectNextTime(lastPost?.timestamp, now);
   newPost.status.flag = PostStatus.PENDING;
-  return left(await newPost.save());
+  return ok(await newPost.save());
 }
 
-async function selectNextPhoto(): Promise<Either<ImageDocument, PostError>> {
+async function selectNextPhoto(): Promise<Result<ImageDocument, PostError>> {
   const allImages = await Image.find().where({ deleted: false });
   if (allImages.length == 0) {
-    return right({ message: "no images" });
+    return error({ message: "no images" });
   }
   const randomIndex = randomInt(0, allImages.length);
-  return left(allImages[randomIndex]);
+  return ok(allImages[randomIndex]);
 }
 
 async function selectNextTime(lastPostTime: Date | undefined, now: Date): Promise<Date> {
   const lastTimeToday = date_set(startOfToday(), { hours: configuration.lastPostHour });
 
   let startDate: Date;
-  if (lastPostTime) {
+  if (lastPostTime != null) {
     if (lastPostTime > startOfToday()) {
       // we already posted today
       startDate = startOfTomorrow();
