@@ -1,14 +1,27 @@
-import { createLogger, format, transports } from "winston";
+import { createLogger, transports, format } from "winston";
+
+const formatter = format.combine(
+  format.timestamp({
+    format: "YYYY-MM-DD HH:mm:ss"
+  }),
+  format.errors({ stack: true }),
+  format.printf(info => {
+    const { timestamp, level, stack } = info;
+    let { code, message } = info;
+
+    // print out http error code w/ a space if we have one
+    code = code ? ` ${code}` : "";
+    // print the stack if we have it, message otherwise.
+    message = stack || message;
+
+    return `${timestamp} ${level}${code}: ${message}`;
+  })
+);
 
 export const logger = createLogger({
+
   level: "debug",
-  format: format.combine(
-    format.timestamp({
-      format: "YYYY-MM-DD HH:mm:ss"
-    }),
-    format.errors({ stack: true }),
-    format.json()
-  ),
+  format: formatter,
   transports: [
     new transports.File({ filename: "errors.log", level: "error" })
   ]
@@ -22,7 +35,7 @@ if (process.env.NODE_ENV !== "production") {
   logger.add(new transports.Console({
     format: format.combine(
       format.colorize(),
-      format.simple()
+      formatter
     )
   }));
 }
