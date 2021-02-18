@@ -5,8 +5,7 @@ import { Image } from "./database/images.model";
 import { randomInt } from "./utils/random";
 import date_set from "date-fns/set";
 import date_add from "date-fns/add";
-import startOfToday from "date-fns/startOfToday";
-import { differenceInMinutes, isFuture, startOfTomorrow } from "date-fns";
+import { differenceInMinutes, startOfDay } from "date-fns/fp";
 import { configuration } from "./config";
 import { Result, ok, error } from "./utils/result";
 import { logger } from "./utils/logger";
@@ -53,30 +52,31 @@ async function selectNextPhoto(): Promise<Result<ImageDocument, PostError>> {
 }
 
 async function selectNextTime(lastPostTime: Date | undefined, now: Date): Promise<Date> {
-  const lastTimeToday = date_set(startOfToday(), { hours: configuration.lastPostHour });
+  const startOfToday = startOfDay(now);
+  const startOfTomorrow = date_add(startOfToday, { days: 1 });
+  const lastTimeToday = date_set(startOfToday, { hours: configuration.lastPostHour });
 
   let startDate: Date;
-  if (lastPostTime != null) {
-    if (lastPostTime > startOfToday()) {
+  if(now >= lastTimeToday) {
+    // no more posts today
+    startDate = startOfTomorrow;
+  } else if(lastPostTime != null) {
+    // there are previous posts
+    if (lastPostTime > startOfToday) {
       // we already posted today
-      startDate = startOfTomorrow();
+      startDate = startOfTomorrow;
     } else {
       // still need to post today
-      startDate = startOfToday();
+      startDate = startOfToday;
     }
   } else {
-    if (now > lastTimeToday) {
-      // can't post today any more, post tomorrow
-      startDate = startOfTomorrow();
-    } else {
-      // post today
-      startDate = startOfToday();
-    }
+    // no posts at all, post today
+    startDate = startOfToday;
   }
   let firstTime = date_set(startDate, { hours: configuration.firstPostHour });
   const lastTime = date_set(startDate, { hours: configuration.lastPostHour });
 
-  if (!isFuture(firstTime)) {
+  if (firstTime <= now) {
     firstTime = now;
   }
   const diff = Math.abs(differenceInMinutes(firstTime, lastTime));

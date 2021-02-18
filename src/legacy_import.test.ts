@@ -7,6 +7,13 @@ afterEach(async () => {
 });
 
 describe("test imports", () => {
+  beforeEach(async () => {
+      await database.connect();
+      await PostHistory.deleteMany();
+      await database.disconnect();
+    }
+  );
+
   it("should import many images", async () => {
     await expect(
       perform_import("./test_resources/test_post_history_325.log"))
@@ -14,6 +21,6 @@ describe("test imports", () => {
       .toBe(325);
 
     await expect(database.connect()).resolves.toBeUndefined();
-    await expect(PostHistory.find()).resolves.toHaveLength(325)
+    await expect(PostHistory.find()).resolves.toHaveLength(325);
   });
 });

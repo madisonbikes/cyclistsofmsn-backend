@@ -7,7 +7,7 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
-    "test": "npx jest --watchAll --detectOpenHandles",
+    "test": "npx jest --watchAll",
     "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log"
   },
   "author": "Ben Sandee",
