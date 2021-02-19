@@ -1,10 +1,18 @@
 import { configuration } from "../config";
-import { database } from "../database";
 import path from "path";
 import axios from "axios";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 configuration.photosDir = path.resolve(__dirname, "../../test_resources");
-// eslint-disable-next-line
-configuration.mongodbUri = process.env.MONGO_URL!;
-
 axios.defaults.baseURL = `http://localhost:${configuration.serverPort}`;
+
+let mongoServer: MongoMemoryServer;
+
+before(async () => {
+  mongoServer = new MongoMemoryServer();
+  configuration.mongodbUri = await mongoServer.getUri();
+});
+
+after(async () => {
+  await mongoServer.stop();
+});

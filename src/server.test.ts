@@ -1,35 +1,36 @@
 import axios from "axios";
+import { expect } from "chai";
 import { startServer } from "./server";
 
 let close: () => Promise<void> | undefined;
 
-beforeAll(async () => {
-  close = await startServer();
-});
-
-afterAll(async () => {
-  await close()
-});
-
-describe("server process", () => {
-
-  it("responds to image list api call", async () => {
-    const imageResponse = await axios.get("/images");
-    expect(imageResponse.status).toEqual(200);
-    expect(imageResponse.data.length).toEqual(5);
+describe("server process", function() {
+  before(async function () {
+    this.timeout(15000);
+    close = await startServer();
   });
 
-  it("response to single image api call", async () => {
+  after(async () => {
+    await close();
+  });
+
+  it("responds to image list api call", async function() {
+    const imageResponse = await axios.get("/images");
+    expect(imageResponse.status).eq(200);
+    expect(imageResponse.data.length).eq(5);
+  });
+
+  it("response to single image api call", async function() {
     const imageListResponse = await axios.get("/images");
-    expect(imageListResponse.status).toEqual(200);
-    expect(imageListResponse.data.length).toEqual(5);
+    expect(imageListResponse.status).eq(200);
+    expect(imageListResponse.data.length).eq(5);
 
     const id = imageListResponse.data[0].id;
     const imageResponse = await axios.get(`images/${id}`);
-    expect(imageResponse.status).toEqual(200);
+    expect(imageResponse.status).eq(200);
     const headers = imageResponse.headers;
     const type = headers["content-type"];
-    expect(type).toEqual("image/jpeg");
-    expect(imageResponse.data).toBeDefined();
+    expect(type).eq("image/jpeg");
+    expect(imageResponse.data).to.exist;
   });
 });

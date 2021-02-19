@@ -7,22 +7,23 @@ class Database {
   private connection?: Mongoose;
 
   async reconnect() {
-    await this.disconnect()
-    await this.connect()
+    await this.disconnect();
+    await this.connect();
   }
 
-  async connect() {
-    if(this.connection) {
-      logger.debug(`already connected to mongodb at ${configuration.mongodbUri}`)
-      return
+  async connect(): Promise<boolean> {
+    if (this.connection) {
+      logger.debug(`already connected to mongodb at ${configuration.mongodbUri}`);
+      return false;
     }
-    logger.debug(`connecting to mongodb at ${configuration.mongodbUri}`)
+    logger.debug(`connecting to mongodb at ${configuration.mongodbUri}`);
     this.connection = await mongoose.connect(configuration.mongodbUri, {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,
       useUnifiedTopology: true
     });
+    return true;
   }
 
   async disconnect() {
@@ -33,4 +34,4 @@ class Database {
   }
 }
 
-export const database = new Database()
+export const database = new Database();

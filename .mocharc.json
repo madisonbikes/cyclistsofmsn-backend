@@ -1,0 +1,9 @@
+{
+  "extension": [
+    "ts"
+  ],
+  "reporter": "spec",
+  "ui": "bdd",
+  "package": "package.json",
+  "file": ["src/test/test_setup.ts"]
+}

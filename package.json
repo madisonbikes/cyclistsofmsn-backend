@@ -7,7 +7,7 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
-    "test": "npx jest --watchAll",
+    "test": "npx ts-mocha 'src/**/*.ts' --exit",
     "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log"
   },
   "author": "Ben Sandee",
@@ -38,25 +38,31 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@shelf/jest-mongodb": "^1.2.3",
     "@tsconfig/node14": "^1.0.0",
-    "@types/jest": "^26.0.20",
+    "@types/chai": "^4.2.15",
+    "@types/expect": "^24.3.0",
     "@types/koa": "^2.11.7",
     "@types/koa-logger": "^3.1.1",
     "@types/koa-qs": "^2.0.0",
     "@types/koa-router": "^7.4.1",
     "@types/koa-static": "^4.0.1",
+    "@types/mocha": "^8.2.1",
     "@types/node": "^14.14.22",
+    "@types/proxyquire": "^1.3.28",
     "@types/sharp": "^0.27.1",
+    "@types/sinon": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
     "axios": "^0.21.1",
+    "chai": "^4.3.0",
     "eslint": "^7.19.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-no-autofix": "^1.0.2",
-    "jest": "^26.6.3",
+    "mocha": "^8.3.0",
+    "mongodb-memory-server": "^6.9.3",
     "prettier": "2.2.1",
-    "ts-jest": "^26.5.0",
+    "sinon": "^9.2.4",
+    "ts-mocha": "^8.0.0",
     "ts-node-dev": "^1.1.1"
   }
 }

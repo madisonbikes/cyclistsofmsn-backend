@@ -1,59 +1,53 @@
 import { PostError, scheduleNextPost } from "./post_scheduler";
 import { database } from "./database";
 import { Image } from "./database/images.model";
-import { randomInt } from "./utils/random";
 import { startOfToday, startOfTomorrow, startOfYesterday, add as date_add, set as date_set } from "date-fns";
 import assert from "assert";
 import { PostHistory } from "./database/post_history.model";
 import { configuration } from "./config";
 import { PostHistoryDocument, PostStatus } from "./database/post_history.types";
-
-jest.mock("./utils/random", () => {
-  return {
-    randomInt: (min: number, max: number): number => {
-      let val = 50;
-      if (val < min) {
-        val = min;
-      }
-      if (val >= max) {
-        val = max - 1;
-      }
-      return val;
-    }
-  };
-});
-
-beforeAll(async () => {
-  await database.connect();
-});
-
-afterAll(async () => {
-  await database.disconnect();
-});
-
-afterEach(() => {
-  jest.clearAllMocks();
-});
+import { expect } from "chai";
 
 const RANDOM_VALUE = 50;
+function custom_random(min: number, max: number): number {
+  let val = RANDOM_VALUE;
+  if (val < min) {
+    val = min;
+  }
+  if (val >= max) {
+    val = max - 1;
+  }
+  return val;
+}
 
-describe("mocks", () => {
-  it("randomInt should be mocked", () => {
-    expect(randomInt(5, 60)).toBe(RANDOM_VALUE);
+describe("mocks", function() {
+
+  it("randomInt should be mocked", function() {
+    expect(custom_random(5, 60)).equals(RANDOM_VALUE);
   });
+
 });
 
-describe("test schedule component", () => {
-  beforeEach(async () => {
+describe("test schedule component", function() {
+
+  before(async () => {
+    await database.connect();
+  });
+
+  after(async () => {
+    await database.disconnect();
+  });
+
+  beforeEach(async function() {
     // clear posts and images
     await PostHistory.deleteMany();
     await Image.deleteMany();
   });
 
-  describe("with no images", () => {
-    it("should fail with no images error", async () => {
+  describe("with no images", function() {
+    it("should fail with no images error", async function() {
       const error = await getErrorPostResult(startOfToday());
-      expect(error.message).toBe("no images");
+      expect(error.message).eq("no images");
     });
   });
 
@@ -72,7 +66,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
-      expect(newPost.timestamp).toStrictEqual(expected);
+      expect(JSON.stringify(newPost.timestamp)).eql((JSON.stringify(expected)));
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -82,7 +76,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), { minutes: RANDOM_VALUE, hours: configuration.firstPostHour });
-      expect(newPost.timestamp).toStrictEqual(expected);
+      expect(newPost.timestamp).eql(expected);
     });
   });
 
@@ -108,7 +102,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
-      expect(newPost.timestamp).toStrictEqual(expected);
+      expect(newPost.timestamp).eql(expected);
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -118,7 +112,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), { minutes: RANDOM_VALUE, hours: configuration.firstPostHour });
-      expect(newPost.timestamp).toStrictEqual(expected);
+      expect(newPost.timestamp).eql(expected);
     });
   });
 
@@ -143,7 +137,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(startOfTomorrow(), { hours: configuration.firstPostHour, minutes: RANDOM_VALUE });
-      expect(newPost.timestamp).toStrictEqual(expected);
+      expect(newPost.timestamp).eql(expected);
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -154,7 +148,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), { minutes: RANDOM_VALUE, hours: configuration.firstPostHour });
-      expect(newPost.timestamp).toStrictEqual(expected);
+      expect(newPost.timestamp).eql(expected);
     });
   });
 
@@ -178,23 +172,23 @@ describe("test schedule component", () => {
       const newPost = await getOkPostResult(now);
 
       const expected = date_add(startOfToday(), { hours: 10, minutes: 15 });
-      expect(newPost.timestamp).toStrictEqual(expected);
-      expect(newPost.status.flag).toBe(PostStatus.PENDING);
+      expect(newPost.timestamp).eql(expected);
+      expect(newPost.status.flag).eq(PostStatus.PENDING);
     });
   });
 });
 
 async function getOkPostResult(now: Date): Promise<PostHistoryDocument> {
-  const result = await scheduleNextPost(now);
-  expect(result.isOk()).toBeTruthy();
+  const result = await scheduleNextPost(now, custom_random);
+  expect(result.isOk()).ok;
   const newPost = result.value;
   assert(newPost instanceof PostHistory);
   return newPost;
 }
 
 async function getErrorPostResult(now: Date): Promise<PostError> {
-  const result = await scheduleNextPost(now);
-  expect(result.isError()).toBeTruthy();
+  const result = await scheduleNextPost(now, custom_random);
+  expect(result.isError()).ok;
   assert(result.isError());
   return result.value;
 }

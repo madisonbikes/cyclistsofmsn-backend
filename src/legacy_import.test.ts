@@ -1,26 +1,27 @@
 import { perform_import } from "./legacy_import";
 import { PostHistory } from "./database/post_history.model";
 import { database } from "./database";
+import { expect } from "chai";
 
-afterEach(async () => {
-  await database.disconnect();
-});
-
-describe("test imports", () => {
-  beforeEach(async () => {
+describe("test imports", function() {
+  beforeEach(async function() {
       await database.connect();
       await PostHistory.deleteMany();
       await database.disconnect();
     }
   );
 
-  it("should import many images", async () => {
-    await expect(
-      perform_import("./test_resources/test_post_history_325.log"))
-      .resolves
-      .toBe(325);
+  afterEach(async () => {
+    await database.disconnect();
+  });
 
-    await expect(database.connect()).resolves.toBeUndefined();
-    await expect(PostHistory.find()).resolves.toHaveLength(325);
+
+  it("should import many previous posts", async function() {
+    expect(
+      await perform_import("./test_resources/test_post_history_325.log")
+    ).eq(325);
+
+    expect(await database.connect()).is.true;
+    expect(await PostHistory.find()).length(325);
   });
 });
