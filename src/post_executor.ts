@@ -8,24 +8,29 @@ import { container } from "tsyringe";
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
 
-let timeout: NodeJS.Timeout | undefined;
+let intervalTimeout: NodeJS.Timeout | undefined;
+let startupTimeout: NodeJS.Timeout | undefined;
 
 export function startExecutor(): void {
-  setTimeout(checkTimeToPost, 10 * 1000);
-  timeout = setInterval(checkTimeToPost, CHECK_INTERVAL);
+  startupTimeout = setTimeout(checkTimeToPost, 10 * 1000);
+  intervalTimeout = setInterval(checkTimeToPost, CHECK_INTERVAL);
 }
 
 export function stopExecutor(): void {
-  if (timeout != null) {
-    clearInterval(timeout);
-    timeout = undefined;
+  if (startupTimeout != null) {
+    clearTimeout(startupTimeout);
+    startupTimeout = undefined;
+  }
+  if (intervalTimeout != null) {
+    clearInterval(intervalTimeout);
+    intervalTimeout = undefined;
   }
 }
 
 /** async function is fine for setInterval(), but it should never throw an exception */
 async function checkTimeToPost() {
   try {
-    const scheduler = container.resolve(PostScheduler)
+    const scheduler = container.resolve(PostScheduler);
     const scheduledResult = await scheduler.scheduleNextPost();
     if (scheduledResult.isError()) {
       logger.error("Error scheduling post", scheduledResult.value);
