@@ -8,16 +8,15 @@ import { differenceInMinutes, startOfDay } from "date-fns/fp";
 import { configuration } from "./config";
 import { Result, ok, error } from "./utils/result";
 import { logger } from "./utils/logger";
-import { Now } from "./utils/now";
 import { Random } from "./utils/random";
-import { injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 
 export type PostResult = Result<PostHistoryDocument, PostError>
 export type PostError = { message: string }
 
 @injectable()
 export class PostScheduler {
-  constructor(private random: Random, private now: Now) {
+  constructor(private random: Random, @inject("now") private now: Date) {
   }
 
   async scheduleNextPost(): Promise<PostResult> {
@@ -59,12 +58,12 @@ export class PostScheduler {
   }
 
   private async selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
-    const startOfToday = startOfDay(this.now.now());
+    const startOfToday = startOfDay(this.now);
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
     const lastTimeToday = date_set(startOfToday, { hours: configuration.lastPostHour });
 
     let startDate: Date;
-    if (this.now.now() >= lastTimeToday) {
+    if (this.now >= lastTimeToday) {
       // no more posts today
       startDate = startOfTomorrow;
     } else if (lastPostTime != null) {
@@ -83,8 +82,8 @@ export class PostScheduler {
     let firstTime = date_set(startDate, { hours: configuration.firstPostHour });
     const lastTime = date_set(startDate, { hours: configuration.lastPostHour });
 
-    if (firstTime <= this.now.now()) {
-      firstTime = this.now.now();
+    if (firstTime <= this.now) {
+      firstTime = this.now;
     }
     const diff = Math.abs(differenceInMinutes(firstTime, lastTime));
     const random_min = this.random.randomInt(0, diff);

@@ -9,7 +9,6 @@ import { PostHistoryDocument, PostStatus } from "./database/post_history.types";
 import { expect } from "chai";
 import { container } from "tsyringe";
 import { Random } from "./utils/random";
-import { Now } from "./utils/now";
 
 const RANDOM_VALUE = 50;
 
@@ -27,17 +26,6 @@ class NotVeryRandom extends Random {
       val = max - 1;
     }
     return val;
-  }
-}
-
-class NotNow extends Now {
-  constructor(
-    private specifiedValue: Date) {
-    super();
-  }
-
-  now(): Date {
-    return this.specifiedValue;
   }
 }
 
@@ -208,7 +196,7 @@ describe("test schedule component", function() {
   function buildScheduler(now: Date) {
     return container.createChildContainer()
       .register<Random>(Random, { useValue: new NotVeryRandom(RANDOM_VALUE) })
-      .register<Now>(Now, { useValue: new NotNow(now) })
+      .register("now", { useValue: now })
       .resolve(PostScheduler);
   }
 });
