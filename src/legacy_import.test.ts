@@ -17,6 +17,7 @@ describe("test imports", function() {
 
 
   it("should import many previous posts", async function() {
+    this.timeout(10000);
     expect(
       await perform_import("./test_resources/test_post_history_325.log")
     ).eq(325);

@@ -2,7 +2,7 @@
   "extension": [
     "ts"
   ],
-  "reporter": "dot",
+  "reporter": "spec",
   "ui": "bdd",
   "package": "package.json",
   "require": ["src/test/hooks.ts"]
