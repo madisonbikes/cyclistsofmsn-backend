@@ -1,4 +1,4 @@
-import { PostError, scheduleNextPost } from "./post_scheduler";
+import { PostError, PostScheduler } from "./post_scheduler";
 import { database } from "./database";
 import { Image } from "./database/images.model";
 import { startOfToday, startOfTomorrow, startOfYesterday, add as date_add, set as date_set } from "date-fns";
@@ -7,29 +7,41 @@ import { PostHistory } from "./database/post_history.model";
 import { configuration } from "./config";
 import { PostHistoryDocument, PostStatus } from "./database/post_history.types";
 import { expect } from "chai";
+import { container } from "tsyringe";
+import { Random } from "./utils/random";
+import { Now } from "./utils/now";
 
 const RANDOM_VALUE = 50;
-function custom_random(min: number, max: number): number {
-  let val = RANDOM_VALUE;
-  if (val < min) {
-    val = min;
+
+class NotVeryRandom extends Random {
+  constructor(private specifiedValue: number) {
+    super();
   }
-  if (val >= max) {
-    val = max - 1;
+
+  randomInt(min: number, max: number): number {
+    let val = this.specifiedValue;
+    if (val < min) {
+      val = min;
+    }
+    if (val >= max) {
+      val = max - 1;
+    }
+    return val;
   }
-  return val;
 }
 
-describe("mocks", function() {
+class NotNow extends Now {
+  constructor(
+    private specifiedValue: Date) {
+    super();
+  }
 
-  it("randomInt should be mocked", function() {
-    expect(custom_random(5, 60)).equals(RANDOM_VALUE);
-  });
-
-});
+  now(): Date {
+    return this.specifiedValue;
+  }
+}
 
 describe("test schedule component", function() {
-
   before(async () => {
     await database.connect();
   });
@@ -39,6 +51,7 @@ describe("test schedule component", function() {
   });
 
   beforeEach(async function() {
+
     // clear posts and images
     await PostHistory.deleteMany();
     await Image.deleteMany();
@@ -176,19 +189,26 @@ describe("test schedule component", function() {
       expect(newPost.status.flag).eq(PostStatus.PENDING);
     });
   });
+
+  async function getOkPostResult(now: Date): Promise<PostHistoryDocument> {
+    const result = await buildScheduler(now).scheduleNextPost();
+    expect(result.isOk()).ok;
+    const newPost = result.value;
+    assert(newPost instanceof PostHistory);
+    return newPost;
+  }
+
+  async function getErrorPostResult(now: Date): Promise<PostError> {
+    const result = await buildScheduler(now).scheduleNextPost();
+    expect(result.isError()).ok;
+    assert(result.isError());
+    return result.value;
+  }
+
+  function buildScheduler(now: Date) {
+    return container.createChildContainer()
+      .register<Random>(Random, { useValue: new NotVeryRandom(RANDOM_VALUE) })
+      .register<Now>(Now, { useValue: new NotNow(now) })
+      .resolve(PostScheduler);
+  }
 });
-
-async function getOkPostResult(now: Date): Promise<PostHistoryDocument> {
-  const result = await scheduleNextPost(now, custom_random);
-  expect(result.isOk()).ok;
-  const newPost = result.value;
-  assert(newPost instanceof PostHistory);
-  return newPost;
-}
-
-async function getErrorPostResult(now: Date): Promise<PostError> {
-  const result = await scheduleNextPost(now, custom_random);
-  expect(result.isError()).ok;
-  assert(result.isError());
-  return result.value;
-}

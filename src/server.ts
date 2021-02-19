@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import Koa from "koa";
 import koaQueryString from "koa-qs";
 import koa_logger from "koa-logger";

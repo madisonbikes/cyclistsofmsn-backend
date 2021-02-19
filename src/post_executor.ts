@@ -2,7 +2,8 @@ import { logger } from "./utils/logger";
 import assert from "assert";
 import { Image } from "./database/images.model";
 import { PostStatus } from "./database/post_history.types";
-import { scheduleNextPost } from "./post_scheduler";
+import { PostScheduler } from "./post_scheduler";
+import { container } from "tsyringe";
 
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
@@ -24,7 +25,8 @@ export function stopExecutor(): void {
 /** async function is fine for setInterval(), but it should never throw an exception */
 async function checkTimeToPost() {
   try {
-    const scheduledResult = await scheduleNextPost();
+    const scheduler = container.resolve(PostScheduler)
+    const scheduledResult = await scheduler.scheduleNextPost();
     if (scheduledResult.isError()) {
       logger.error("Error scheduling post", scheduledResult.value);
       return;

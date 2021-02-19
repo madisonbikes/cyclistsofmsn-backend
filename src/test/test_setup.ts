@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { configuration } from "../config";
 import path from "path";
 import axios from "axios";

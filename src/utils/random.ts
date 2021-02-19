@@ -1,5 +1,7 @@
 import { randomInt as otherRandomInt } from "crypto";
 
-export function randomInt(min: number, max: number): number {
-  return otherRandomInt(min, max)
+export class Random {
+  randomInt(min: number, max: number): number {
+    return otherRandomInt(min, max);
+  }
 }
