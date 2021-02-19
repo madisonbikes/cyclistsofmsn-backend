@@ -7,7 +7,7 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
-    "test": "npx ts-mocha 'src/**/*.ts' --exit",
+    "test": "npx ts-mocha 'src/**/*.ts'",
     "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log"
   },
   "author": "Ben Sandee",
@@ -52,6 +52,7 @@
     "@types/proxyquire": "^1.3.28",
     "@types/sharp": "^0.27.1",
     "@types/sinon": "^9.0.10",
+    "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
     "axios": "^0.21.1",
@@ -63,6 +64,7 @@
     "mongodb-memory-server": "^6.9.3",
     "prettier": "2.2.1",
     "sinon": "^9.2.4",
+    "supertest": "^6.1.3",
     "ts-mocha": "^8.0.0",
     "ts-node-dev": "^1.1.1"
   }

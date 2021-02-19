@@ -1,17 +1,18 @@
+import { PhotoServer } from "./server";
 import axios from "axios";
 import { expect } from "chai";
-import { startServer } from "./server";
-
-let close: () => Promise<void> | undefined;
 
 describe("server process", function() {
-  before(async function () {
-    this.timeout(15000);
-    close = await startServer();
+  let photoServer: PhotoServer | undefined;
+
+  before(async function() {
+    photoServer = new PhotoServer();
+    await photoServer.start();
   });
 
-  after(async () => {
-    await close();
+  after(async function() {
+    await photoServer?.stop();
+    photoServer = undefined;
   });
 
   it("responds to image list api call", async function() {
@@ -22,6 +23,7 @@ describe("server process", function() {
 
   it("response to single image api call", async function() {
     const imageListResponse = await axios.get("/images");
+
     expect(imageListResponse.status).eq(200);
     expect(imageListResponse.data.length).eq(5);
 

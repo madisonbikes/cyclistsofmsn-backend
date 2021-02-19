@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import http from "http";
 import Koa from "koa";
 import koaQueryString from "koa-qs";
 import koa_logger from "koa-logger";
@@ -9,54 +10,68 @@ import { scan } from "./scan";
 import { database } from "./database";
 import { startExecutor, stopExecutor } from "./post_executor";
 import { logger } from "./utils/logger";
+import { container } from "tsyringe";
+import { Server } from "http";
+
+container.register("now", {
+  useFactory: () => {
+    new Date();
+  }
+});
 
 /** expose command-line launcher */
 if (require.main === module) {
   /** launches server. this syntax allows server startup to run as async function */
   Promise.resolve()
     .then(() => {
-      return startServer();
+      return new PhotoServer().start();
     })
     .catch((error) => {
       logger.error(error);
     });
 }
 
-/** returns async function that can be used to shutdown the server */
-export async function startServer(): Promise<() => Promise<void>> {
-  await database.connect();
-  await scan();
-  await startExecutor();
+export class PhotoServer {
+  server: Server | undefined;
 
-  const app = new Koa();
+  /** returns async function that can be used to shutdown the server */
+  async start(): Promise<void> {
+    await database.connect();
+    await scan();
+    await startExecutor();
 
-  // for query strings, only the first value for the given parameter is passed
-  // to keep our APIs simple
-  koaQueryString(app, "first");
+    const app = new Koa();
 
-  app.use(
-    koa_logger({
-      transporter: (str: string, args: unknown) => {
-        logger.debug(str, args);
-      }
-    })
-  );
+    // for query strings, only the first value for the given parameter is passed
+    // to keep our APIs simple
+    koaQueryString(app, "first");
 
-  // in production mode, serve the production React app from here
-  if (configuration.reactStaticRootDir) {
-    app.use(serve(configuration.reactStaticRootDir));
-  }
-  app.use(router.routes());
-  app.use(router.allowedMethods());
+    app.use(
+      koa_logger({
+        transporter: (str: string, args: unknown) => {
+          logger.debug(str, args);
+        }
+      })
+    );
 
-  const server = app.listen(configuration.serverPort, () => {
+    // in production mode, serve the production React app from here
+    if (configuration.reactStaticRootDir) {
+      app.use(serve(configuration.reactStaticRootDir));
+    }
+    app.use(router.routes());
+    app.use(router.allowedMethods());
+    app.on("error", err => {
+      logger.error(err);
+    });
+
+    this.server = http.createServer(app.callback()).listen(configuration.serverPort);
     logger.info(`Server is listening on port ${configuration.serverPort}`);
-  });
+  }
 
-  return async () => {
-    server.close();
+  async stop(): Promise<void> {
+    this.server?.close();
     await stopExecutor();
 
     await database.disconnect();
-  };
+  }
 }
