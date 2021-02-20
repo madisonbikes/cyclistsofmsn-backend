@@ -9,7 +9,8 @@ import { injectable } from "tsyringe";
 /** expose scanning operation.  requires database connection to be established */
 @injectable()
 export class ImageRepositoryScanner {
-  constructor(private fsRepository: FilesystemRepository) {}
+  constructor(private fsRepository: FilesystemRepository) {
+  }
 
   async scan(): Promise<void> {
     const files = await this.fsRepository.imageFiles();

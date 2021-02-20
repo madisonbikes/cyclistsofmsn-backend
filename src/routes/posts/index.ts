@@ -1,5 +1,5 @@
 import KoaRouter from "koa-router";
-import { PostHistory, PostHistoryDocument, Image } from "../../database";
+import { Image, PostHistory, PostHistoryDocument } from "../../database";
 import assert from "assert";
 import { jwt } from "../../security/jwt";
 import { injectable } from "tsyringe";

@@ -57,6 +57,7 @@ export function jwtAuthz(expectedScopes: string[], checkAllScopes = false, custo
     _error(ctx, expectedScopes, "User not allowed");
   };
 }
+
 /**
  * Helper
  *

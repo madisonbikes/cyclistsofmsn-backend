@@ -8,5 +8,7 @@ interface IImage {
   deleted: boolean
 }
 
-export interface ImageDocument extends IImage, Document {}
+export interface ImageDocument extends IImage, Document {
+}
+
 export type ImageModel = Model<ImageDocument>

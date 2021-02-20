@@ -8,9 +8,9 @@ import fs from "fs";
 import path from "path";
 import parse from "date-fns/parse";
 
-import { Image, PostHistory, PostStatus, Database } from "./database";
+import { Database, Image, PostHistory, PostStatus } from "./database";
 import { logger } from "./utils";
-import { injectable, container } from "tsyringe";
+import { container, injectable } from "tsyringe";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -37,7 +37,8 @@ type Post = { filename: string; date: Date };
 /** import post history from cyclists_of_msn logfile */
 @injectable()
 export class Importer {
-  constructor(private database: Database) {}
+  constructor(private database: Database) {
+  }
 
   async perform_import(logFile: string): Promise<number> {
     logger.info(`importing ${logFile}`);

@@ -44,5 +44,5 @@ PostHistorySchema.statics.findOrderedPosts = async () => {
 PostHistorySchema.statics.findNextScheduledPost = async (): Promise<PostHistoryDocument | null> => {
   return PostHistory.findOne()
     .where({ "status.flag": PostStatus.PENDING })
-    .sort({ timestamp: "-1" })
+    .sort({ timestamp: "-1" });
 };

@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import http from "http";
+import http, { Server } from "http";
 import Koa from "koa";
 import koaQueryString from "koa-qs";
 import koa_logger from "koa-logger";
@@ -7,7 +7,6 @@ import serve from "koa-static";
 import { startExecutor, stopExecutor } from "./post_executor";
 import { logger } from "./utils";
 import { container, injectable } from "tsyringe";
-import { Server } from "http";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
@@ -33,7 +32,8 @@ export class PhotoServer {
     private scanner: ImageRepositoryScanner,
     private database: Database,
     private router: Router
-  ) {}
+  ) {
+  }
 
   server: Server | undefined;
 
@@ -52,7 +52,7 @@ export class PhotoServer {
       koa_logger({
         transporter: (str: string, args: unknown) => {
           logger.debug(str, args);
-        },
+        }
       })
     );
 

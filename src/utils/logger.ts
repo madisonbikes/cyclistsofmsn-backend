@@ -1,4 +1,4 @@
-import { createLogger, transports, format } from "winston";
+import { createLogger, format, transports } from "winston";
 
 const formatter = format.combine(
   format.timestamp({

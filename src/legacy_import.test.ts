@@ -1,4 +1,4 @@
-import { PostHistory, Database } from "./database";
+import { Database, PostHistory } from "./database";
 import { expect } from "chai";
 import { testContainer } from "./test/setup";
 import { Importer } from "./legacy_import";
@@ -6,7 +6,7 @@ import { Importer } from "./legacy_import";
 describe("test imports", () => {
 
   beforeEach(async () => {
-    testContainer.clearInstances()
+    testContainer.clearInstances();
 
     const database = testContainer.resolve(Database);
 
@@ -15,7 +15,7 @@ describe("test imports", () => {
     await database.disconnect();
   });
 
-  it("should import many previous posts", async function () {
+  it("should import many previous posts", async function() {
     this.timeout(10000);
     const importer = testContainer.resolve(Importer);
 

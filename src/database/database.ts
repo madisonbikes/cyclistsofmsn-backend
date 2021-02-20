@@ -7,7 +7,8 @@ import { injectable, singleton } from "tsyringe";
 @injectable()
 @singleton()
 export class Database {
-  constructor(private configuration: ServerConfiguration) {}
+  constructor(private configuration: ServerConfiguration) {
+  }
 
   private connection?: Mongoose;
 
@@ -23,7 +24,7 @@ export class Database {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,
-      useUnifiedTopology: true,
+      useUnifiedTopology: true
     });
     return true;
   }

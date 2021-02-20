@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { TEST_MONGODB_DATABASE_NAME } from "./setup";
-import { TEST_MONGODB_SERVER_PORT } from "./setup";
+import { TEST_MONGODB_DATABASE_NAME, TEST_MONGODB_SERVER_PORT } from "./setup";
 
 let mongoServer;
 

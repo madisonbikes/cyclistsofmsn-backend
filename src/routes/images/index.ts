@@ -29,8 +29,8 @@ export class ImageRouter extends KoaRouter {
         filename = (await Image.findById(id).and([{ deleted: false }]))
           ?.filename;
         if (filename === undefined) return;
-      } catch(err) {
-        logger.info("Requested image id not found in db ", id)
+      } catch (err) {
+        logger.info("Requested image id not found in db ", id);
         return;
       }
 
@@ -46,7 +46,7 @@ export class ImageRouter extends KoaRouter {
       try {
         await access(imageFile, constants.R_OK);
       } catch (err) {
-        logger.info("Requested file not found in image repository ", imageFile)
+        logger.info("Requested file not found in image repository ", imageFile);
         return;
       }
 

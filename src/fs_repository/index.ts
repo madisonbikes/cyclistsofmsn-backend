@@ -6,7 +6,8 @@ import { injectable } from "tsyringe";
 
 @injectable()
 export class FilesystemRepository {
-  constructor(private configuration: ServerConfiguration) {}
+  constructor(private configuration: ServerConfiguration) {
+  }
 
   private baseDirectory() {
     return this.configuration.photosDir;

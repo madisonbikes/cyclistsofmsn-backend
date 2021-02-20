@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import { resolve } from "path";
 import { injectable, singleton } from "tsyringe";
 
-export const DEFAULT_SERVER_PORT = 3001
+export const DEFAULT_SERVER_PORT = 3001;
 
 @injectable()
 @singleton()
