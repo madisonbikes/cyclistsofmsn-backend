@@ -1,4 +1,4 @@
-export class Now {
+export class NowProvider {
   now(): Date {
     return new Date()
   }

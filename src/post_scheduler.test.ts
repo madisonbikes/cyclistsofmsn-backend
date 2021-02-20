@@ -9,13 +9,13 @@ import {
 import assert from "assert";
 import { Database, Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
 import { expect } from "chai";
-import { Random, Now } from "./utils";
+import { RandomProvider, NowProvider } from "./utils";
 import { testContainer } from "./test/setup";
 import { ServerConfiguration } from "./config";
 
 const RANDOM_VALUE = 50;
 
-class NotVeryRandom extends Random {
+class NotVeryRandom extends RandomProvider {
   constructor(private specifiedValue: number) {
     super();
   }
@@ -32,7 +32,7 @@ class NotVeryRandom extends Random {
   }
 }
 
-class NotVeryNow extends Now {
+class NotVeryNow extends NowProvider {
   constructor(private when: Date) {
     super();
   }
@@ -234,8 +234,8 @@ describe("test schedule component", () => {
   function buildScheduler(now: Date) {
     return testContainer
       .createChildContainer()
-      .register<Random>(Random, { useValue: new NotVeryRandom(RANDOM_VALUE) })
-      .register<Now>(Now, { useValue: new NotVeryNow(now) })
+      .register<RandomProvider>(RandomProvider, { useValue: new NotVeryRandom(RANDOM_VALUE) })
+      .register<NowProvider>(NowProvider, { useValue: new NotVeryNow(now) })
       .resolve(PostScheduler);
   }
 });

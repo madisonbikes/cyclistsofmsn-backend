@@ -1,28 +1,19 @@
-import { PostHistory } from "./database/post_history.model";
-import { PostHistoryDocument, PostStatus } from "./database/post_history.types";
-import { ImageDocument } from "./database/images.types";
-import { Image } from "./database/images.model";
+import { PostHistory, PostHistoryDocument, PostStatus, ImageDocument, Image } from "./database";
 import date_set from "date-fns/set";
 import date_add from "date-fns/add";
 import { differenceInMinutes, startOfDay } from "date-fns/fp";
 import { ServerConfiguration } from "./config";
-import { Result, ok, error } from "./utils/result";
-import { logger, Random, Now } from "./utils";
+import { logger, RandomProvider, NowProvider, Result, ok, error } from "./utils";
 import { injectable, registry } from "tsyringe";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string };
 
-@registry([{
-  token: "now", useFactory: () => {
-    new Date();
-  }
-}])
 @injectable()
 export class PostScheduler {
   constructor(
-    private random: Random,
-    private now: Now,
+    private random: RandomProvider,
+    private now: NowProvider,
     private configuration: ServerConfiguration
   ) {
   }
