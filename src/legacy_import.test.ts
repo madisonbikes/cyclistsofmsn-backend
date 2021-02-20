@@ -3,9 +3,9 @@ import { expect } from "chai";
 import { testContainer } from "./test/setup";
 import { Importer } from "./legacy_import";
 
-describe("test imports", function () {
+describe("test imports", () => {
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     testContainer.clearInstances()
 
     const database = testContainer.resolve(Database);

@@ -42,7 +42,7 @@ class NotVeryNow extends Now {
   }
 }
 
-describe("test schedule component", function() {
+describe("test schedule component", () => {
   const database = testContainer.resolve(Database);
   const configuration = testContainer.resolve(ServerConfiguration);
 
@@ -54,7 +54,7 @@ describe("test schedule component", function() {
     await database.disconnect();
   });
 
-  beforeEach(async function() {
+  beforeEach(async () => {
     testContainer.clearInstances();
 
     // clear posts and images
@@ -62,7 +62,7 @@ describe("test schedule component", function() {
     await Image.deleteMany();
   });
 
-  describe("with no images", function() {
+  describe("with no images", () => {
     it("should fail with no images error", async function() {
       const error = await getErrorPostResult(startOfToday());
       expect(error.message).eq("no images");
