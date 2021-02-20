@@ -5,5 +5,5 @@
   "reporter": "spec",
   "ui": "bdd",
   "package": "package.json",
-  "require": ["src/test/hooks.ts"]
+  "require": ["src/test/hooks.js"]
 }

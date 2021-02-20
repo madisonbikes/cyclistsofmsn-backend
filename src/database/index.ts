@@ -1,9 +1,13 @@
-import { configuration } from "../config";
+import { ServerConfiguration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
 import { logger } from "../utils/logger";
+import { injectable } from "tsyringe";
 
 /** provide unified access to database connection */
-class Database {
+@injectable()
+export class Database {
+  constructor(private configuration: ServerConfiguration) {}
+
   private connection?: Mongoose;
 
   async reconnect() {
@@ -13,15 +17,17 @@ class Database {
 
   async connect(): Promise<boolean> {
     if (this.connection) {
-      logger.debug(`already connected to mongodb at ${configuration.mongodbUri}`);
+      logger.debug(
+        `already connected to mongodb at ${this.configuration.mongodbUri}`
+      );
       return false;
     }
-    logger.debug(`connecting to mongodb at ${configuration.mongodbUri}`);
-    this.connection = await mongoose.connect(configuration.mongodbUri, {
+    logger.debug(`connecting to mongodb at ${this.configuration.mongodbUri}`);
+    this.connection = await mongoose.connect(this.configuration.mongodbUri, {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     });
     return true;
   }
@@ -33,5 +39,3 @@ class Database {
     }
   }
 }
-
-export const database = new Database();

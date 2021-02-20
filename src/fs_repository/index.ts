@@ -1,34 +1,39 @@
-import { configuration } from "../config";
+import { ServerConfiguration } from "../config";
 import exifReader, { IccTags, Tags, XmpTags } from "exifreader";
 import fs from "fs/promises";
 import path from "path";
+import { injectable } from "tsyringe";
 
-function baseDirectory() {
-  return configuration.photosDir;
-}
+@injectable()
+export class FilesystemRepository {
+  constructor(private configuration: ServerConfiguration) {}
+  baseDirectory() {
+    return this.configuration.photosDir;
+  }
 
-/** return list of base paths inside the fs repository. treat these as opaque tokens. */
-export async function imageFiles(): Promise<string[]> {
-  const files = await fs.readdir(baseDirectory());
-  const filteredFiles = files.filter((value) => {
-    const extension = path.parse(value).ext.toLowerCase();
-    return [".jpg", ".png"].includes(extension);
-  });
-  return filteredFiles;
-}
+  /** return list of base paths inside the fs repository. treat these as opaque tokens. */
+  async imageFiles(): Promise<string[]> {
+    const files = await fs.readdir(this.baseDirectory());
+    const filteredFiles = files.filter((value) => {
+      const extension = path.parse(value).ext.toLowerCase();
+      return [".jpg", ".png"].includes(extension);
+    });
+    return filteredFiles;
+  }
 
-export async function exif(baseFilename: string): Promise<Tags & IccTags & XmpTags> {
-  const path = photoPath(baseFilename);
-  const fileData = await fs.readFile(path);
-  return exifReader.load(fileData);
-}
+  async exif(baseFilename: string): Promise<Tags & IccTags & XmpTags> {
+    const path = this.photoPath(baseFilename);
+    const fileData = await fs.readFile(path);
+    return exifReader.load(fileData);
+  }
 
-export async function timestamp(baseFilename: string): Promise<Date> {
-  const path = photoPath(baseFilename);
-  const stat = await fs.stat(path);
-  return stat.mtime;
-}
+  async timestamp(baseFilename: string): Promise<Date> {
+    const path = this.photoPath(baseFilename);
+    const stat = await fs.stat(path);
+    return stat.mtime;
+  }
 
-export function photoPath(baseFilename: string): string {
-  return `${baseDirectory()}/${baseFilename}`;
+  photoPath(baseFilename: string): string {
+    return `${this.baseDirectory()}/${baseFilename}`;
+  }
 }

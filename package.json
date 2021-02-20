@@ -41,7 +41,6 @@
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
     "@types/chai": "^4.2.15",
-    "@types/expect": "^24.3.0",
     "@types/koa": "^2.11.7",
     "@types/koa-logger": "^3.1.1",
     "@types/koa-qs": "^2.0.0",

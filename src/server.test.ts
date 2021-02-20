@@ -1,27 +1,32 @@
 import { PhotoServer } from "./server";
 import axios from "axios";
 import { expect } from "chai";
+import { container } from "./test/setup";
 
-describe("server process", function() {
+describe("server process", function () {
   let photoServer: PhotoServer | undefined;
 
-  before(async function() {
-    photoServer = new PhotoServer();
+  beforeEach(function () {
+    container.clearInstances()
+  })
+
+  before(async function () {
+    photoServer = container.resolve(PhotoServer);
     await photoServer.start();
   });
 
-  after(async function() {
+  after(async function () {
     await photoServer?.stop();
     photoServer = undefined;
   });
 
-  it("responds to image list api call", async function() {
+  it("responds to image list api call", async function () {
     const imageResponse = await axios.get("/images");
     expect(imageResponse.status).eq(200);
     expect(imageResponse.data.length).eq(5);
   });
 
-  it("response to single image api call", async function() {
+  it("response to single image api call", async function () {
     const imageListResponse = await axios.get("/images");
 
     expect(imageListResponse.status).eq(200);

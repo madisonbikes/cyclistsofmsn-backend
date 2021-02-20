@@ -1,14 +1,20 @@
 import { PostError, PostScheduler } from "./post_scheduler";
-import { database } from "./database";
 import { Image } from "./database/images.model";
-import { startOfToday, startOfTomorrow, startOfYesterday, add as date_add, set as date_set } from "date-fns";
+import {
+  startOfToday,
+  startOfTomorrow,
+  startOfYesterday,
+  add as date_add,
+  set as date_set,
+} from "date-fns";
 import assert from "assert";
 import { PostHistory } from "./database/post_history.model";
-import { configuration } from "./config";
 import { PostHistoryDocument, PostStatus } from "./database/post_history.types";
 import { expect } from "chai";
-import { container } from "tsyringe";
 import { Random } from "./utils/random";
+import { Database } from "./database";
+import { container } from "./test/setup"
+import { ServerConfiguration } from "./config";
 
 const RANDOM_VALUE = 50;
 
@@ -29,7 +35,10 @@ class NotVeryRandom extends Random {
   }
 }
 
-describe("test schedule component", function() {
+describe("test schedule component", function () {
+  const database = container.resolve(Database);
+  const configuration = container.resolve(ServerConfiguration);
+
   before(async () => {
     await database.connect();
   });
@@ -38,15 +47,16 @@ describe("test schedule component", function() {
     await database.disconnect();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
+    container.clearInstances()
 
     // clear posts and images
     await PostHistory.deleteMany();
     await Image.deleteMany();
   });
 
-  describe("with no images", function() {
-    it("should fail with no images error", async function() {
+  describe("with no images", function () {
+    it("should fail with no images error", async function () {
       const error = await getErrorPostResult(startOfToday());
       expect(error.message).eq("no images");
     });
@@ -62,12 +72,14 @@ describe("test schedule component", function() {
 
     it("should schedule a post today", async () => {
       // set current time to 10:00 AM
-      const now = date_add(startOfToday(), { hours: configuration.firstPostHour + 2 });
+      const now = date_add(startOfToday(), {
+        hours: configuration.firstPostHour + 2,
+      });
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
-      expect(JSON.stringify(newPost.timestamp)).eql((JSON.stringify(expected)));
+      expect(JSON.stringify(newPost.timestamp)).eql(JSON.stringify(expected));
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -76,7 +88,10 @@ describe("test schedule component", function() {
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after earliest time (8am) due to injected random
-      const expected = date_set(startOfTomorrow(), { minutes: RANDOM_VALUE, hours: configuration.firstPostHour });
+      const expected = date_set(startOfTomorrow(), {
+        minutes: RANDOM_VALUE,
+        hours: configuration.firstPostHour,
+      });
       expect(newPost.timestamp).eql(expected);
     });
   });
@@ -97,7 +112,9 @@ describe("test schedule component", function() {
 
     it("should schedule a post today", async () => {
       // set current time to 10:00 AM
-      const now = date_set(startOfToday(), { hours: configuration.firstPostHour + 3 });
+      const now = date_set(startOfToday(), {
+        hours: configuration.firstPostHour + 3,
+      });
 
       const newPost = await getOkPostResult(now);
 
@@ -112,7 +129,10 @@ describe("test schedule component", function() {
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after earliest time (8am) due to injected random
-      const expected = date_set(startOfTomorrow(), { minutes: RANDOM_VALUE, hours: configuration.firstPostHour });
+      const expected = date_set(startOfTomorrow(), {
+        minutes: RANDOM_VALUE,
+        hours: configuration.firstPostHour,
+      });
       expect(newPost.timestamp).eql(expected);
     });
   });
@@ -127,17 +147,25 @@ describe("test schedule component", function() {
       const newPost = new PostHistory();
       newPost.image = newImage.id;
       newPost.status.flag = PostStatus.COMPLETE;
-      newPost.timestamp = date_set(startOfToday(), { hours: configuration.firstPostHour, minutes: 15 });
+      newPost.timestamp = date_set(startOfToday(), {
+        hours: configuration.firstPostHour,
+        minutes: 15,
+      });
       await newPost.save();
     });
 
     it("should schedule a post tomorrow", async () => {
       // set current time to 11:00 AM
-      const now = date_set(startOfToday(), { hours: configuration.firstPostHour + 3 });
+      const now = date_set(startOfToday(), {
+        hours: configuration.firstPostHour + 3,
+      });
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after now due to injected random
-      const expected = date_add(startOfTomorrow(), { hours: configuration.firstPostHour, minutes: RANDOM_VALUE });
+      const expected = date_add(startOfTomorrow(), {
+        hours: configuration.firstPostHour,
+        minutes: RANDOM_VALUE,
+      });
       expect(newPost.timestamp).eql(expected);
     });
 
@@ -148,7 +176,10 @@ describe("test schedule component", function() {
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after earliest time (8am) due to injected random
-      const expected = date_set(startOfTomorrow(), { minutes: RANDOM_VALUE, hours: configuration.firstPostHour });
+      const expected = date_set(startOfTomorrow(), {
+        minutes: RANDOM_VALUE,
+        hours: configuration.firstPostHour,
+      });
       expect(newPost.timestamp).eql(expected);
     });
   });
@@ -194,7 +225,8 @@ describe("test schedule component", function() {
   }
 
   function buildScheduler(now: Date) {
-    return container.createChildContainer()
+    return container
+      .createChildContainer()
       .register<Random>(Random, { useValue: new NotVeryRandom(RANDOM_VALUE) })
       .register("now", { useValue: now })
       .resolve(PostScheduler);
