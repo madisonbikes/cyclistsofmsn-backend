@@ -4,14 +4,14 @@ import Koa from "koa";
 import koaQueryString from "koa-qs";
 import koa_logger from "koa-logger";
 import serve from "koa-static";
-import { router } from "./routes";
 import { startExecutor, stopExecutor } from "./post_executor";
-import { logger } from "./utils/logger";
+import { logger } from "./utils";
 import { container, injectable } from "tsyringe";
 import { Server } from "http";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
+import { Router } from "./routes";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -31,7 +31,8 @@ export class PhotoServer {
   constructor(
     private configuration: ServerConfiguration,
     private scanner: ImageRepositoryScanner,
-    private database: Database
+    private database: Database,
+    private router: Router
   ) {}
 
   server: Server | undefined;
@@ -47,7 +48,6 @@ export class PhotoServer {
     // for query strings, only the first value for the given parameter is passed
     // to keep our APIs simple
     koaQueryString(app, "first");
-
     app.use(
       koa_logger({
         transporter: (str: string, args: unknown) => {
@@ -60,8 +60,8 @@ export class PhotoServer {
     if (this.configuration.reactStaticRootDir) {
       app.use(serve(this.configuration.reactStaticRootDir));
     }
-    app.use(router.routes());
-    app.use(router.allowedMethods());
+    app.use(this.router.routes());
+    app.use(this.router.allowedMethods());
     app.on("error", (err) => {
       logger.error(err);
     });

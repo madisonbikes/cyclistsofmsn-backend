@@ -8,12 +8,9 @@ import fs from "fs";
 import path from "path";
 import parse from "date-fns/parse";
 
-import { Image } from "./database/images.model";
-import { PostHistory } from "./database/post_history.model";
-import { PostStatus } from "./database/post_history.types";
-import { logger } from "./utils/logger";
+import { Image, PostHistory, PostStatus, Database } from "./database";
+import { logger } from "./utils";
 import { injectable, container } from "tsyringe";
-import { Database } from "./database";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -24,7 +21,7 @@ if (require.main === module) {
   Promise.resolve()
     .then(() => {
       const importer = container.resolve(Importer);
-      importer.perform_import(process.argv[2]);
+      return importer.perform_import(process.argv[2]);
     })
     .catch((error) => {
       console.error(error);

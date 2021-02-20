@@ -2,10 +2,12 @@ import { config } from "dotenv";
 import { resolve } from "path";
 import { injectable, singleton } from "tsyringe";
 
+export const DEFAULT_SERVER_PORT = 3001
+
 @injectable()
 @singleton()
 export class ServerConfiguration {
-  public serverPort = process.env.PORT || "3001";
+  public serverPort = process.env.PORT || `${DEFAULT_SERVER_PORT}`;
   public photosDir = process.env.PHOTOS_DIR || "photos";
   public reactStaticRootDir?: string = process.env.STATIC_ROOT_DIR;
   public mongodbUri =

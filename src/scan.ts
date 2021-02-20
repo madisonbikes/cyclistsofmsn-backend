@@ -66,14 +66,14 @@ export class ImageRepositoryScanner {
     logger.info("Scan complete");
   }
 
-  parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
+  private parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
     if (!tag || tag.value.length === 0) {
       return undefined;
     }
     return parseDate(tag?.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
   }
 
-  async markImageRemoved(image: ImageDocument) {
+  private async markImageRemoved(image: ImageDocument) {
     logger.debug(`marking cruft db image ${image.filename}`);
     image.deleted = true;
     image.fs_timestamp = undefined;

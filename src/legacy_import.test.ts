@@ -1,14 +1,14 @@
-import { PostHistory } from "./database/post_history.model";
+import { PostHistory, Database } from "./database";
 import { expect } from "chai";
-import { container } from "./test/setup";
-import { Database } from "./database";
+import { testContainer } from "./test/setup";
 import { Importer } from "./legacy_import";
 
 describe("test imports", function () {
-  const database = container.resolve(Database);
 
   beforeEach(async function () {
-    container.clearInstances()
+    testContainer.clearInstances()
+
+    const database = testContainer.resolve(Database);
 
     await database.connect();
     await PostHistory.deleteMany();
@@ -17,7 +17,7 @@ describe("test imports", function () {
 
   it("should import many previous posts", async function () {
     this.timeout(10000);
-    const importer = container.resolve(Importer);
+    const importer = testContainer.resolve(Importer);
 
     expect(
       await importer.perform_import(
@@ -25,6 +25,7 @@ describe("test imports", function () {
       )
     ).eq(325);
 
+    const database = testContainer.resolve(Database);
     expect(await database.connect()).is.true;
     expect(await PostHistory.find()).length(325);
     await database.disconnect();

@@ -2,12 +2,19 @@
 /**
  * This has the routes defined.
  */
-import Router from "koa-router";
-import { router as postRouter } from "./posts";
-import { router as imageRouter } from "./images";
+import KoaRouter from "koa-router";
+import { PostRouter } from "./posts";
+import { ImageRouter } from "./images";
+import { injectable } from "tsyringe";
 
-export const router = new Router();
-router.use(postRouter.routes(), postRouter.allowedMethods());
-router.use(imageRouter.routes(), imageRouter.allowedMethods());
+@injectable()
+export class Router extends KoaRouter {
+  constructor(imageRouter: ImageRouter, postRouter: PostRouter) {
+    super();
+
+    this.use(postRouter.routes(), postRouter.allowedMethods());
+    this.use(imageRouter.routes(), imageRouter.allowedMethods());
+  }
+}
 
 

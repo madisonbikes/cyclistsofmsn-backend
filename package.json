@@ -8,7 +8,8 @@
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
     "test": "NODE_ENV=test npx ts-mocha 'src/**/*.ts'",
-    "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log"
+    "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log",
+    "lint": "eslint '**/*.ts' '**/*.js'"
   },
   "author": "Ben Sandee",
   "license": "Apache-2.0",

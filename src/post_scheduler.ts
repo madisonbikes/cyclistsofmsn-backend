@@ -7,21 +7,25 @@ import date_add from "date-fns/add";
 import { differenceInMinutes, startOfDay } from "date-fns/fp";
 import { ServerConfiguration } from "./config";
 import { Result, ok, error } from "./utils/result";
-import { logger } from "./utils/logger";
-import { Random } from "./utils/random";
-import { inject, injectable, registry } from "tsyringe";
+import { logger, Random, Now } from "./utils";
+import { injectable, registry } from "tsyringe";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string };
 
-@registry([{ token: "now", useValue: new Date() }])
+@registry([{
+  token: "now", useFactory: () => {
+    new Date();
+  }
+}])
 @injectable()
 export class PostScheduler {
   constructor(
     private random: Random,
-    @inject("now") private now: Date,
+    private now: Now,
     private configuration: ServerConfiguration
-  ) {}
+  ) {
+  }
 
   async scheduleNextPost(): Promise<PostResult> {
     const nextPost = await PostHistory.findNextScheduledPost();
@@ -40,7 +44,7 @@ export class PostScheduler {
   private async createNewScheduledPost(): Promise<PostResult> {
     const [lastPost, newImage] = await Promise.all([
       PostHistory.findCurrentPost(),
-      this.selectNextPhoto(),
+      this.selectNextPhoto()
     ]);
     const newPost = new PostHistory();
     if (newImage.isError()) {
@@ -62,14 +66,14 @@ export class PostScheduler {
   }
 
   private async selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
-    const startOfToday = startOfDay(this.now);
+    const startOfToday = startOfDay(this.now.now());
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
     const lastTimeToday = date_set(startOfToday, {
-      hours: this.configuration.lastPostHour,
+      hours: this.configuration.lastPostHour
     });
 
     let startDate: Date;
-    if (this.now >= lastTimeToday) {
+    if (this.now.now() >= lastTimeToday) {
       // no more posts today
       startDate = startOfTomorrow;
     } else if (lastPostTime != null) {
@@ -86,14 +90,14 @@ export class PostScheduler {
       startDate = startOfToday;
     }
     let firstTime = date_set(startDate, {
-      hours: this.configuration.firstPostHour,
+      hours: this.configuration.firstPostHour
     });
     const lastTime = date_set(startDate, {
-      hours: this.configuration.lastPostHour,
+      hours: this.configuration.lastPostHour
     });
 
-    if (firstTime <= this.now) {
-      firstTime = this.now;
+    if (firstTime <= this.now.now()) {
+      firstTime = this.now.now();
     }
     const diff = Math.abs(differenceInMinutes(firstTime, lastTime));
     const random_min = this.random.randomInt(0, diff);

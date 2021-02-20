@@ -1,7 +1,6 @@
-import { logger } from "./utils/logger";
+import { logger } from "./utils";
 import assert from "assert";
-import { Image } from "./database/images.model";
-import { PostStatus } from "./database/post_history.types";
+import { Image, PostStatus } from "./database";
 import { PostScheduler } from "./post_scheduler";
 import { container } from "tsyringe";
 
