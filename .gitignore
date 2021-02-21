@@ -4,3 +4,4 @@ data
 .eslintcache
 globalConfig.json
 *.log
+.nyc_output

@@ -1,5 +1,7 @@
 import { NowProvider, RandomProvider } from "../utils";
 
+export * from "./assertions";
+
 /** Generates deterministric values that meet the randomInt() contract */
 export class NotVeryRandom extends RandomProvider {
   constructor(public specifiedValue: number) {

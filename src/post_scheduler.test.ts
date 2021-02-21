@@ -1,12 +1,11 @@
 import { PostError, PostScheduler } from "./post_scheduler";
 import { add as date_add, set as date_set, startOfToday, startOfTomorrow, startOfYesterday } from "date-fns";
-import assert from "assert";
 import { Database, Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
 import { expect } from "chai";
-import { NowProvider, RandomProvider } from "./utils";
+import { NowProvider,  RandomProvider } from "./utils";
 import { testContainer } from "./test/setup";
 import { ServerConfiguration } from "./config";
-import { MutableNow, NotVeryRandom } from "./test";
+import { assertError, assertInstanceOf, assertOk, MutableNow, NotVeryRandom } from "./test";
 
 const RANDOM_VALUE = 50;
 
@@ -190,16 +189,15 @@ describe("test schedule component", () => {
 
   async function getOkPostResult(now: Date): Promise<PostHistoryDocument> {
     const result = await buildScheduler(now).scheduleNextPost();
-    expect(result.isOk()).ok;
+    assertOk(result);
     const newPost = result.value;
-    assert(newPost instanceof PostHistory);
+    assertInstanceOf(newPost, PostHistory);
     return newPost;
   }
 
   async function getErrorPostResult(now: Date): Promise<PostError> {
     const result = await buildScheduler(now).scheduleNextPost();
-    expect(result.isError()).ok;
-    assert(result.isError());
+    assertError(result);
     return result.value;
   }
 
