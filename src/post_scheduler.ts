@@ -12,12 +12,13 @@ export type PostError = { message: string };
 @injectable()
 export class PostScheduler {
   constructor(
-    private random: RandomProvider,
-    private now: NowProvider,
+    private randomProvider: RandomProvider,
+    private nowProvider: NowProvider,
     private configuration: ServerConfiguration
   ) {
   }
 
+  /** returns the next post after scheduling or if it still needs to be posted */
   async scheduleNextPost(): Promise<PostResult> {
     const nextPost = await PostHistory.findNextScheduledPost();
     if (nextPost != null) {
@@ -52,19 +53,20 @@ export class PostScheduler {
     if (allImages.length == 0) {
       return error({ message: "no images" });
     }
-    const randomIndex = this.random.randomInt(0, allImages.length);
+    const randomIndex = this.randomProvider.randomInt(0, allImages.length);
     return ok(allImages[randomIndex]);
   }
 
   private async selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
-    const startOfToday = startOfDay(this.now.now());
+    const now = this.nowProvider.now();
+    const startOfToday = startOfDay(now);
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
     const lastTimeToday = date_set(startOfToday, {
       hours: this.configuration.lastPostHour
     });
 
     let startDate: Date;
-    if (this.now.now() >= lastTimeToday) {
+    if (now >= lastTimeToday) {
       // no more posts today
       startDate = startOfTomorrow;
     } else if (lastPostTime != null) {
@@ -87,11 +89,11 @@ export class PostScheduler {
       hours: this.configuration.lastPostHour
     });
 
-    if (firstTime <= this.now.now()) {
-      firstTime = this.now.now();
+    if (firstTime <= now) {
+      firstTime = now;
     }
     const diff = Math.abs(differenceInMinutes(firstTime, lastTime));
-    const random_min = this.random.randomInt(0, diff);
+    const random_min = this.randomProvider.randomInt(0, diff);
 
     // return
     return date_add(firstTime, { minutes: random_min });

@@ -6,35 +6,9 @@ import { expect } from "chai";
 import { NowProvider, RandomProvider } from "./utils";
 import { testContainer } from "./test/setup";
 import { ServerConfiguration } from "./config";
+import { MutableNow, NotVeryRandom } from "./test";
 
 const RANDOM_VALUE = 50;
-
-class NotVeryRandom extends RandomProvider {
-  constructor(private specifiedValue: number) {
-    super();
-  }
-
-  randomInt(min: number, max: number): number {
-    let val = this.specifiedValue;
-    if (val < min) {
-      val = min;
-    }
-    if (val >= max) {
-      val = max - 1;
-    }
-    return val;
-  }
-}
-
-class NotVeryNow extends NowProvider {
-  constructor(private when: Date) {
-    super();
-  }
-
-  now(): Date {
-    return this.when;
-  }
-}
 
 describe("test schedule component", () => {
   const database = testContainer.resolve(Database);
@@ -208,6 +182,10 @@ describe("test schedule component", () => {
       expect(newPost.timestamp).eql(expected);
       expect(newPost.status.flag).eq(PostStatus.PENDING);
     });
+
+    it("should do nothing at 8:15, then at 10:30 it should generate the next post", () => {
+      expect(false);
+    });
   });
 
   async function getOkPostResult(now: Date): Promise<PostHistoryDocument> {
@@ -225,11 +203,15 @@ describe("test schedule component", () => {
     return result.value;
   }
 
-  function buildScheduler(now: Date) {
+  /** build a scheduler based on a specific time stamp or mutable now */
+  function buildScheduler(now: MutableNow | Date) {
+    if (now instanceof Date) {
+      now = new MutableNow(now);
+    }
     return testContainer
       .createChildContainer()
       .register<RandomProvider>(RandomProvider, { useValue: new NotVeryRandom(RANDOM_VALUE) })
-      .register<NowProvider>(NowProvider, { useValue: new NotVeryNow(now) })
+      .register<NowProvider>(NowProvider, { useValue: now })
       .resolve(PostScheduler);
   }
 });
