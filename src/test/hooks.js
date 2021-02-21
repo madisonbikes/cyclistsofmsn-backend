@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { TEST_MONGODB_DATABASE_NAME, TEST_MONGODB_SERVER_PORT } from "./setup";
+import { logger } from "../utils";
 
 let mongoServer;
 
@@ -15,7 +16,7 @@ export async function mochaGlobalSetup() {
   });
   await mongoServer.start();
   const url = await mongoServer.getUri();
-  console.log(url);
+  logger.debug("connecting to test mongodb ", url)
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
