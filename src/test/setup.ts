@@ -62,20 +62,25 @@ export function testDatabase(): Database {
 async function initializeSuite(options: Partial<SuiteOptions>): Promise<DependencyContainer> {
   const withDatabase = options.withDatabase;
   if (withDatabase) {
+    // start the mongo in-memory server on an ephemeral port
     mongoServer = new MongoMemoryServer();
     mongoUri = await mongoServer.getUri();
   }
 
   // don't use value registrations because they will be cleared in the beforeEach() handler
   const testContainer = rootContainer.createChildContainer();
+
+  // provide a custom TestConfiguration adapted for the testing environment
   testContainer.register<ServerConfiguration>(ServerConfiguration,
     { useClass: TestConfiguration },
     { lifecycle: Lifecycle.ContainerScoped });
   if (withDatabase) {
+    // provide a Database object scoped to the container rather, overriding singleton normally
     testContainer.register<Database>(Database,
       { useClass: Database },
       { lifecycle: Lifecycle.ContainerScoped });
   } else {
+    // if database not enabled, trigger an error if we try to inject a database object
     testContainer.register<Database>(Database,
       {
         useFactory: () => {
@@ -99,6 +104,7 @@ class TestConfiguration extends ServerConfiguration {
     this.photosDir = path.resolve(
       __dirname,
       "../../test_resources");
+    // use static mongo URI set in suite initialization
     this.mongodbUri = mongoUri;
   }
 }
