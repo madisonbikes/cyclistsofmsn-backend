@@ -1,9 +1,8 @@
-import { Image } from "./database/images.model";
-import { ImageDocument } from "./database/images.types";
+import { Image, ImageDocument } from "./database";
 import { FilesystemRepository } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
 import parseDate from "date-fns/parse";
-import { logger } from "./utils/logger";
+import { logger } from "./utils";
 import { injectable } from "tsyringe";
 
 /** expose scanning operation.  requires database connection to be established */
