@@ -1,6 +1,6 @@
 import { ServerConfiguration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 import { injectable, singleton } from "tsyringe";
 
 /** provide unified access to database connection */

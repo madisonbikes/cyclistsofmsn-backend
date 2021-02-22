@@ -3,8 +3,9 @@ import { DEFAULT_SERVER_PORT, ServerConfiguration } from "../config";
 import axios from "axios";
 import winston from "winston";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { container as rootContainer, DependencyContainer, injectable, Lifecycle, scoped } from "tsyringe";
+import { container as rootContainer, DependencyContainer, injectable, Lifecycle } from "tsyringe";
 import path from "path";
+import { Database } from "../database";
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer;
@@ -19,7 +20,12 @@ async function initializeTestContainer(): Promise<DependencyContainer> {
   mongoServer = new MongoMemoryServer();
   mongoUri = await mongoServer.getUri();
   const testContainer = rootContainer.createChildContainer();
-  testContainer.register<ServerConfiguration>(ServerConfiguration, { useClass: TestConfiguration });
+  testContainer.register<ServerConfiguration>(ServerConfiguration,
+    { useClass: TestConfiguration },
+    { lifecycle: Lifecycle.ContainerScoped });
+  testContainer.register<Database>(Database,
+    { useClass: Database },
+    { lifecycle: Lifecycle.ContainerScoped });
   return testContainer;
 }
 
@@ -48,7 +54,6 @@ export function testContainer(): DependencyContainer {
 }
 
 @injectable()
-@scoped(Lifecycle.ResolutionScoped)
 class TestConfiguration extends ServerConfiguration {
   constructor() {
     super();
