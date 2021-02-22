@@ -1,28 +1,61 @@
+import "reflect-metadata";
 import { DEFAULT_SERVER_PORT, ServerConfiguration } from "../config";
-import { container as rootContainer, singleton } from "tsyringe";
-import path from "path";
 import axios from "axios";
+import winston from "winston";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { container as rootContainer, DependencyContainer, injectable, Lifecycle, scoped } from "tsyringe";
+import path from "path";
 
-// this is just a random port
-export const TEST_MONGODB_SERVER_PORT = 52333;
-
-// this could be anything.
-// FIXME maybe someday a different database per test suite to help allow parallel suites?
-export const TEST_MONGODB_DATABASE_NAME = "test";
+let mongoUri: string;
+let mongoServer: MongoMemoryServer;
 
 // the test container is preconfigured
-export const testContainer = rootContainer.createChildContainer();
+winston.remove(winston.transports.Console);
+winston.remove(winston.transports.File);
 
-@singleton()
+axios.defaults.baseURL = `http://localhost:${DEFAULT_SERVER_PORT}`;
+
+async function initializeTestContainer(): Promise<DependencyContainer> {
+  mongoServer = new MongoMemoryServer();
+  mongoUri = await mongoServer.getUri();
+  const testContainer = rootContainer.createChildContainer();
+  testContainer.register<ServerConfiguration>(ServerConfiguration, { useClass: TestConfiguration });
+  return testContainer;
+}
+
+async function cleanupTestContainer(): Promise<void> {
+  await mongoServer.stop();
+}
+
+let tc: DependencyContainer;
+
+export function setupTestContainer(): void {
+  beforeAll(async () => {
+    tc = await initializeTestContainer();
+  });
+
+  afterAll(async () => {
+    await cleanupTestContainer();
+  });
+
+  beforeEach(() => {
+    tc.clearInstances();
+  });
+}
+
+export function testContainer(): DependencyContainer {
+  return tc;
+}
+
+@injectable()
+@scoped(Lifecycle.ResolutionScoped)
 class TestConfiguration extends ServerConfiguration {
   constructor() {
     super();
+
     this.photosDir = path.resolve(
       __dirname,
       "../../test_resources");
-    this.mongodbUri = `mongodb://localhost:${TEST_MONGODB_SERVER_PORT}/${TEST_MONGODB_DATABASE_NAME}?`;
+    this.mongodbUri = mongoUri;
   }
 }
-
-testContainer.register<ServerConfiguration>(ServerConfiguration, { useClass: TestConfiguration });
-axios.defaults.baseURL = `http://localhost:${DEFAULT_SERVER_PORT}`;

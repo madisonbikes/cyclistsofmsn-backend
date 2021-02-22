@@ -1,29 +1,33 @@
+import {
+  assertError,
+  assertInstanceOf,
+  assertOk,
+  MutableNow,
+  NotVeryRandom, setupTestContainer, testContainer
+} from "./test";
 import { PostError, PostScheduler } from "./post_scheduler";
 import { add as date_add, set as date_set, startOfToday, startOfTomorrow, startOfYesterday } from "date-fns";
 import { Database, Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
-import { expect } from "chai";
-import { NowProvider,  RandomProvider } from "./utils";
-import { testContainer } from "./test/setup";
+import { NowProvider, RandomProvider } from "./utils";
 import { ServerConfiguration } from "./config";
-import { assertError, assertInstanceOf, assertOk, MutableNow, NotVeryRandom } from "./test";
 
 const RANDOM_VALUE = 50;
 
 describe("test schedule component", () => {
-  const database = testContainer.resolve(Database);
-  const configuration = testContainer.resolve(ServerConfiguration);
 
-  before(async () => {
+  setupTestContainer()
+  let database: Database;
+
+  beforeAll(async () => {
+    database = testContainer().resolve(Database);
     await database.connect();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await database.disconnect();
   });
 
   beforeEach(async () => {
-    testContainer.clearInstances();
-
     // clear posts and images
     await PostHistory.deleteMany();
     await Image.deleteMany();
@@ -32,7 +36,7 @@ describe("test schedule component", () => {
   describe("with no images", () => {
     it("should fail with no images error", async function() {
       const error = await getErrorPostResult(startOfToday());
-      expect(error.message).eq("no images");
+      expect(error.message).toEqual("no images");
     });
   });
 
@@ -47,13 +51,13 @@ describe("test schedule component", () => {
     it("should schedule a post today", async () => {
       // set current time to 10:00 AM
       const now = date_add(startOfToday(), {
-        hours: configuration.firstPostHour + 2
+        hours: configuration().firstPostHour + 2
       });
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
-      expect(JSON.stringify(newPost.timestamp)).eql(JSON.stringify(expected));
+      expect(JSON.stringify(newPost.timestamp)).toEqual(JSON.stringify(expected));
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -64,9 +68,9 @@ describe("test schedule component", () => {
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), {
         minutes: RANDOM_VALUE,
-        hours: configuration.firstPostHour
+        hours: configuration().firstPostHour
       });
-      expect(newPost.timestamp).eql(expected);
+      expect(newPost.timestamp).toEqual(expected);
     });
   });
 
@@ -87,14 +91,14 @@ describe("test schedule component", () => {
     it("should schedule a post today", async () => {
       // set current time to 10:00 AM
       const now = date_set(startOfToday(), {
-        hours: configuration.firstPostHour + 3
+        hours: configuration().firstPostHour + 3
       });
 
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
-      expect(newPost.timestamp).eql(expected);
+      expect(newPost.timestamp).toEqual(expected);
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -105,9 +109,9 @@ describe("test schedule component", () => {
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), {
         minutes: RANDOM_VALUE,
-        hours: configuration.firstPostHour
+        hours: configuration().firstPostHour
       });
-      expect(newPost.timestamp).eql(expected);
+      expect(newPost.timestamp).toEqual(expected);
     });
   });
 
@@ -122,7 +126,7 @@ describe("test schedule component", () => {
       newPost.image = newImage.id;
       newPost.status.flag = PostStatus.COMPLETE;
       newPost.timestamp = date_set(startOfToday(), {
-        hours: configuration.firstPostHour,
+        hours: configuration().firstPostHour,
         minutes: 15
       });
       await newPost.save();
@@ -131,16 +135,16 @@ describe("test schedule component", () => {
     it("should schedule a post tomorrow", async () => {
       // set current time to 11:00 AM
       const now = date_set(startOfToday(), {
-        hours: configuration.firstPostHour + 3
+        hours: configuration().firstPostHour + 3
       });
       const newPost = await getOkPostResult(now);
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(startOfTomorrow(), {
-        hours: configuration.firstPostHour,
+        hours: configuration().firstPostHour,
         minutes: RANDOM_VALUE
       });
-      expect(newPost.timestamp).eql(expected);
+      expect(newPost.timestamp).toEqual(expected);
     });
 
     it("should schedule a post tomorrow if we missed window", async () => {
@@ -152,9 +156,9 @@ describe("test schedule component", () => {
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), {
         minutes: RANDOM_VALUE,
-        hours: configuration.firstPostHour
+        hours: configuration().firstPostHour
       });
-      expect(newPost.timestamp).eql(expected);
+      expect(newPost.timestamp).toEqual(expected);
     });
   });
 
@@ -178,8 +182,8 @@ describe("test schedule component", () => {
       const newPost = await getOkPostResult(now);
 
       const expected = date_add(startOfToday(), { hours: 10, minutes: 15 });
-      expect(newPost.timestamp).eql(expected);
-      expect(newPost.status.flag).eq(PostStatus.PENDING);
+      expect(newPost.timestamp).toEqual(expected);
+      expect(newPost.status.flag).toEqual(PostStatus.PENDING);
     });
 
     it("should do nothing at 8:15, then at 10:30 it should generate the next post", async () => {
@@ -188,28 +192,28 @@ describe("test schedule component", () => {
       const nowProvider = new MutableNow(now);
       const scheduler = await buildScheduler(nowProvider);
       let newPostResult = await scheduler.scheduleNextPost();
-      assertOk(newPostResult)
+      assertOk(newPostResult);
       let { value: newPost } = newPostResult;
-      assertInstanceOf(newPost, PostHistory)
+      assertInstanceOf(newPost, PostHistory);
 
       let expected = date_add(startOfToday(), { hours: 10, minutes: 15 });
-      expect(newPost.timestamp).eql(expected);
-      expect(newPost.status.flag).eq(PostStatus.PENDING);
+      expect(newPost.timestamp).toEqual(expected);
+      expect(newPost.status.flag).toEqual(PostStatus.PENDING);
 
       // do the post
-      newPost.status.flag = PostStatus.COMPLETE
-      await newPost.save()
+      newPost.status.flag = PostStatus.COMPLETE;
+      await newPost.save();
 
       nowProvider.when = date_set(startOfToday(), { hours: 10, minutes: 30 });
       newPostResult = await scheduler.scheduleNextPost();
-      assertOk(newPostResult)
+      assertOk(newPostResult);
       newPost = newPostResult.value;
       assertInstanceOf(newPost, PostHistory);
 
       // post tomorrow
       expected = date_add(startOfTomorrow(), { hours: 8, minutes: 50 });
-      expect(newPost.timestamp).eql(expected);
-      expect(newPost.status.flag).eq(PostStatus.PENDING);
+      expect(newPost.timestamp).toEqual(expected);
+      expect(newPost.status.flag).toEqual(PostStatus.PENDING);
     });
   });
 
@@ -232,10 +236,14 @@ describe("test schedule component", () => {
     if (now instanceof Date) {
       now = new MutableNow(now);
     }
-    return testContainer
+    return testContainer()
       .createChildContainer()
       .register<RandomProvider>(RandomProvider, { useValue: new NotVeryRandom(RANDOM_VALUE) })
       .register<NowProvider>(NowProvider, { useValue: now })
       .resolve(PostScheduler);
+  }
+
+  function configuration(): ServerConfiguration {
+    return testContainer().resolve(ServerConfiguration);
   }
 });

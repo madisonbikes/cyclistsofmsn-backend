@@ -1,54 +1,50 @@
+import { setupTestContainer, testContainer } from "./test";
 import { PhotoServer } from "./server";
 import axios from "axios";
-import { expect } from "chai";
-import { testContainer } from "./test/setup";
 import { Image } from "./database";
 
 // FIXME don't use axios for testing REST, use something like supertest/superagent
 describe("server process", () => {
-  let photoServer: PhotoServer | undefined;
+  let photoServer: PhotoServer;
 
-  beforeEach(() => {
-    testContainer.clearInstances();
-  });
+  setupTestContainer()
 
-  before(async () => {
-    photoServer = testContainer.resolve(PhotoServer);
+  beforeAll(async () => {
+    photoServer = testContainer().resolve(PhotoServer);
     await photoServer.start();
   });
 
-  after(async () => {
-    await photoServer?.stop();
-    photoServer = undefined;
+  afterAll(async () => {
+    await photoServer.stop();
   });
 
   it("responds to image list api call", async () => {
     const imageResponse = await axios.get("/images");
-    expect(imageResponse.status).eq(200);
-    expect(imageResponse.data.length).eq(5);
+    expect(imageResponse.status).toEqual(200);
+    expect(imageResponse.data).toHaveLength(5);
   });
 
   it("responds to single image api call", async () => {
     const imageListResponse = await axios.get("/images");
 
-    expect(imageListResponse.status).eq(200);
-    expect(imageListResponse.data.length).eq(5);
+    expect(imageListResponse.status).toEqual(200);
+    expect(imageListResponse.data).toHaveLength(5);
 
     const id = imageListResponse.data[0].id;
     const imageResponse = await axios.get(`/images/${id}`);
-    expect(imageResponse.status).eq(200);
+    expect(imageResponse.status).toEqual(200);
     const headers = imageResponse.headers;
     const type = headers["content-type"];
-    expect(type).eq("image/jpeg");
-    expect(imageResponse.data).to.exist;
+    expect(type).toEqual("image/jpeg");
+    expect(imageResponse.data).toBeDefined();
   });
 
   it("failed response to invalid image call", async () => {
     try {
       await axios.get("/images/badid");
-      expect(false);
+      expect(false).toBe(true);
     } catch (err) {
-      expect(err.response.status).eq(404);
+      expect(err.response.status).toEqual(404);
     }
   });
 
@@ -59,9 +55,9 @@ describe("server process", () => {
 
     try {
       await axios.get(`/images/${badImage.id}`);
-      expect(false);
+      expect(false).toEqual(true);
     } catch (err) {
-      expect(err.response.status).eq(404);
+      expect(err.response.status).toEqual(404);
     }
   });
 });
