@@ -11,6 +11,7 @@ import parse from "date-fns/parse";
 import { Database, Image, PostHistory, PostStatus } from "./database";
 import { logger } from "./utils";
 import { container, injectable } from "tsyringe";
+import { once } from "events";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -53,10 +54,10 @@ export class Importer {
         // strip out UTC portion
         const date = matched[2] + " " + matched[3] + " Z";
         const parsedDate = parse(date, "MMM d HH:mm:ss yyyy X", new Date());
-
         posts.push({ filename: filename, date: parsedDate });
       }
     });
+    await once(readInterface, "close");
 
     await this.database.connect();
 
