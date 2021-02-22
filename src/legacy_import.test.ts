@@ -1,9 +1,9 @@
-import { setupTestContainer, testContainer } from "./test";
-import { Database, PostHistory } from "./database";
+import { setupSuite, testContainer, testDatabase } from "./test";
+import { PostHistory } from "./database";
 import { Importer } from "./legacy_import";
 
 describe("test imports", () => {
-  setupTestContainer();
+  setupSuite({ withDatabase: true });
 
   beforeEach(async () => {
     await PostHistory.deleteMany();
@@ -16,8 +16,7 @@ describe("test imports", () => {
     expect(value).toEqual(325);
 
     // ensure database connection is back
-    const database = testContainer().resolve(Database);
-    expect(await database.connect()).toEqual(true);
+    expect(await testDatabase().connect()).toEqual(true);
     expect(await PostHistory.find()).toHaveLength(325);
   });
 });

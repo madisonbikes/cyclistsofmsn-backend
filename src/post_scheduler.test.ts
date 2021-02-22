@@ -3,8 +3,7 @@ import {
   assertInstanceOf,
   assertOk,
   MutableNow,
-  NotVeryRandom,
-  setupTestContainer,
+  NotVeryRandom, setupSuite,
   testContainer
 } from "./test";
 import { PostError, PostScheduler } from "./post_scheduler";
@@ -16,7 +15,7 @@ import { ServerConfiguration } from "./config";
 const RANDOM_VALUE = 50;
 
 describe("test schedule component", () => {
-  setupTestContainer();
+  setupSuite({ withDatabase: true });
 
   beforeEach(async () => {
     // clear posts and images

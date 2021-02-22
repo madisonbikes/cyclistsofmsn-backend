@@ -1,4 +1,4 @@
-import { setupTestContainer, testContainer } from "./test";
+import { setupSuite, testContainer } from "./test";
 import { PhotoServer } from "./server";
 import axios from "axios";
 import { Image } from "./database";
@@ -7,7 +7,7 @@ import { Image } from "./database";
 describe("server process", () => {
   let photoServer: PhotoServer;
 
-  setupTestContainer()
+  setupSuite({ withDatabase: true });
 
   beforeAll(async () => {
     photoServer = testContainer().resolve(PhotoServer);
