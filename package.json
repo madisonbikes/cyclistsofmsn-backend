@@ -7,7 +7,7 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
-    "test": "NODE_ENV=test npx jest ",
+    "test": "NODE_ENV=test npx jest",
     "coverage": "NODE_ENV=test npx jest --coverage=true",
     "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log",
     "lint": "eslint '**/*.ts' '**/*.js'"

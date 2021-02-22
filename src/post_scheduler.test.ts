@@ -3,29 +3,20 @@ import {
   assertInstanceOf,
   assertOk,
   MutableNow,
-  NotVeryRandom, setupTestContainer, testContainer
+  NotVeryRandom,
+  setupTestContainer,
+  testContainer
 } from "./test";
 import { PostError, PostScheduler } from "./post_scheduler";
 import { add as date_add, set as date_set, startOfToday, startOfTomorrow, startOfYesterday } from "date-fns";
-import { Database, Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
+import { Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
 import { NowProvider, RandomProvider } from "./utils";
 import { ServerConfiguration } from "./config";
 
 const RANDOM_VALUE = 50;
 
 describe("test schedule component", () => {
-
-  setupTestContainer()
-  let database: Database;
-
-  beforeAll(async () => {
-    database = testContainer().resolve(Database);
-    await database.connect();
-  });
-
-  afterAll(async () => {
-    await database.disconnect();
-  });
+  setupTestContainer();
 
   beforeEach(async () => {
     // clear posts and images
