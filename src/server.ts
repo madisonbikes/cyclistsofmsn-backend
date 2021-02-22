@@ -18,7 +18,7 @@ if (require.main === module) {
   Promise.resolve()
     .then(() => {
       const server = container.resolve(PhotoServer);
-      return server.start();
+      return server.createAndListen();
     })
     .catch((error) => {
       logger.error(error);
@@ -37,8 +37,7 @@ export class PhotoServer {
 
   server: Server | undefined;
 
-  /** returns async function that can be used to shutdown the server */
-  async start(): Promise<void> {
+  async create(): Promise<Server> {
     await this.database.connect();
     await this.scanner.scan();
     await startExecutor();
@@ -66,9 +65,13 @@ export class PhotoServer {
       logger.error(err);
     });
 
-    this.server = http
-      .createServer(app.callback())
-      .listen(this.configuration.serverPort);
+    this.server = http.createServer(app.callback());
+    return this.server;
+  }
+
+  async createAndListen(): Promise<void> {
+    await this.create();
+    this.server?.listen(this.configuration.serverPort);
     logger.info(`Server is listening on port ${this.configuration.serverPort}`);
   }
 
