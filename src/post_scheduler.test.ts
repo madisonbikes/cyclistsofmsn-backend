@@ -182,8 +182,34 @@ describe("test schedule component", () => {
       expect(newPost.status.flag).eq(PostStatus.PENDING);
     });
 
-    it("should do nothing at 8:15, then at 10:30 it should generate the next post", () => {
-      expect(false);
+    it("should do nothing at 8:15, then at 10:30 it should generate the next post", async () => {
+      // set current time to 8:15 AM
+      const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
+      const nowProvider = new MutableNow(now);
+      const scheduler = await buildScheduler(nowProvider);
+      let newPostResult = await scheduler.scheduleNextPost();
+      assertOk(newPostResult)
+      let { value: newPost } = newPostResult;
+      assertInstanceOf(newPost, PostHistory)
+
+      let expected = date_add(startOfToday(), { hours: 10, minutes: 15 });
+      expect(newPost.timestamp).eql(expected);
+      expect(newPost.status.flag).eq(PostStatus.PENDING);
+
+      // do the post
+      newPost.status.flag = PostStatus.COMPLETE
+      await newPost.save()
+
+      nowProvider.when = date_set(startOfToday(), { hours: 10, minutes: 30 });
+      newPostResult = await scheduler.scheduleNextPost();
+      assertOk(newPostResult)
+      newPost = newPostResult.value;
+      assertInstanceOf(newPost, PostHistory);
+
+      // post tomorrow
+      expected = date_add(startOfTomorrow(), { hours: 8, minutes: 50 });
+      expect(newPost.timestamp).eql(expected);
+      expect(newPost.status.flag).eq(PostStatus.PENDING);
     });
   });
 
