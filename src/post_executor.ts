@@ -1,59 +1,61 @@
-import { logger } from "./utils";
+import { Cancellable, logger, NowProvider, SimpleScheduler } from "./utils";
 import assert from "assert";
 import { Image, PostStatus } from "./database";
 import { PostScheduler } from "./post_scheduler";
-import { container } from "tsyringe";
+import { injectable } from "tsyringe";
 
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
 
-let intervalTimeout: NodeJS.Timeout | undefined;
-let startupTimeout: NodeJS.Timeout | undefined;
+@injectable()
+export class PostExecutor {
+  private intervalCancellable: Cancellable | undefined;
+  private startupCancellable: Cancellable | undefined;
 
-export function startExecutor(): void {
-  startupTimeout = setTimeout(checkTimeToPost, 10 * 1000);
-  intervalTimeout = setInterval(checkTimeToPost, CHECK_INTERVAL);
-}
-
-export function stopExecutor(): void {
-  if (startupTimeout != null) {
-    clearTimeout(startupTimeout);
-    startupTimeout = undefined;
+  constructor(private scheduler: PostScheduler, private nowProvider: NowProvider, private simpleScheduler: SimpleScheduler) {
   }
-  if (intervalTimeout != null) {
-    clearInterval(intervalTimeout);
-    intervalTimeout = undefined;
-  }
-}
 
-/** async function is fine for setInterval(), but it should never throw an exception */
-async function checkTimeToPost() {
-  try {
-    const scheduler = container.resolve(PostScheduler);
-    const scheduledResult = await scheduler.scheduleNextPost();
-    if (scheduledResult.isError()) {
-      logger.error("Error scheduling post", scheduledResult.value);
+  start(): void {
+    this.startupCancellable = this.simpleScheduler.scheduleTimeout(this.checkTimeToPost, 10 * 1000);
+    this.intervalCancellable = this.simpleScheduler.scheduleInterval(this.checkTimeToPost, CHECK_INTERVAL);
+  }
+
+  stop(): void {
+    this.intervalCancellable?.cancel()
+    this.intervalCancellable = undefined;
+
+    this.startupCancellable?.cancel()
+    this.startupCancellable = undefined;
+  }
+
+  /** async function is fine for setInterval(), but it should never throw an exception */
+  private async checkTimeToPost() {
+    try {
+      const scheduledResult = await this.scheduler.scheduleNextPost();
+      if (scheduledResult.isError()) {
+        logger.error("Error scheduling post", scheduledResult.value);
+        return;
+      }
+      const nextPost = scheduledResult.value;
+      const when = this.nowProvider.now().getTime() - nextPost.timestamp.getTime();
+      if (when > 0) {
+        await nextPost
+          .populate("image")
+          .execPopulate();
+
+        assert(nextPost.image instanceof Image);
+        logger.info(`Posting ${nextPost.image.filename} a new twitter!`);
+        nextPost.status.flag = PostStatus.COMPLETE;
+        await nextPost.save();
+        if (when > CHECK_INTERVAL) {
+          logger.info(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, running immediately.`);
+        } else {
+          logger.info("Running scheduled post on schedule");
+        }
+      }
+    } catch (e) {
+      logger.error(e);
       return;
     }
-    const nextPost = scheduledResult.value;
-    const when = Date.now() - nextPost.timestamp.getTime();
-    if (when > 0) {
-      await nextPost
-        .populate("image")
-        .execPopulate();
-
-      assert(nextPost.image instanceof Image);
-      logger.info(`Posting ${nextPost.image.filename} a new twitter!`);
-      nextPost.status.flag = PostStatus.COMPLETE;
-      await nextPost.save();
-      if (when > CHECK_INTERVAL) {
-        logger.info(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, running immediately.`);
-      } else {
-        logger.info("Running scheduled post on schedule");
-      }
-    }
-  } catch (e) {
-    logger.error(e);
-    return;
   }
 }

@@ -4,13 +4,13 @@ import Koa from "koa";
 import koaQueryString from "koa-qs";
 import koa_logger from "koa-logger";
 import serve from "koa-static";
-import { startExecutor, stopExecutor } from "./post_executor";
 import { logger } from "./utils";
 import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
 import { Router } from "./routes";
+import { PostExecutor } from "./post_executor";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -31,16 +31,18 @@ export class PhotoServer {
     private configuration: ServerConfiguration,
     private scanner: ImageRepositoryScanner,
     private database: Database,
-    private router: Router
+    private router: Router,
+    private postExecutor: PostExecutor
   ) {
   }
 
   server: Server | undefined;
 
+  /** create server but don't start listener, for testing */
   async create(): Promise<Server> {
     await this.database.connect();
     await this.scanner.scan();
-    await startExecutor();
+    this.postExecutor.start();
 
     const app = new Koa();
 
@@ -69,6 +71,7 @@ export class PhotoServer {
     return this.server;
   }
 
+  /** called to create and start listener */
   async createAndListen(): Promise<void> {
     await this.create();
     this.server?.listen(this.configuration.serverPort);
@@ -77,7 +80,7 @@ export class PhotoServer {
 
   async stop(): Promise<void> {
     this.server?.close();
-    await stopExecutor();
+    this.postExecutor.stop();
 
     await this.database.disconnect();
   }
