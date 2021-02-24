@@ -1,8 +1,7 @@
 import "reflect-metadata";
-import { Cancellable, NowProvider, RandomProvider, ScheduledFunction, SimpleScheduler } from "../utils";
+import { NowProvider, RandomProvider } from "../utils";
 import supertest from "supertest";
 import { Server } from "http";
-import { injectable } from "tsyringe";
 
 export * from "./assertions";
 export * from "./setup";
