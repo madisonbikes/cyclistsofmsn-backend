@@ -2,9 +2,7 @@
  * Adapted from https://github.com/lagden/koa-jwt-authz
  */
 
-import { Context } from "koa";
-
-type NextFn = (ctx: Context, next: () => Promise<unknown>) => void
+import Koa, { Context, Middleware } from "koa";
 
 /**
  * JWT Authz middleware.
@@ -15,8 +13,8 @@ type NextFn = (ctx: Context, next: () => Promise<unknown>) => void
  * @returns {function}           - next function
  * @api public
  */
-export function jwtAuthz(expectedScopes: string[], checkAllScopes = false, customScopeKey = "scope"): NextFn {
-  return async (ctx: Context, next: () => Promise<unknown>) => {
+export function jwtAuthz(expectedScopes: string[], checkAllScopes = false, customScopeKey = "scope"): Middleware {
+  return async (ctx: Context, next: Koa.Next) => {
     if (expectedScopes.length === 0) {
       await next();
       return;

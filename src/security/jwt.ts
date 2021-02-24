@@ -3,7 +3,7 @@ import jwks from "jwks-rsa";
 import jwt_internal from "koa-jwt";
 import compose from "koa-compose";
 import { jwtAuthz } from "./koa-jwt-authz";
-import Koa from "koa";
+import { Middleware } from "koa";
 
 const secret = jwks.koaJwtSecret({
   cache: true,
@@ -22,7 +22,7 @@ const jwt_first = jwt_internal(
   }
 );
 
-export function jwt(requiredScopes: string[] = []): Koa.Middleware {
+export function jwt(requiredScopes: string[] = []): Middleware {
   if (requiredScopes.length == 0) {
     return jwt_first;
   } else {
