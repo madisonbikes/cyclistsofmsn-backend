@@ -15,7 +15,7 @@ describe("test imports", () => {
     expect(value).toEqual(325);
 
     // ensure database connection is back
-    expect(await testDatabase().connect()).toEqual(true);
+    expect(await testDatabase().start()).toEqual(true);
     expect(await PostHistory.find()).toHaveLength(325);
   });
 });

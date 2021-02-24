@@ -4,13 +4,13 @@ import Koa from "koa";
 import koaQueryString from "koa-qs";
 import koa_logger from "koa-logger";
 import serve from "koa-static";
-import { logger } from "./utils";
+import { Lifecycle, logger } from "./utils";
 import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
 import { Router } from "./routes";
-import { PostExecutor } from "./post_executor";
+import { PostDispatcher } from "./posts/dispatcher";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -18,7 +18,7 @@ if (require.main === module) {
   Promise.resolve()
     .then(() => {
       const server = container.resolve(PhotoServer);
-      return server.createAndListen();
+      return server.start();
     })
     .catch((error) => {
       logger.error(error);
@@ -26,23 +26,27 @@ if (require.main === module) {
 }
 
 @injectable()
-export class PhotoServer {
+export class PhotoServer implements Lifecycle {
   constructor(
     private configuration: ServerConfiguration,
-    private scanner: ImageRepositoryScanner,
-    private database: Database,
+    scanner: ImageRepositoryScanner,
+    database: Database,
     private router: Router,
-    private postExecutor: PostExecutor
+    postDispatcher: PostDispatcher
   ) {
+    this.components.push(database)
+    this.components.push(scanner)
+    this.components.push(postDispatcher)
   }
 
+  components: Lifecycle[] = []
   server: Server | undefined;
 
-  /** create server but don't start listener, for testing */
+  /** create server but don't start main listener, for testing */
   async create(): Promise<Server> {
-    await this.database.connect();
-    await this.scanner.scan();
-    this.postExecutor.start();
+    for await (const c of this.components) {
+      await c.start()
+    }
 
     const app = new Koa();
 
@@ -72,7 +76,7 @@ export class PhotoServer {
   }
 
   /** called to create and start listener */
-  async createAndListen(): Promise<void> {
+  async start(): Promise<void> {
     await this.create();
     this.server?.listen(this.configuration.serverPort);
     logger.info(`Server is listening on port ${this.configuration.serverPort}`);
@@ -80,8 +84,10 @@ export class PhotoServer {
 
   async stop(): Promise<void> {
     this.server?.close();
-    this.postExecutor.stop();
 
-    await this.database.disconnect();
+    // shut them down in reverse order
+    for await (const c of this.components.reverse()) {
+      await c.stop?.()
+    }
   }
 }

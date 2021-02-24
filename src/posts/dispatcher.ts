@@ -1,7 +1,7 @@
-import { Cancellable, logger, NowProvider, SimpleScheduler } from "./utils";
+import { Cancellable, Lifecycle, logger, NowProvider, SimpleScheduler } from "../utils";
 import assert from "assert";
-import { Image, PostStatus } from "./database";
-import { PostScheduler } from "./post_scheduler";
+import { Image, PostStatus } from "../database";
+import { PostScheduler } from "./scheduler";
 import { injectable } from "tsyringe";
 
 /** check every five minutes */
@@ -9,7 +9,7 @@ const CHECK_INTERVAL = 5 * 60 * 1000;
 const DELAY = 5 * 1000;
 
 @injectable()
-export class PostExecutor {
+export class PostDispatcher implements Lifecycle {
   private scheduled: Cancellable | undefined;
 
   constructor(private scheduler: PostScheduler, private nowProvider: NowProvider,

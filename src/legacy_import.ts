@@ -59,7 +59,7 @@ export class Importer {
     });
     await once(readInterface, "close");
 
-    await this.database.connect();
+    await this.database.start();
 
     let count = 0;
     let placeholders = 0;
@@ -90,7 +90,7 @@ export class Importer {
     );
 
     // and we're done
-    await this.database.disconnect();
+    await this.database.stop();
     /*
   // sample query to get list of posts
   const results = await PostHistory.aggregate([

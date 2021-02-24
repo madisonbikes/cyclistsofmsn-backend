@@ -1,18 +1,18 @@
 import { ServerConfiguration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
-import { logger } from "../utils";
+import { Lifecycle, logger } from "../utils";
 import { injectable, singleton } from "tsyringe";
 
 /** provide unified access to database connection */
 @injectable()
 @singleton()
-export class Database {
+export class Database implements Lifecycle {
   constructor(private configuration: ServerConfiguration) {
   }
 
   private connection?: Mongoose;
 
-  async connect(): Promise<boolean> {
+  async start(): Promise<boolean> {
     if (this.connection) {
       logger.debug(
         `already connected to mongodb at ${this.configuration.mongodbUri}`
@@ -29,7 +29,7 @@ export class Database {
     return true;
   }
 
-  async disconnect(): Promise<void> {
+  async stop(): Promise<void> {
     if (this.connection) {
       await this.connection.disconnect();
       this.connection = undefined;

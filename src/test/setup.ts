@@ -8,7 +8,7 @@ import path from "path";
 import { Database } from "../database";
 import assert from "assert";
 
-// no logging for tests
+// no logging for test
 winston.remove(winston.transports.Console);
 winston.remove(winston.transports.File);
 
@@ -47,7 +47,7 @@ export function setupSuite(options: Partial<SuiteOptions> = {}): void {
 
 /**
  * Callers that make modifications to the container should do so in a CHILD container because the container is not reset
- * between tests
+ * between test
  */
 export function testContainer(): DependencyContainer {
   assert(tc);
@@ -110,11 +110,11 @@ class TestConfiguration extends ServerConfiguration {
 }
 
 async function clearDatabaseConnection() {
-  await testDatabase().disconnect();
+  await testDatabase().stop();
 }
 
 async function createDatabaseConnection() {
-  await testDatabase().connect();
+  await testDatabase().start();
 }
 
 

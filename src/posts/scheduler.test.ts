@@ -1,9 +1,10 @@
-import { assertError, assertInstanceOf, assertOk, MutableNow, NotVeryRandom, setupSuite, testContainer } from "./test";
-import { PostError, PostScheduler } from "./post_scheduler";
+import { assertError, assertInstanceOf, assertOk, MutableNow, NotVeryRandom, setupSuite, testContainer } from "../test";
+import { PostError, PostResult, PostScheduler } from "./scheduler";
 import { add as date_add, set as date_set, startOfToday, startOfTomorrow, startOfYesterday } from "date-fns";
-import { Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
-import { NowProvider, RandomProvider } from "./utils";
-import { ServerConfiguration } from "./config";
+import { Image, PostHistory, PostHistoryDocument, PostStatus } from "../database";
+import { NowProvider, RandomProvider } from "../utils";
+import { ServerConfiguration } from "../config";
+import { injectable } from "tsyringe";
 
 const RANDOM_VALUE = 50;
 

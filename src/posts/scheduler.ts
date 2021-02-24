@@ -1,9 +1,9 @@
-import { Image, ImageDocument, PostHistory, PostHistoryDocument, PostStatus } from "./database";
+import { Image, ImageDocument, PostHistory, PostHistoryDocument, PostStatus } from "../database";
 import date_set from "date-fns/set";
 import date_add from "date-fns/add";
 import { differenceInMinutes, startOfDay } from "date-fns/fp";
-import { ServerConfiguration } from "./config";
-import { error, logger, NowProvider, ok, RandomProvider, Result } from "./utils";
+import { ServerConfiguration } from "../config";
+import { error, logger, NowProvider, ok, RandomProvider, Result } from "../utils";
 import { injectable } from "tsyringe";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;

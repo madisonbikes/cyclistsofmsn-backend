@@ -2,16 +2,16 @@ import { Image, ImageDocument } from "./database";
 import { FilesystemRepository } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
 import parseDate from "date-fns/parse";
-import { logger } from "./utils";
+import { Lifecycle, logger } from "./utils";
 import { injectable } from "tsyringe";
 
 /** expose scanning operation.  requires database connection to be established */
 @injectable()
-export class ImageRepositoryScanner {
+export class ImageRepositoryScanner implements Lifecycle {
   constructor(private fsRepository: FilesystemRepository) {
   }
 
-  async scan(): Promise<void> {
+  async start(): Promise<void> {
     const files = await this.fsRepository.imageFiles();
     const dbFiles = await Image.find().exec();
     const matchedFiles: ImageDocument[] = [];
