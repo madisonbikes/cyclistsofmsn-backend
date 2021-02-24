@@ -58,7 +58,7 @@ export class PostScheduler {
   }
 
   private async selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
-    const now = this.nowProvider.now();
+    const now = new Date(this.nowProvider.now());
     const startOfToday = startOfDay(now);
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
     const lastTimeToday = date_set(startOfToday, {

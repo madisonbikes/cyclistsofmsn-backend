@@ -1,5 +1,5 @@
 export class NowProvider {
-  now(): Date {
-    return new Date();
+  now(): number {
+    return Date.now();
   }
 }

@@ -14,7 +14,24 @@ describe("simple scheduler", () => {
     let called = 0;
 
     const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleTimeout(() => {
+    const cancel = scheduler.scheduleOnce(() => {
+      called++;
+    }, 5000);
+    jest.advanceTimersByTime(4000);
+    expect(called).toBe(0);
+    jest.advanceTimersByTime(4000);
+    expect(called).toBe(1);
+    jest.advanceTimersByTime(4000);
+    expect(called).toBe(1);
+
+    cancel.cancel();
+  });
+
+  it("call timeout executes async method", () => {
+    let called = 0;
+
+    const scheduler = new SimpleScheduler();
+    const cancel = scheduler.scheduleOnce(async () => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
@@ -31,7 +48,7 @@ describe("simple scheduler", () => {
     let called = 0;
 
     const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleTimeout(() => {
+    const cancel = scheduler.scheduleOnce(() => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
@@ -45,13 +62,13 @@ describe("simple scheduler", () => {
     let called = 0;
 
     const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleInterval(() => {
+    const cancel = scheduler.scheduleRepeat(async () => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
     expect(called).toBe(0);
 
-    // 8000
+    // 8000 (cross interval boundary)
     jest.advanceTimersByTime(4000);
     expect(called).toBe(1);
 
@@ -65,4 +82,31 @@ describe("simple scheduler", () => {
     expect(called).toBe(2);
   });
 
+  it("call interval with delay executes method twice then cancel", () => {
+    let called = 0;
+
+    const scheduler = new SimpleScheduler();
+    const cancel = scheduler.scheduleRepeat( () => {
+      called++;
+    }, 5000, 2000);
+    jest.advanceTimersByTime(3000);
+    expect(called).toBe(1);
+
+    // 6000
+    jest.advanceTimersByTime(3000);
+    expect(called).toBe(1);
+
+    // 10000
+    jest.advanceTimersByTime(4000);
+    expect(called).toBe(2);
+
+    // 14000 (cross interval boundary)
+    jest.advanceTimersByTime(4000);
+    expect(called).toBe(3);
+    cancel.cancel();
+
+    // 16000 (cross interval boundary)
+    jest.advanceTimersByTime(4000);
+    expect(called).toBe(3);
+  });
 });

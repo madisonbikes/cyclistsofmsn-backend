@@ -1,11 +1,4 @@
-import {
-  assertError,
-  assertInstanceOf,
-  assertOk,
-  MutableNow,
-  NotVeryRandom, setupSuite,
-  testContainer
-} from "./test";
+import { assertError, assertInstanceOf, assertOk, MutableNow, NotVeryRandom, setupSuite, testContainer } from "./test";
 import { PostError, PostScheduler } from "./post_scheduler";
 import { add as date_add, set as date_set, startOfToday, startOfTomorrow, startOfYesterday } from "date-fns";
 import { Image, PostHistory, PostHistoryDocument, PostStatus } from "./database";
@@ -194,7 +187,7 @@ describe("test schedule component", () => {
       newPost.status.flag = PostStatus.COMPLETE;
       await newPost.save();
 
-      nowProvider.when = date_set(startOfToday(), { hours: 10, minutes: 30 });
+      nowProvider.when = date_set(startOfToday(), { hours: 10, minutes: 30 }).getTime();
       newPostResult = await scheduler.scheduleNextPost();
       assertOk(newPostResult);
       newPost = newPostResult.value;

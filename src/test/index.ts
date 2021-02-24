@@ -1,6 +1,8 @@
-import { NowProvider, RandomProvider } from "../utils";
+import "reflect-metadata";
+import { Cancellable, NowProvider, RandomProvider, ScheduledFunction, SimpleScheduler } from "../utils";
 import supertest from "supertest";
 import { Server } from "http";
+import { injectable } from "tsyringe";
 
 export * from "./assertions";
 export * from "./setup";
@@ -33,12 +35,21 @@ export class NotVeryRandom extends RandomProvider {
 
 /** Time can advance with this now provider */
 export class MutableNow extends NowProvider {
-  constructor(public when: Date) {
+  public when: number;
+
+  constructor(when: number | Date = Date.now()) {
     super();
+    if (when instanceof Date) {
+      this.when = when.getTime();
+    } else {
+      this.when = when;
+    }
   }
 
-  now(): Date {
+  now(): number {
     return this.when;
   }
 }
+
+
 

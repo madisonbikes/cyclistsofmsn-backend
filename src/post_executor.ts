@@ -6,26 +6,25 @@ import { injectable } from "tsyringe";
 
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
+const DELAY = 5 * 1000;
 
 @injectable()
 export class PostExecutor {
-  private intervalCancellable: Cancellable | undefined;
-  private startupCancellable: Cancellable | undefined;
+  private scheduled: Cancellable | undefined;
 
-  constructor(private scheduler: PostScheduler, private nowProvider: NowProvider, private simpleScheduler: SimpleScheduler) {
+  constructor(private scheduler: PostScheduler, private nowProvider: NowProvider,
+              private simpleScheduler: SimpleScheduler) {
   }
 
   start(): void {
-    this.startupCancellable = this.simpleScheduler.scheduleTimeout(this.checkTimeToPost, 10 * 1000);
-    this.intervalCancellable = this.simpleScheduler.scheduleInterval(this.checkTimeToPost, CHECK_INTERVAL);
+    this.scheduled = this.simpleScheduler.scheduleRepeat(async () => {
+      return this.checkTimeToPost();
+    }, CHECK_INTERVAL, DELAY);
   }
 
   stop(): void {
-    this.intervalCancellable?.cancel()
-    this.intervalCancellable = undefined;
-
-    this.startupCancellable?.cancel()
-    this.startupCancellable = undefined;
+    this.scheduled?.cancel();
+    this.scheduled = undefined;
   }
 
   /** async function is fine for setInterval(), but it should never throw an exception */
@@ -37,7 +36,7 @@ export class PostExecutor {
         return;
       }
       const nextPost = scheduledResult.value;
-      const when = this.nowProvider.now().getTime() - nextPost.timestamp.getTime();
+      const when = this.nowProvider.now() - nextPost.timestamp.getTime();
       if (when > 0) {
         await nextPost
           .populate("image")

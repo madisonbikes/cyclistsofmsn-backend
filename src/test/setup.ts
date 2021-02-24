@@ -110,15 +110,12 @@ class TestConfiguration extends ServerConfiguration {
 }
 
 async function clearDatabaseConnection() {
-  assert(tc);
-
-  const database = tc.resolve(Database);
-  await database.disconnect();
+  await testDatabase().disconnect();
 }
 
 async function createDatabaseConnection() {
-  assert(tc);
-  const database = tc.resolve(Database);
-  await database.connect();
+  await testDatabase().connect();
 }
+
+
 
