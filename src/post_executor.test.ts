@@ -39,16 +39,15 @@ describe("post executor component", () => {
 
   function build() {
     const childContainer = testContainer().createChildContainer()
-      .registerType(PostScheduler, MockPostScheduler)
       .registerInstance(SimpleScheduler, mockScheduler)
       .registerInstance(NowProvider, now);
 
-    const postScheduler = childContainer.resolve(PostScheduler);
+    const postScheduler = childContainer.resolve(MockPostScheduler);
     
     childContainer.registerInstance(PostScheduler, postScheduler);
     const postExecutor = childContainer.resolve(PostExecutor);
     return {
-      postScheduler: postScheduler as MockPostScheduler,
+      postScheduler: postScheduler,
       executor: postExecutor
     };
   }
