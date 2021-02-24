@@ -12,8 +12,9 @@ export class Router extends KoaRouter {
   constructor(imageRouter: ImageRouter, postRouter: PostRouter) {
     super();
 
-    this.use(postRouter.routes(), postRouter.allowedMethods());
-    this.use(imageRouter.routes(), imageRouter.allowedMethods());
+    this
+      .use(postRouter.routes(), postRouter.allowedMethods())
+      .use(imageRouter.routes(), imageRouter.allowedMethods());
   }
 }
 

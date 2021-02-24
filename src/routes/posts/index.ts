@@ -9,27 +9,31 @@ export class PostRouter extends KoaRouter {
   constructor() {
     super({ prefix: "/posts" });
 
-    this.get("/", async (ctx) => {
-        ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-        const posts = await PostHistory.findOrderedPosts();
-        ctx.body = posts.map(mapPost);
-      }
-    );
+    this
 
-    this.get("/current", async (ctx) => {
-      const post = await PostHistory.findCurrentPost();
-      if (post) {
-        ctx.body = mapPost(post);
-      }
-    });
+      // all posts
+      .get("/", async (ctx) => {
+          ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
+          const posts = await PostHistory.findOrderedPosts();
+          ctx.body = posts.map(mapPost);
+        }
+      )
 
-    // post operation is secured by jwt token
-    this.post("/create",
-      jwt(["create:post"]),
-      async (ctx) => {
-        ctx.body = "Submitted new post";
-      }
-    );
+      // current post
+      .get("/current", async (ctx) => {
+        const post = await PostHistory.findCurrentPost();
+        if (post) {
+          ctx.body = mapPost(post);
+        }
+      })
+
+      // post create operation is secured by jwt token
+      .post("/create",
+        jwt(["create:post"]),
+        async (ctx) => {
+          ctx.body = "Submitted new post";
+        }
+      );
   }
 }
 
