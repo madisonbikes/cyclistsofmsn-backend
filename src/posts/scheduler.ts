@@ -26,11 +26,10 @@ export class PostScheduler {
       return ok(nextPost);
     }
 
-    const createdPost = await this.createNewScheduledPost();
-    if (createdPost.isOk()) {
-      logger.info(`Scheduled new post @ ${createdPost.value.timestamp}`);
-    }
-    return createdPost;
+    const createdPost = await this.createNewScheduledPost()
+    return createdPost.alsoOnOk(value => {
+      logger.info(`Scheduled new post @ ${value.timestamp}`);
+    })
   }
 
   private async createNewScheduledPost(): Promise<PostResult> {
@@ -38,10 +37,10 @@ export class PostScheduler {
       PostHistory.findCurrentPost(),
       this.selectNextPhoto()
     ]);
-    const newPost = new PostHistory();
-    if (newImage.isError()) {
-      return error(newImage.value);
+    if(newImage.isError()) {
+      return error(newImage.value)
     }
+    const newPost = new PostHistory();
     newPost.image = newImage.value;
     newPost.timestamp = await this.selectNextTime(lastPost?.timestamp);
     newPost.status.flag = PostStatus.PENDING;

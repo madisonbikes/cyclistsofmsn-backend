@@ -1,42 +1,76 @@
 /** adapted from https://medium.com/inato/expressive-error-handling-in-typescript-and-benefits-for-domain-driven-design-70726e061c86 */
-export type Result<L, A> = Ok<L, A> | Error<L, A>;
+export type Result<K, E> = Ok<K, E> | Error<K, E>;
 
-export class Ok<L, A> {
-  readonly value: L;
+export class Ok<K, E> {
+  readonly value: K;
 
-  constructor(value: L) {
+  constructor(value: K) {
     this.value = value;
   }
 
-  isOk(): this is Ok<L, A> {
+  isOk(): this is Ok<K, E> {
     return true;
   }
 
-  isError(): this is Error<L, A> {
+  isError(): this is Error<K, E> {
     return false;
+  }
+
+  alsoOnOk(func: (k: K) => void): Result<K, E> {
+    func(this.value)
+    return this
+  }
+
+  alsoOnError(func: (e: E) => void): Result<K, E> {
+    return this;
+  }
+
+  mapOk<B>(func: (k: K) => Result<B, E>): Result<B, E> {
+    return func(this.value)
+  }
+
+  mapError<B>(func: (e: E) => Result<K, B>): Result<K, B> {
+    return (this as unknown) as Error<K,B>;
   }
 }
 
-export class Error<L, A> {
-  readonly value: A;
+export class Error<K, E> {
+  readonly value: E;
 
-  constructor(value: A) {
+  constructor(value: E) {
     this.value = value;
   }
 
-  isOk(): this is Ok<L, A> {
+  isOk(): this is Ok<K, E> {
     return false;
   }
 
-  isError(): this is Error<L, A> {
+  isError(): this is Error<K, E> {
     return true;
+  }
+
+  alsoOnOk(func: (k: K) => void): Result<K, E> {
+    return this;
+  }
+
+  alsoOnError(func: (e: E) => void): Result<K, E> {
+    func(this.value)
+    return this
+  }
+
+  mapOk<B>(func: (k: K) => Result<B, E>): Result<B, E> {
+    return (this as unknown) as Error<B,E>;
+  }
+
+  mapError<B>(func: (e: E) => Result<K, B>): Result<K, B> {
+    return func(this.value)
   }
 }
 
-export const ok = <L, A>(l: L): Result<L, A> => {
-  return new Ok(l);
+export const ok = <K, E>(k: K): Result<K, E> => {
+  return new Ok<K, E>(k);
 };
 
-export const error = <L, A>(a: A): Result<L, A> => {
-  return new Error<L, A>(a);
+export const error = <K, E>(e: E): Result<K, E> => {
+  return new Error<K, E>(e);
 };
