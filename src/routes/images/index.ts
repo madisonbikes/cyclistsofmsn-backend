@@ -7,6 +7,7 @@ import { constants } from "fs";
 import { injectable } from "tsyringe";
 import { logger } from "../../utils";
 import { MemoryCache } from "../cache";
+import { Types } from "mongoose";
 
 @injectable()
 export class ImageRouter extends KoaRouter {
@@ -24,23 +25,19 @@ export class ImageRouter extends KoaRouter {
         });
       })
 
-      // single image
+      // single image, cached
       .get("/:id", cache.middleware(),
         async (ctx) => {
           if (await cache.isCached(ctx)) return;
 
           const id = ctx.params.id;
-          let filename: string | undefined;
-
-          // FIXME let's find a better pattern for this instead of very broad and tight try/catch
-          try {
-            filename = (await Image.findById(id).and([{ deleted: false }]))
-              ?.filename;
-            if (filename === undefined) return;
-          } catch (err) {
-            logger.info("Requested image id not found in db ", id);
+          if (!Types.ObjectId.isValid(id)) {
+            // bad object id throws exception later, so check early
             return;
           }
+          const filename = (await Image.findById(id).and([{ deleted: false }]))
+            ?.filename;
+          if (filename === undefined) return;
 
           const imageFile = this.fsRepository.photoPath(filename);
 
