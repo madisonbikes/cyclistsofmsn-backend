@@ -14,6 +14,7 @@ export class ServerConfiguration {
     process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
   public firstPostHour = 8;
   public lastPostHour = 16;
+  public memoryCacheSize = 20 * 1024 * 1024;
 }
 
 // from dotenv samples:

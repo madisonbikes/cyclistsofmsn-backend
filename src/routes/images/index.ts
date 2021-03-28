@@ -6,10 +6,11 @@ import { access } from "fs/promises";
 import { constants } from "fs";
 import { injectable } from "tsyringe";
 import { logger } from "../../utils";
+import { MemoryCache } from "../cache";
 
 @injectable()
 export class ImageRouter extends KoaRouter {
-  constructor(private fsRepository: FilesystemRepository) {
+  constructor(private fsRepository: FilesystemRepository, private cache: MemoryCache) {
     super({ prefix: "/images" });
 
     this
@@ -24,44 +25,47 @@ export class ImageRouter extends KoaRouter {
       })
 
       // single image
-      .get("/:id", async (ctx) => {
-        const id = ctx.params.id;
-        let filename: string | undefined;
+      .get("/:id", cache.middleware(),
+        async (ctx) => {
+          if (await cache.isCached(ctx)) return;
 
-        // FIXME let's find a better pattern for this instead of very broad and tight try/catch
-        try {
-          filename = (await Image.findById(id).and([{ deleted: false }]))
-            ?.filename;
-          if (filename === undefined) return;
-        } catch (err) {
-          logger.info("Requested image id not found in db ", id);
-          return;
-        }
+          const id = ctx.params.id;
+          let filename: string | undefined;
 
-        const imageFile = this.fsRepository.photoPath(filename);
+          // FIXME let's find a better pattern for this instead of very broad and tight try/catch
+          try {
+            filename = (await Image.findById(id).and([{ deleted: false }]))
+              ?.filename;
+            if (filename === undefined) return;
+          } catch (err) {
+            logger.info("Requested image id not found in db ", id);
+            return;
+          }
 
-        let width = safeParseInt(ctx.query.width);
-        const height = safeParseInt(ctx.query.height);
-        if (!width && !height) {
-          width = 1024;
-        }
+          const imageFile = this.fsRepository.photoPath(filename);
 
-        // FIXME let's find a better pattern for this instead of tight try/catch
-        try {
-          await access(imageFile, constants.R_OK);
-        } catch (err) {
-          logger.info("Requested file not found in image repository ", imageFile);
-          return;
-        }
+          let width = safeParseInt(ctx.query.width);
+          const height = safeParseInt(ctx.query.height);
+          if (!width && !height) {
+            width = 1024;
+          }
 
-        const buffer = await sharp(imageFile)
-          .resize({ width, height, withoutEnlargement: true })
-          .toFormat("jpeg")
-          .toBuffer();
-        ctx.type = "jpeg";
-        ctx.set("Cache-Control", "max-age=3600, s-max-age=36000");
-        ctx.body = buffer;
-      });
+          // FIXME let's find a better pattern for this instead of tight try/catch
+          try {
+            await access(imageFile, constants.R_OK);
+          } catch (err) {
+            logger.info("Requested file not found in image repository ", imageFile);
+            return;
+          }
+
+          const buffer = await sharp(imageFile)
+            .resize({ width, height, withoutEnlargement: true })
+            .toFormat("jpeg")
+            .toBuffer();
+          ctx.type = "jpeg";
+          ctx.set("Cache-Control", "max-age=3600, s-max-age=36000");
+          ctx.body = buffer;
+        });
   }
 }
 
