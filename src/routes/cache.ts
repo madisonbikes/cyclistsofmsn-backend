@@ -4,10 +4,6 @@ import Koa, { Middleware } from "koa";
 import koaCash from "koa-cash";
 import { ServerConfiguration } from "../config";
 
-type Holder = {
-  value: unknown;
-}
-
 @injectable()
 @singleton()
 export class MemoryCache {
@@ -25,6 +21,7 @@ export class MemoryCache {
     }
   });
 
+  /** returns a koa middleware that enables caching downstream */
   middleware(): Middleware {
     const lruCache = this.lru;
     const addCacheHeader = process.env.NODE_ENV == "test"
@@ -45,12 +42,25 @@ export class MemoryCache {
     });
   }
 
+  /**
+   * Should be called in next downstream middleware to check if response is cached, if so
+   * return immediately.
+   * @param ctx
+   */
   async isCached(ctx: Koa.Context): Promise<boolean> {
     return await ctx.cashed()
   }
 
+  /**
+   * Clears the cache. Useful between test cases.
+   */
   clear(): void {
     this.lru.reset()
   }
 }
+
+type Holder = {
+  value: unknown;
+}
+
 
