@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { DEFAULT_SERVER_PORT, ServerConfiguration } from "../config";
-import axios from "axios";
 import winston from "winston";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { container as rootContainer, DependencyContainer, injectable, Lifecycle } from "tsyringe";
@@ -11,10 +10,6 @@ import assert from "assert";
 // no logging for test
 winston.remove(winston.transports.Console);
 winston.remove(winston.transports.File);
-
-// preset axios
-// FIXME get rid of axios and use supertest
-axios.defaults.baseURL = `http://localhost:${DEFAULT_SERVER_PORT}`;
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;
