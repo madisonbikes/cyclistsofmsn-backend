@@ -7,7 +7,7 @@ import { constants } from "fs";
 import { injectable } from "tsyringe";
 import { logger } from "../../utils";
 import { MemoryCache } from "../cache";
-import { Types } from "mongoose";
+import { isValidObjectId } from "mongoose";
 
 @injectable()
 export class ImageRouter extends KoaRouter {
@@ -31,7 +31,7 @@ export class ImageRouter extends KoaRouter {
           if (await cache.isCached(ctx)) return;
 
           const id = ctx.params.id;
-          if (!Types.ObjectId.isValid(id)) {
+          if (!isValidObjectId(id)) {
             // bad object id throws exception later, so check early
             return;
           }
