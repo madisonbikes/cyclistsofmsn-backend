@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { DEFAULT_SERVER_PORT, ServerConfiguration } from "../config";
+import { ServerConfiguration } from "../config";
 import winston from "winston";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { container as rootContainer, DependencyContainer, injectable, Lifecycle } from "tsyringe";
@@ -58,8 +58,8 @@ async function initializeSuite(options: Partial<SuiteOptions>): Promise<Dependen
   const withDatabase = options.withDatabase;
   if (withDatabase) {
     // start the mongo in-memory server on an ephemeral port
-    mongoServer = new MongoMemoryServer();
-    mongoUri = await mongoServer.getUri();
+    mongoServer = await MongoMemoryServer.create()
+    mongoUri = mongoServer.getUri();
   }
 
   // don't use value registrations because they will be cleared in the beforeEach() handler
