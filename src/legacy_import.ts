@@ -77,7 +77,7 @@ export class Importer {
       await PostHistory.deleteMany({ image: image.id, timestamp: p.date });
 
       const newDoc = new PostHistory();
-      newDoc.image = image._id;
+      newDoc.image = image;
       newDoc.timestamp = p.date;
       newDoc.status.flag = PostStatus.COMPLETE;
       newDoc.status.uri = "twitter";

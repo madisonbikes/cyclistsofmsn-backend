@@ -60,7 +60,7 @@ export class ImageRepositoryScanner implements Lifecycle {
           .DateTimeOriginal;
         image.exif_createdon = this.parseImageTag(dateTime);
         image.deleted = false;
-        await image.save();
+        await image.save()
       }
     }
     logger.info("Scan complete");
