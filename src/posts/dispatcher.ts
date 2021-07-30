@@ -1,6 +1,5 @@
 import { Cancellable, Lifecycle, logger, NowProvider, SimpleScheduler } from "../utils";
-import assert from "assert";
-import { Image, PostStatus } from "../database";
+import { PostStatus } from "../database";
 import { PostScheduler } from "./scheduler";
 import { injectable } from "tsyringe";
 
@@ -42,8 +41,7 @@ export class PostDispatcher implements Lifecycle {
           .populate("image")
           .execPopulate();
 
-        assert(nextPost.image instanceof Image);
-        logger.info(`Posting ${nextPost.image.filename} a new twitter!`);
+        logger.info(`Posting ${nextPost.image} a new twitter!`);
         nextPost.status.flag = PostStatus.COMPLETE;
         await nextPost.save();
         if (when > CHECK_INTERVAL) {

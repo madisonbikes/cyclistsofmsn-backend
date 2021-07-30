@@ -12,8 +12,10 @@ export class ImageRepositoryScanner implements Lifecycle {
   }
 
   async start(): Promise<void> {
-    const files = await this.fsRepository.imageFiles();
-    const dbFiles = await Image.find().exec();
+    const [files, dbFiles] = await Promise.all([
+      this.fsRepository.imageFiles(),
+      Image.find().exec()
+    ]);
     const matchedFiles: ImageDocument[] = [];
     const filesToAdd: string[] = [];
 
@@ -60,7 +62,7 @@ export class ImageRepositoryScanner implements Lifecycle {
           .DateTimeOriginal;
         image.exif_createdon = this.parseImageTag(dateTime);
         image.deleted = false;
-        await image.save()
+        await image.save();
       }
     }
     logger.info("Scan complete");

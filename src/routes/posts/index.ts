@@ -1,8 +1,8 @@
 import KoaRouter from "koa-router";
-import { Image, PostHistory, PostHistoryDocument } from "../../database";
-import assert from "assert";
+import { PostHistory, PostHistoryDocument } from "../../database";
 import { jwt } from "../../security/jwt";
 import { injectable } from "tsyringe";
+import { isDocument } from "@typegoose/typegoose";
 
 @injectable()
 export class PostRouter extends KoaRouter {
@@ -38,6 +38,9 @@ export class PostRouter extends KoaRouter {
 }
 
 function mapPost(post: PostHistoryDocument) {
-  assert(post.image instanceof Image);
-  return { id: post._id, timestamp: post.timestamp, image: post.image._id };
+  if(isDocument(post.image)) {
+    return { id: post.id, timestamp: post.timestamp, image: post.image._id };
+  } else {
+    return { id: post.id, timestamp: post.timestamp, image: post.image };
+  }
 }

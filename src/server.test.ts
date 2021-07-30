@@ -2,7 +2,6 @@ import { setupSuite, testContainer, testRequest, TestRequest } from "./test";
 import { PhotoServer } from "./server";
 import { Image } from "./database";
 import { MemoryCache } from "./routes/cache";
-import * as superagent from "superagent";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
@@ -80,7 +79,7 @@ describe("server process", () => {
     expect(imageResponse.get("x-cached-response")).toEqual("HIT");
   });
 
-  async function requestGoodImage(id: string): Promise<superagent.Response> {
+  async function requestGoodImage(id: string) {
     const response = await request
       .get(`/images/${id}`)
       .expect(200);

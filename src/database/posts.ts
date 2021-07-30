@@ -1,8 +1,13 @@
-import { DocumentType, getModelForClass, modelOptions, prop, ReturnModelType } from "@typegoose/typegoose";
-import { Image, ImageClass } from "./images";
-import assert from "assert";
-import { Base } from "@typegoose/typegoose/lib/defaultClasses";
-import { Types } from "mongoose";
+import {
+  DocumentType,
+  getModelForClass,
+  isDocument,
+  modelOptions,
+  prop,
+  Ref,
+  ReturnModelType
+} from "@typegoose/typegoose";
+import { ImageClass } from "./images";
 
 export enum PostStatus { PENDING = "pending", FAILED = "failed", COMPLETE = "complete" }
 
@@ -22,36 +27,37 @@ export class PostHistoryStatus {
 }
 
 @modelOptions({ schemaOptions: { collection: "posts" } })
-class PostHistoryClass implements Base {
-  id!: string;
-  _id!: Types.ObjectId;
-
+class PostHistoryClass  {
   @prop({ ref: () => ImageClass, required: true })
-  public image!: ImageClass;
+  public image!: Ref<ImageClass>;
 
   @prop({ required: true, default: Date.now, index: true })
   public timestamp!: Date;
 
-  @prop({ default: new PostHistoryStatus(), required: true })
+  @prop({ default: new PostHistoryStatus(), required: true, _id: false })
   public status!: PostHistoryStatus;
 
   public static async findCurrentPost(this: ReturnModelType<typeof PostHistoryClass>){
     const val = this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
       .sort({ timestamp: "-1" })
-      .populate("image", "deleted");
+      .populate("image", ["deleted"]);
     return val;
   };
 
   public static async findOrderedPosts(this: ReturnModelType<typeof PostHistoryClass>) {
     const posts = await this.find()
       .sort({ timestamp: "1" })
-      .populate("image", "deleted");
+      .populate("image", ["deleted"])
+      .where({"image.deleted": false})
 
     return posts
       .filter((post) => {
-        assert(post.image instanceof Image);
-        return !post.image.deleted;
+        if(isDocument(post.image)) {
+          return !post.image.deleted
+        } else {
+          return false
+        }
       });
   };
 
@@ -61,5 +67,6 @@ class PostHistoryClass implements Base {
       .sort({ timestamp: "-1" });
   };
 }
+
 export type PostHistoryDocument = DocumentType<PostHistoryClass>;
 export const PostHistory = getModelForClass(PostHistoryClass);
