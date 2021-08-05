@@ -3,7 +3,7 @@ export type ScheduledFunction = (() => Promise<void>) | (() => void)
 
 /** a thing that can be cancelled */
 export interface Cancellable {
-  cancel(): void
+  cancel(): void;
 }
 
 export class SimpleScheduler {
@@ -31,9 +31,11 @@ export class SimpleScheduler {
       cancel: () => {
         if (timeouts[0]) {
           clearTimeout(timeouts[0]);
+          timeouts[0] = undefined;
         }
         if (timeouts[1]) {
           clearInterval(timeouts[1]);
+          timeouts[1] = undefined;
         }
       }
     };

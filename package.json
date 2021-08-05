@@ -1,7 +1,6 @@
 {
   "name": "cyclists_of_msn_api",
   "version": "0.1.0",
-  "private": true,
   "description": "Cyclists of Madison REST API",
   "main": "src/server.ts",
   "scripts": {
@@ -12,7 +11,9 @@
     "test": "NODE_ENV=test npx jest",
     "coverage": "NODE_ENV=test npx jest --coverage=true",
     "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log",
-    "lint": "eslint '**/*.ts' '**/*.js'"
+    "lint": "eslint '**/*.ts' '**/*.js'",
+    "register_twitter": "ts-node src/twitter/register.ts",
+    "test_tweet": "ts-node src/twitter/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg"
   },
   "author": "Ben Sandee",
   "license": "Apache-2.0",
@@ -20,7 +21,8 @@
     "node": ">=14.x"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^8.0.1",
+    "@typegoose/typegoose": "^8.1.1",
+    "build-url": "^6.0.1",
     "date-fns": "^2.23.0",
     "dotenv": "^10.0.0",
     "exifreader": "^3.15.0",
@@ -34,12 +36,16 @@
     "koa-router": "^10.0.0",
     "koa-static": "^5.0.0",
     "lru-cache": "^6.0.0",
-    "mongoose": "^5.13.4",
+    "mongoose": "^5.13.5",
+    "oauth-1.0a": "^2.2.6",
     "pm2": "^5.1.0",
+    "readline-sync": "^1.4.10",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.28.3",
+    "superagent": "^6.1.0",
     "ts-node": "^10.1.0",
     "tsyringe": "^4.6.0",
+    "twitter-api-client": "^1.3.8",
     "typescript": "^4.3.5",
     "winston": "^3.3.3"
   },
@@ -54,11 +60,12 @@
     "@types/koa-router": "^7.4.4",
     "@types/koa-static": "^4.0.2",
     "@types/lru-cache": "^5.1.1",
+    "@types/readline-sync": "^1.4.4",
     "@types/sharp": "^0.28.5",
     "@types/supertest": "^2.0.10",
-    "@typescript-eslint/eslint-plugin": "^4.28.5",
-    "@typescript-eslint/parser": "^4.28.5",
-    "eslint": "^7.31.0",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.0.0",
     "eslint-plugin-no-autofix": "^1.0.2",
     "jest": "^27.0.6",
