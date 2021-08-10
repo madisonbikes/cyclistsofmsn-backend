@@ -14,7 +14,6 @@ export class ServerConfiguration {
     process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
   public firstPostHour = 8;
   public lastPostHour = 16;
-  public memoryCacheSize = 20 * 1024 * 1024;
   public twitterApiKey = process.env.TWITTER_API_KEY || ""
   public twitterApiSecret = process.env.TWITTER_API_SECRET || ""
   public twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || ""

@@ -1,10 +1,11 @@
-import { Image, ImageDocument, PostHistory, PostHistoryDocument, PostStatus } from "../database";
+import { PostHistory, PostHistoryDocument, PostStatus } from "../database";
 import date_set from "date-fns/set";
 import date_add from "date-fns/add";
 import { differenceInMinutes, startOfDay } from "date-fns/fp";
 import { ServerConfiguration } from "../config";
 import { error, logger, NowProvider, ok, RandomProvider, Result } from "../utils";
 import { injectable } from "tsyringe";
+import { PostSelector } from "./selection/selector";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string };
@@ -14,7 +15,8 @@ export class PostScheduler {
   constructor(
     private randomProvider: RandomProvider,
     private nowProvider: NowProvider,
-    private configuration: ServerConfiguration
+    private configuration: ServerConfiguration,
+    private postSelector: PostSelector
   ) {
   }
 
@@ -35,7 +37,7 @@ export class PostScheduler {
   private async createNewScheduledPost(): Promise<PostResult> {
     const [lastPost, newImage] = await Promise.all([
       PostHistory.findCurrentPost(),
-      this.selectNextPhoto()
+      this.postSelector.nextPost()
     ]);
     if(newImage.isError()) {
       return error(newImage.value)
@@ -45,15 +47,6 @@ export class PostScheduler {
     newPost.timestamp = await this.selectNextTime(lastPost?.timestamp);
     newPost.status.flag = PostStatus.PENDING;
     return ok(await newPost.save());
-  }
-
-  private async selectNextPhoto(): Promise<Result<ImageDocument, PostError>> {
-    const allImages = await Image.find().where({ deleted: false });
-    if (allImages.length == 0) {
-      return error({ message: "no images" });
-    }
-    const randomIndex = this.randomProvider.randomInt(0, allImages.length);
-    return ok(allImages[randomIndex]);
   }
 
   private async selectNextTime(lastPostTime: Date | undefined): Promise<Date> {

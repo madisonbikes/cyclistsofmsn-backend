@@ -2,16 +2,14 @@ import { injectable, singleton } from "tsyringe";
 import LRUCache from "lru-cache";
 import Koa, { Middleware } from "koa";
 import koaCash from "koa-cash";
-import { ServerConfiguration } from "../config";
+
+const CACHE_SIZE = 20 * 1024 * 1024;
 
 @injectable()
 @singleton()
 export class MemoryCache {
-  constructor(private configuration: ServerConfiguration) {
-  }
-
   private lru = new LRUCache<string, Holder>({
-    max: this.configuration.memoryCacheSize,
+    max: CACHE_SIZE,
     length: function(holder: Holder): number {
       const v = holder.value as { body: { length: number }}
       if(v !== undefined) {
