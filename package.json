@@ -1,7 +1,7 @@
 {
   "name": "cyclists_of_msn_api",
   "version": "0.1.0",
-  "description": "Cyclists of Madison REST API",
+  "description": "Cyclists of Madison Server/API",
   "main": "src/server.ts",
   "scripts": {
     "start": "ts-node src/server.ts",
