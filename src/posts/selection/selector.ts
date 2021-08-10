@@ -7,7 +7,10 @@ import { RepostCriteria, SeasonalityCriteria, UnpostedCriteria } from "./criteri
 @injectable()
 export class PostSelector {
   constructor(
-    private randomProvider: RandomProvider
+    private randomProvider: RandomProvider,
+    private repostCriteria: RepostCriteria,
+    private seasonalityCriteria: SeasonalityCriteria,
+    private unpostedCriteria: UnpostedCriteria
   ) {
     // empty
   }
@@ -18,23 +21,19 @@ export class PostSelector {
       return error({ message: "no images" });
     }
 
-    const repostCriteria = new RepostCriteria()
-    const unpostedCriteria = new UnpostedCriteria()
-    const seasonalityCriteria = new SeasonalityCriteria()
-
     const criteria = [
       // unposted photos that match seasonality
-      [seasonalityCriteria, unpostedCriteria],
+      [this.seasonalityCriteria, this.unpostedCriteria],
 
       // posted photos outside of repost window (e.g. >180 days) that
       // match seasonality (i.e. last year's photos from this season)
-      [seasonalityCriteria, repostCriteria],
+      [this.seasonalityCriteria, this.repostCriteria],
 
       // any unposted photos left in the repository
-      [unpostedCriteria],
+      [this.unpostedCriteria],
 
       // any photos (posted or otherwise) outside of repost window (e.g. >180 days)
-      [repostCriteria]
+      [this.repostCriteria]
     ]
 
     const orderedPhotoList = arrayShuffle(this.randomProvider, allImages)

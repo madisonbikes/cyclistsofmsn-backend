@@ -1,6 +1,6 @@
 // noinspection JSUnusedLocalSymbols
 
-import { setupSuite } from "../../test";
+import { setupSuite, testContainer } from "../../test";
 import { Image, ImageDocument, PostHistory } from "../../database";
 import { RepostCriteria, SeasonalityCriteria, UnpostedCriteria } from "./criteria";
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
@@ -20,35 +20,35 @@ describe("test criteria components", () => {
     it("before window", async () => {
       const testImage = await createImage("testImage", subDays(startOfToday(), 50));
 
-      const criteria = new SeasonalityCriteria();
+      const criteria = testContainer().resolve(SeasonalityCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
     it("before window, last year", async () => {
       const testImage = await createImage("testImage", subYears(subDays(startOfToday(), 50), 1));
 
-      const criteria = new SeasonalityCriteria();
+      const criteria = testContainer().resolve(SeasonalityCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
     it("after window", async () => {
       const testImage = await createImage("testImage", addDays(startOfToday(), 50));
 
-      const criteria = new SeasonalityCriteria();
+      const criteria = testContainer().resolve(SeasonalityCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
     it("within window", async () => {
       const testImage = await createImage("testImage", addDays(startOfToday(), 5));
 
-      const criteria = new SeasonalityCriteria();
+      const criteria = testContainer().resolve(SeasonalityCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
 
     it("within window, last year", async () => {
       const testImage = await createImage("testImage", subYears(addDays(startOfToday(), 5), 1));
 
-      const criteria = new SeasonalityCriteria();
+      const criteria = testContainer().resolve(SeasonalityCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
 
@@ -59,7 +59,7 @@ describe("test criteria components", () => {
 
       const testImage = await createImage();
 
-      const criteria = new RepostCriteria();
+      const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
   });
@@ -68,7 +68,7 @@ describe("test criteria components", () => {
     it("no posts", async () => {
       const testImage = await createImage();
 
-      const criteria = new RepostCriteria();
+      const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
 
@@ -76,7 +76,7 @@ describe("test criteria components", () => {
       const testImage = await createImage();
       const post = await createPost(testImage, subDays(startOfToday(), 30));
 
-      const criteria = new RepostCriteria();
+      const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
@@ -84,7 +84,7 @@ describe("test criteria components", () => {
       const testImage = await createImage();
       const post = await createPost(testImage, subDays(startOfToday(), 365));
 
-      const criteria = new RepostCriteria();
+      const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
 
@@ -95,7 +95,7 @@ describe("test criteria components", () => {
 
       const testImage = await createImage();
 
-      const criteria = new RepostCriteria();
+      const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
   });
@@ -105,7 +105,7 @@ describe("test criteria components", () => {
     it("no posts", async () => {
       const testImage = await createImage();
 
-      const criteria = new UnpostedCriteria();
+      const criteria = testContainer().resolve(UnpostedCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
 
@@ -113,7 +113,7 @@ describe("test criteria components", () => {
       const testImage = await createImage();
       const post = await createPost(testImage, subDays(startOfToday(), 30));
 
-      const criteria = new UnpostedCriteria();
+      const criteria = testContainer().resolve(UnpostedCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
@@ -123,7 +123,7 @@ describe("test criteria components", () => {
 
       const testImage = await createImage();
 
-      const criteria = new UnpostedCriteria();
+      const criteria = testContainer().resolve(UnpostedCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
   });
