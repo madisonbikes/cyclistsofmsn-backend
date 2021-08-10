@@ -1,5 +1,9 @@
 node_modules
 data
+dist
+coverage
 .env
 .eslintcache
 globalConfig.json
+*.log
+.nyc_output

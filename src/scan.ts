@@ -1,51 +1,84 @@
-import fs from "fs";
-import path from "path";
-import { configuration } from "./config";
-import { promisify } from "util";
-import { Image } from "./schema/images.model";
+import { Image, ImageDocument } from "./database";
+import { FilesystemRepository } from "./fs_repository";
+import { StringArrayTag } from "exifreader";
+import parseDate from "date-fns/parse";
+import { Lifecycle, logger } from "./utils";
+import { injectable } from "tsyringe";
 
-const readdir = promisify(fs.readdir);
+/** expose scanning operation.  requires database connection to be established */
+@injectable()
+export class ImageRepositoryScanner implements Lifecycle {
+  constructor(private fsRepository: FilesystemRepository) {
+  }
 
-export async function scan(): Promise<void> {
-  const files = await readdir(configuration.photos_dir);
-  const filteredFiles = files.filter((value) => {
-    const extension = path.parse(value).ext.toLowerCase();
-    return [".jpg", ".png"].includes(extension);
-  });
-  await handleImages(filteredFiles);
-}
+  async start(): Promise<void> {
+    const [files, dbFiles] = await Promise.all([
+      this.fsRepository.imageFiles(),
+      Image.find().exec()
+    ]);
+    const matchedFiles: ImageDocument[] = [];
+    const filesToAdd: string[] = [];
 
-async function handleImages(files: string[]) {
-
-  const dbFiles = await Image.find().exec();
-  const matchedFiles: string[] = [];
-  const filesToAdd: string[] = [];
-
-  // bin files into either files that are in db, or are missing
-  for (const item of files) {
-    if (dbFiles.find((value) => value.filename === item)) {
-      matchedFiles.push(item);
-    } else {
-      filesToAdd.push(item);
+    // bin files into either files that are in db, or are missing
+    for (const item of files) {
+      const foundElement = dbFiles.find((value) => value.filename === item);
+      if (foundElement !== undefined) {
+        matchedFiles.push(foundElement);
+      } else {
+        filesToAdd.push(item);
+      }
     }
-  }
-  // bin db entries into entries that match files, or are cruft
-  const dbCruft = dbFiles.filter((item) => {
-    const found = files.includes(item.filename);
-    return !found;
-  });
+    // bin db entries into entries that match files, or are cruft
+    const dbCruft = dbFiles.filter((item) => {
+      const found = files.includes(item.filename);
+      return !found && !item.deleted;
+    });
 
-  // actually remove cruft
-  for await (const element of dbCruft) {
-    console.debug(`removing cruft db image ${element.filename}`);
-    await Image.deleteOne({ _id: element.id });
+    // actually remove cruft
+    for await (const element of dbCruft) {
+      await this.markImageRemoved(element);
+    }
+
+    // insert new items
+    for await (const filename of filesToAdd) {
+      logger.debug(`adding new image ${filename}`);
+      const newImage = new Image({ filename: filename });
+      newImage.fs_timestamp = await this.fsRepository.timestamp(filename);
+      const dateTime = (await this.fsRepository.exif(filename))
+        .DateTimeOriginal;
+      newImage.exif_createdon = this.parseImageTag(dateTime);
+      newImage.update();
+      await newImage.save();
+    }
+
+    for await (const image of matchedFiles) {
+      const filename = image.filename;
+
+      const newTimestamp = await this.fsRepository.timestamp(filename);
+      if (image.fs_timestamp?.getTime() !== newTimestamp.getTime()) {
+        logger.debug(`updating existing image ${filename}`);
+        image.fs_timestamp = newTimestamp;
+        const dateTime = (await this.fsRepository.exif(filename))
+          .DateTimeOriginal;
+        image.exif_createdon = this.parseImageTag(dateTime);
+        image.deleted = false;
+        await image.save();
+      }
+    }
+    logger.info("Scan complete");
   }
 
-  // insert new items
-  for await (const newItem of filesToAdd) {
-    console.debug(`adding new image ${newItem}`);
-    const newImage = new Image({ filename: newItem })
-    await newImage.save();
+  private parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
+    if (!tag || tag.value.length === 0) {
+      return undefined;
+    }
+    return parseDate(tag?.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
   }
-  console.info("Scan complete");
+
+  private async markImageRemoved(image: ImageDocument) {
+    logger.debug(`marking cruft db image ${image.filename}`);
+    image.deleted = true;
+    image.fs_timestamp = undefined;
+    await image.save();
+  }
 }
