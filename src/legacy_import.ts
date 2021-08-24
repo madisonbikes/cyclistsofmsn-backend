@@ -61,8 +61,7 @@ export class Importer {
 
     await this.database.start();
 
-    let count = 0;
-    let placeholders = 0;
+    let count = 0, placeholders = 0, runningDeletedCount = 0;
     for await (const p of posts) {
       let image = await Image.findOne({ filename: p.filename });
       if (!image) {
@@ -74,7 +73,9 @@ export class Importer {
         placeholders++;
       }
       // delete any existing posts that match this exactly
-      await PostHistory.deleteMany({ image: image.id, timestamp: p.date });
+
+      const { deletedCount } = await PostHistory.deleteMany({ image: image.id, timestamp: p.date });
+      runningDeletedCount += deletedCount ?? 0;
 
       const newDoc = new PostHistory();
       newDoc.image = image;
@@ -86,19 +87,11 @@ export class Importer {
       count++;
     }
     logger.info(
-      `Imported ${count} posts, added ${placeholders} placeholder images.`
+      `Imported ${count} posts, added ${placeholders} placeholder images, deleted ${runningDeletedCount} existing matching entries.`
     );
 
     // and we're done
     await this.database.stop();
-    /*
-  // sample query to get list of posts
-  const results = await PostHistory.aggregate([
-    { $group: { _id: `$image`, count: { $sum: 1 } } },
-    { $sort: { count: 1 } }
-  ]);
-  console.log(JSON.stringify(results));
-   */
     return count;
   }
 }
