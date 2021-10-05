@@ -18,7 +18,7 @@ export class SimpleScheduler {
   }
 
   scheduleRepeat(run: ScheduledFunction, intervalInMillis: number, delayInMillis = 0): Cancellable {
-    if (delayInMillis == 0) {
+    if (delayInMillis === 0) {
       delayInMillis = intervalInMillis;
     }
     const timeouts = new Array<NodeJS.Timeout | undefined>(2);

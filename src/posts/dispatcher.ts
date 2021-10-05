@@ -52,8 +52,7 @@ export class PostDispatcher implements Lifecycle {
           logger.info("Sending scheduled post on schedule");
         }
         await nextPost
-          .populate("image")
-          .execPopulate();
+          .populate("image");
         if (!isDocument(nextPost.image)) {
           logger.error("nextPost.image should be populated");
           return;
