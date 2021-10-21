@@ -2,6 +2,7 @@ import { Cancellable, Lifecycle, logger, NowProvider, SimpleScheduler } from "..
 import { PostScheduler } from "./scheduler";
 import { injectable } from "tsyringe";
 import { PostExecutor } from "./postExecutor";
+import { PostStatus } from "../database";
 
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
@@ -29,7 +30,6 @@ export class PostDispatcher implements Lifecycle {
     this.scheduled = undefined;
   }
 
-
   /** async function is fine for setInterval(), but it should never throw an exception */
   private async checkTimeToPost() {
     try {
@@ -47,11 +47,15 @@ export class PostDispatcher implements Lifecycle {
           logger.info("Sending scheduled post on schedule");
         }
       }
-      const result = await this.executor.execute(nextPost)
-      if(result.isOk()) {
-        // persist the post data
-        await result.value.save();
+      // execute the post and then if it's sucessful, update the post status
+      const postedImage = await this.executor.post()
+      if(postedImage.isOk()) {
+        nextPost.image = postedImage.value
+        nextPost.status.flag = PostStatus.COMPLETE;
+      } else {
+        nextPost.status.error = postedImage.value.message
       }
+      await nextPost.save();
     } catch (e) {
       logger.error(e);
       return;
