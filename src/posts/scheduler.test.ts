@@ -17,9 +17,15 @@ describe("test schedule component", () => {
   });
 
   describe("with no images", () => {
-    it("should fail with no images error", async function() {
-      const error = await getErrorPostResult(startOfToday());
-      expect(error.message).toEqual("no images");
+    it("should succeed, will fail at actual posting time", async function() {
+      // set current time to 10:00 AM
+      const now = date_add(startOfToday(), {
+        hours: configuration().firstPostHour + 2
+      });
+      const newPost = await getOkPostResult(now);
+      // expected is 50 minutes after now due to injected random
+      const expected = date_add(now, { minutes: RANDOM_VALUE });
+      expect(JSON.stringify(newPost.timestamp)).toEqual(JSON.stringify(expected));
     });
   });
 

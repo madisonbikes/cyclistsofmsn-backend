@@ -1,6 +1,6 @@
 import { NotVeryRandom, setupSuite, testContainer } from "../../test";
 import { Image, ImageDocument, PostHistory } from "../../database";
-import { PostSelector } from "./selector";
+import { ImageSelector } from "./selector";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
 import { RandomProvider } from "../../utils";
@@ -19,7 +19,7 @@ describe("test post image selector components", () => {
   describe("selector", () => {
     it("fail with no image", async () => {
       const selector = buildSelector();
-      const post = await selector.nextPost();
+      const post = await selector.nextImage();
       expect(post.isError()).toBeTruthy();
     });
 
@@ -27,7 +27,7 @@ describe("test post image selector components", () => {
       const image = await createImage();
 
       const selector = buildSelector();
-      const post = await selector.nextPost();
+      const post = await selector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
       expect(post.value.id).toEqual(image.id);
@@ -40,7 +40,7 @@ describe("test post image selector components", () => {
       const newImage = await createImage("newImage");
 
       const selector = buildSelector();
-      const post = await selector.nextPost();
+      const post = await selector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
       expect(post.value.id).toEqual(newImage.id);
@@ -53,7 +53,7 @@ describe("test post image selector components", () => {
       await createPost(seasonalImage, subDays(startOfToday(), 190));
 
       const selector = buildSelector();
-      const post = await selector.nextPost();
+      const post = await selector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
       expect(post.value.id).toEqual(seasonalImage.id);
@@ -80,6 +80,6 @@ describe("test post image selector components", () => {
     return testContainer()
       .createChildContainer()
       .register<RandomProvider>(RandomProvider, { useValue: new NotVeryRandom(101) })
-      .resolve(PostSelector);
+      .resolve(ImageSelector);
   }
 });

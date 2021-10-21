@@ -28,8 +28,8 @@ export class PostHistoryStatus {
 
 @modelOptions({ schemaOptions: { collection: "posts" } })
 class PostHistoryClass  {
-  @prop({ ref: () => ImageClass, required: true })
-  public image!: Ref<ImageClass>;
+  @prop({ ref: () => ImageClass })
+  public image?: Ref<ImageClass>;
 
   @prop({ required: true, default: Date.now, index: true })
   public timestamp!: Date;

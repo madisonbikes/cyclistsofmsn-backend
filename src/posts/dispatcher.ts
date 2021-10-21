@@ -1,9 +1,7 @@
 import { Cancellable, Lifecycle, logger, NowProvider, SimpleScheduler } from "../utils";
-import { ImageDocument, PostStatus } from "../database";
 import { PostScheduler } from "./scheduler";
 import { injectable } from "tsyringe";
-import { PhotoTwitterClient } from "../twitter/post";
-import { isDocument } from "@typegoose/typegoose";
+import { PostExecutor } from "./postExecutor";
 
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
@@ -16,7 +14,8 @@ export class PostDispatcher implements Lifecycle {
   constructor(private scheduler: PostScheduler,
               private nowProvider: NowProvider,
               private simpleScheduler: SimpleScheduler,
-              private photoTweeter: PhotoTwitterClient) {
+              private executor: PostExecutor
+  ) {
   }
 
   start(): void {
@@ -30,10 +29,6 @@ export class PostDispatcher implements Lifecycle {
     this.scheduled = undefined;
   }
 
-  private async doPost(image: ImageDocument) {
-    const result = await this.photoTweeter.post(image);
-    logger.info(`Posted new twitter post id ${result}`);
-  }
 
   /** async function is fine for setInterval(), but it should never throw an exception */
   private async checkTimeToPost() {
@@ -51,15 +46,11 @@ export class PostDispatcher implements Lifecycle {
         } else {
           logger.info("Sending scheduled post on schedule");
         }
-        await nextPost
-          .populate("image");
-        if (!isDocument(nextPost.image)) {
-          logger.error("nextPost.image should be populated");
-          return;
-        }
-        await this.doPost(nextPost.image);
-        nextPost.status.flag = PostStatus.COMPLETE;
-        await nextPost.save();
+      }
+      const result = await this.executor.execute(nextPost)
+      if(result.isOk()) {
+        // persist the post data
+        await result.value.save();
       }
     } catch (e) {
       logger.error(e);
