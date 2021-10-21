@@ -46,16 +46,17 @@ export class PostDispatcher implements Lifecycle {
         } else {
           logger.info("Sending scheduled post on schedule");
         }
+        // execute the post and then if it's sucessful, update the post status
+        const postedImage = await this.executor.post()
+        if(postedImage.isOk()) {
+          nextPost.image = postedImage.value
+          nextPost.status.flag = PostStatus.COMPLETE;
+        } else {
+          nextPost.status.flag = PostStatus.FAILED;
+          nextPost.status.error = postedImage.value.message
+        }
+        await nextPost.save();
       }
-      // execute the post and then if it's sucessful, update the post status
-      const postedImage = await this.executor.post()
-      if(postedImage.isOk()) {
-        nextPost.image = postedImage.value
-        nextPost.status.flag = PostStatus.COMPLETE;
-      } else {
-        nextPost.status.error = postedImage.value.message
-      }
-      await nextPost.save();
     } catch (e) {
       logger.error(e);
       return;
