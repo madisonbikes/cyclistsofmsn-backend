@@ -1,9 +1,8 @@
 import { Cancellable, Lifecycle, logger, NowProvider, SimpleScheduler } from "../utils";
-import { ImageDocument, PostStatus } from "../database";
 import { PostScheduler } from "./scheduler";
 import { injectable } from "tsyringe";
-import { PhotoTwitterClient } from "../twitter/post";
-import { isDocument } from "@typegoose/typegoose";
+import { PostExecutor } from "./postExecutor";
+import { PostStatus } from "../database";
 
 /** check every five minutes */
 const CHECK_INTERVAL = 5 * 60 * 1000;
@@ -16,7 +15,8 @@ export class PostDispatcher implements Lifecycle {
   constructor(private scheduler: PostScheduler,
               private nowProvider: NowProvider,
               private simpleScheduler: SimpleScheduler,
-              private photoTweeter: PhotoTwitterClient) {
+              private executor: PostExecutor
+  ) {
   }
 
   start(): void {
@@ -28,11 +28,6 @@ export class PostDispatcher implements Lifecycle {
   stop(): void {
     this.scheduled?.cancel();
     this.scheduled = undefined;
-  }
-
-  private async doPost(image: ImageDocument) {
-    const result = await this.photoTweeter.post(image);
-    logger.info(`Posted new twitter post id ${result}`);
   }
 
   /** async function is fine for setInterval(), but it should never throw an exception */
@@ -51,15 +46,15 @@ export class PostDispatcher implements Lifecycle {
         } else {
           logger.info("Sending scheduled post on schedule");
         }
-        await nextPost
-          .populate("image")
-          .execPopulate();
-        if (!isDocument(nextPost.image)) {
-          logger.error("nextPost.image should be populated");
-          return;
+        // execute the post and then if it's sucessful, update the post status
+        const postedImage = await this.executor.post()
+        if(postedImage.isOk()) {
+          nextPost.image = postedImage.value
+          nextPost.status.flag = PostStatus.COMPLETE;
+        } else {
+          nextPost.status.flag = PostStatus.FAILED;
+          nextPost.status.error = postedImage.value.message
         }
-        await this.doPost(nextPost.image);
-        nextPost.status.flag = PostStatus.COMPLETE;
         await nextPost.save();
       }
     } catch (e) {

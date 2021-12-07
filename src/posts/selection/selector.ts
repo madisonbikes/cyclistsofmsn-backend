@@ -5,7 +5,7 @@ import { PostError } from "../scheduler";
 import { RepostCriteria, SeasonalityCriteria, UnpostedCriteria } from "./criteria";
 
 @injectable()
-export class PostSelector {
+export class ImageSelector {
   constructor(
     private randomProvider: RandomProvider,
     private repostCriteria: RepostCriteria,
@@ -15,7 +15,7 @@ export class PostSelector {
     // empty
   }
 
-  public async nextPost(): Promise<Result<ImageDocument, PostError>> {
+  public async nextImage(): Promise<Result<ImageDocument, PostError>> {
     const allImages = await Image.find().where({ deleted: false })
     if (allImages.length == 0) {
       return error({ message: "no images" });

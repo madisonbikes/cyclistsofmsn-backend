@@ -20,12 +20,7 @@ export class Database implements Lifecycle {
       return false;
     }
     logger.debug(`connecting to mongodb at ${this.configuration.mongodbUri}`);
-    this.connection = await mongoose.connect(this.configuration.mongodbUri, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true
-    });
+    this.connection = await mongoose.connect(this.configuration.mongodbUri);
     return true;
   }
 

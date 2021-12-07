@@ -3,9 +3,8 @@ import date_set from "date-fns/set";
 import date_add from "date-fns/add";
 import { differenceInMinutes, startOfDay } from "date-fns";
 import { ServerConfiguration } from "../config";
-import { error, logger, NowProvider, ok, RandomProvider, Result } from "../utils";
+import { logger, NowProvider, ok, RandomProvider, Result } from "../utils";
 import { injectable } from "tsyringe";
-import { PostSelector } from "./selection/selector";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string };
@@ -15,8 +14,7 @@ export class PostScheduler {
   constructor(
     private randomProvider: RandomProvider,
     private nowProvider: NowProvider,
-    private configuration: ServerConfiguration,
-    private postSelector: PostSelector
+    private configuration: ServerConfiguration
   ) {
   }
 
@@ -24,6 +22,7 @@ export class PostScheduler {
 
   /** returns the next post after scheduling or if it still needs to be posted */
   async scheduleNextPost(): Promise<PostResult> {
+
     const nextPost = await PostHistory.findNextScheduledPost();
     if (nextPost != null) {
       // to reduce log spam, only output this once even though we are polling every 5 minutes or so
@@ -42,15 +41,8 @@ export class PostScheduler {
   }
 
   private async createNewScheduledPost(): Promise<PostResult> {
-    const [lastPost, newImage] = await Promise.all([
-      PostHistory.findCurrentPost(),
-      this.postSelector.nextPost()
-    ]);
-    if(newImage.isError()) {
-      return error(newImage.value)
-    }
+    const lastPost = await PostHistory.findCurrentPost();
     const newPost = new PostHistory();
-    newPost.image = newImage.value;
     newPost.timestamp = await this.selectNextTime(lastPost?.timestamp);
     newPost.status.flag = PostStatus.PENDING;
     return ok(await newPost.save());
