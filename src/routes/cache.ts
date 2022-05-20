@@ -9,8 +9,8 @@ const CACHE_SIZE = 20 * 1024 * 1024;
 @singleton()
 export class MemoryCache {
   private lru = new LRUCache<string, Holder>({
-    max: CACHE_SIZE,
-    length: function(holder: Holder): number {
+    maxSize: CACHE_SIZE,
+    sizeCalculation: (holder: Holder): number => {
       const v = holder.value as { body: { length: number }}
       if(v !== undefined) {
         return v.body.length
@@ -53,7 +53,7 @@ export class MemoryCache {
    * Clears the cache. Useful between test cases.
    */
   clear(): void {
-    this.lru.reset()
+    this.lru.clear()
   }
 }
 
