@@ -3,8 +3,8 @@ import { PostError } from "./scheduler";
 import { PhotoTwitterClient } from "../twitter/post";
 import { ImageSelector } from "./selection/selector";
 import { ImageRepositoryScanner } from "../scan";
-import { ImageDocument, PostHistoryDocument, PostStatus } from "../database";
-import { error, logger, ok, Result } from "../utils";
+import { ImageDocument } from "../database";
+import { error, logger, Result } from "../utils";
 
 
 @injectable()
