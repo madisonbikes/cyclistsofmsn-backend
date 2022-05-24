@@ -72,7 +72,7 @@
     "mongodb-memory-server": "^8.5.2",
     "prettier": "2.6.2",
     "supertest": "^6.2.3",
-    "ts-jest": "^28.0.2",
+    "ts-jest": "^28.0.3",
     "ts-node-dev": "^1.1.8"
   }
 }
