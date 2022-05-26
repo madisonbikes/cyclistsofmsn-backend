@@ -1,7 +1,7 @@
 {
-  "name": "cyclists_of_msn_api",
+  "name": "cyclistsofmsn-backend",
   "version": "0.1.0",
-  "description": "Cyclists of Madison Server/API",
+  "description": "Cyclists of Madison Backend",
   "main": "src/server.ts",
   "scripts": {
     "start": "ts-node src/server.ts",
