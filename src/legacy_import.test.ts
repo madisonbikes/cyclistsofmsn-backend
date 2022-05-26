@@ -9,9 +9,11 @@ describe("test imports", () => {
     await PostHistory.deleteMany();
   });
 
-  it("should import many previous posts", async function() {
+  it("should import many previous posts", async function () {
     const importer = testContainer().resolve(Importer);
-    const value = await importer.perform_import("./test_resources/test_post_history_325.log");
+    const value = await importer.perform_import(
+      "./test_resources/test_post_history_325.log"
+    );
     expect(value).toEqual(325);
 
     // ensure database connection is back

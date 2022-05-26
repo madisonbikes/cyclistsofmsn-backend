@@ -15,29 +15,27 @@ export class PostScheduler {
     private randomProvider: RandomProvider,
     private nowProvider: NowProvider,
     private configuration: ServerConfiguration
-  ) {
-  }
+  ) {}
 
-  private lastScheduledPostLog: string | undefined
+  private lastScheduledPostLog: string | undefined;
 
   /** returns the next post after scheduling or if it still needs to be posted */
   async scheduleNextPost(): Promise<PostResult> {
-
     const nextPost = await PostHistory.findNextScheduledPost();
     if (nextPost != null) {
       // to reduce log spam, only output this once even though we are polling every 5 minutes or so
-      const newLog = `Using existing scheduled post @ ${nextPost.timestamp}`
-      if(this.lastScheduledPostLog !== newLog) {
-        logger.info(newLog)
+      const newLog = `Using existing scheduled post @ ${nextPost.timestamp}`;
+      if (this.lastScheduledPostLog !== newLog) {
+        logger.info(newLog);
         this.lastScheduledPostLog = newLog;
       }
       return ok(nextPost);
     }
 
-    const createdPost = await this.createNewScheduledPost()
-    return createdPost.alsoOnOk(value => {
+    const createdPost = await this.createNewScheduledPost();
+    return createdPost.alsoOnOk((value) => {
       logger.info(`Scheduled new post @ ${value.timestamp}`);
-    })
+    });
   }
 
   private async createNewScheduledPost(): Promise<PostResult> {
@@ -53,7 +51,7 @@ export class PostScheduler {
     const startOfToday = startOfDay(now);
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
     const lastTimeToday = date_set(startOfToday, {
-      hours: this.configuration.lastPostHour
+      hours: this.configuration.lastPostHour,
     });
 
     let startDate: Date;
@@ -74,10 +72,10 @@ export class PostScheduler {
       startDate = startOfToday;
     }
     let firstTime = date_set(startDate, {
-      hours: this.configuration.firstPostHour
+      hours: this.configuration.firstPostHour,
     });
     const lastTime = date_set(startDate, {
-      hours: this.configuration.lastPostHour
+      hours: this.configuration.lastPostHour,
     });
 
     if (firstTime <= now) {

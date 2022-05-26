@@ -1,4 +1,10 @@
-import { Cancellable, Lifecycle, logger, NowProvider, SimpleScheduler } from "../utils";
+import {
+  Cancellable,
+  Lifecycle,
+  logger,
+  NowProvider,
+  SimpleScheduler,
+} from "../utils";
 import { PostScheduler } from "./scheduler";
 import { injectable } from "tsyringe";
 import { PostExecutor } from "./postExecutor";
@@ -12,17 +18,21 @@ const DELAY = 5 * 1000;
 export class PostDispatcher implements Lifecycle {
   private scheduled: Cancellable | undefined;
 
-  constructor(private scheduler: PostScheduler,
-              private nowProvider: NowProvider,
-              private simpleScheduler: SimpleScheduler,
-              private executor: PostExecutor
-  ) {
-  }
+  constructor(
+    private scheduler: PostScheduler,
+    private nowProvider: NowProvider,
+    private simpleScheduler: SimpleScheduler,
+    private executor: PostExecutor
+  ) {}
 
   start(): void {
-    this.scheduled = this.simpleScheduler.scheduleRepeat(async () => {
-      return this.checkTimeToPost();
-    }, CHECK_INTERVAL, DELAY);
+    this.scheduled = this.simpleScheduler.scheduleRepeat(
+      async () => {
+        return this.checkTimeToPost();
+      },
+      CHECK_INTERVAL,
+      DELAY
+    );
   }
 
   stop(): void {
@@ -42,18 +52,22 @@ export class PostDispatcher implements Lifecycle {
       const when = this.nowProvider.now() - nextPost.timestamp.getTime();
       if (when > 0) {
         if (when > CHECK_INTERVAL) {
-          logger.info(`Missed scheduled post ${Math.abs(Math.round(when / 1000 / 60))} minutes ago, sending immediately.`);
+          logger.info(
+            `Missed scheduled post ${Math.abs(
+              Math.round(when / 1000 / 60)
+            )} minutes ago, sending immediately.`
+          );
         } else {
           logger.info("Sending scheduled post on schedule");
         }
         // execute the post and then if it's sucessful, update the post status
-        const postedImage = await this.executor.post()
-        if(postedImage.isOk()) {
-          nextPost.image = postedImage.value
+        const postedImage = await this.executor.post();
+        if (postedImage.isOk()) {
+          nextPost.image = postedImage.value;
           nextPost.status.flag = PostStatus.COMPLETE;
         } else {
           nextPost.status.flag = PostStatus.FAILED;
-          nextPost.status.error = postedImage.value.message
+          nextPost.status.error = postedImage.value.message;
         }
         await nextPost.save();
       }

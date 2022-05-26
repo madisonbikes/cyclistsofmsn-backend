@@ -34,18 +34,18 @@ export class PhotoServer implements Lifecycle {
     private router: Router,
     postDispatcher: PostDispatcher
   ) {
-    this.components.push(database)
-    this.components.push(scanner)
-    this.components.push(postDispatcher)
+    this.components.push(database);
+    this.components.push(scanner);
+    this.components.push(postDispatcher);
   }
 
-  components: Lifecycle[] = []
+  components: Lifecycle[] = [];
   server: Server | undefined;
 
   /** create server but don't start main listener, for testing */
   async create(): Promise<Server> {
     for await (const c of this.components) {
-      await c.start()
+      await c.start();
     }
 
     const app = new Koa();
@@ -57,7 +57,7 @@ export class PhotoServer implements Lifecycle {
       koa_logger({
         transporter: (str: string, args: unknown) => {
           logger.debug(str, args);
-        }
+        },
       })
     );
 
@@ -87,7 +87,7 @@ export class PhotoServer implements Lifecycle {
 
     // shut them down in reverse order
     for await (const c of this.components.reverse()) {
-      await c.stop?.()
+      await c.stop?.();
     }
   }
 }

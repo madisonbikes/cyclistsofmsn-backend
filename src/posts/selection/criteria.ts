@@ -14,22 +14,23 @@ interface MatchCriteria {
 @injectable()
 export class UnpostedCriteria implements MatchCriteria {
   async satisfiedBy(image: ImageDocument): Promise<boolean> {
-    const posts = await PostHistory.find()
-      .where("image", image);
+    const posts = await PostHistory.find().where("image", image);
     return posts.length == 0;
   }
 }
 
 @injectable()
 export class RepostCriteria implements MatchCriteria {
-  constructor(private nowProvider: NowProvider) {
-  }
+  constructor(private nowProvider: NowProvider) {}
 
   async satisfiedBy(image: ImageDocument): Promise<boolean> {
-    const threshold = subDays(startOfDay(this.nowProvider.now()), MINIMUM_REPOST_INTERVAL_IN_DAYS);
-    const matchingPosts = await PostHistory
-      .find({ timestamp: { $gte: threshold } })
-      .where("image", image);
+    const threshold = subDays(
+      startOfDay(this.nowProvider.now()),
+      MINIMUM_REPOST_INTERVAL_IN_DAYS
+    );
+    const matchingPosts = await PostHistory.find({
+      timestamp: { $gte: threshold },
+    }).where("image", image);
 
     return matchingPosts.length == 0;
   }
@@ -37,8 +38,7 @@ export class RepostCriteria implements MatchCriteria {
 
 @injectable()
 export class SeasonalityCriteria implements MatchCriteria {
-  constructor(private nowProvider: NowProvider) {
-  }
+  constructor(private nowProvider: NowProvider) {}
 
   async satisfiedBy(image: ImageDocument): Promise<boolean> {
     const createdOnDate = image.exif_createdon;
@@ -46,7 +46,12 @@ export class SeasonalityCriteria implements MatchCriteria {
       return false;
     }
 
-    return this.dayDifferencesBetweenDates(createdOnDate, startOfDay(this.nowProvider.now())) <= SEASONALITY_WINDOW;
+    return (
+      this.dayDifferencesBetweenDates(
+        createdOnDate,
+        startOfDay(this.nowProvider.now())
+      ) <= SEASONALITY_WINDOW
+    );
   }
 
   private dayDifferencesBetweenDates(d1: Date, d2: Date) {

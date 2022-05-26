@@ -86,9 +86,13 @@ describe("simple scheduler", () => {
     let called = 0;
 
     const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleRepeat( () => {
-      called++;
-    }, 5000, 2000);
+    const cancel = scheduler.scheduleRepeat(
+      () => {
+        called++;
+      },
+      5000,
+      2000
+    );
     jest.advanceTimersByTime(3000);
     expect(called).toBe(1);
 

@@ -14,10 +14,11 @@ export class ServerConfiguration {
     process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
   public firstPostHour = 8;
   public lastPostHour = 16;
-  public twitterApiKey = process.env.TWITTER_API_KEY || ""
-  public twitterApiSecret = process.env.TWITTER_API_SECRET || ""
-  public twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || ""
-  public twitterAccessTokenSecret = process.env.TWITTER_ACCESS_TOKEN_SECRET || ""
+  public twitterApiKey = process.env.TWITTER_API_KEY || "";
+  public twitterApiSecret = process.env.TWITTER_API_SECRET || "";
+  public twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || "";
+  public twitterAccessTokenSecret =
+    process.env.TWITTER_ACCESS_TOKEN_SECRET || "";
 }
 
 // from dotenv samples:

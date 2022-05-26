@@ -26,9 +26,9 @@ describe("post dispatcher component", () => {
     postDispatcher.stop();
   });
 
-
   function buildMocks() {
-    const childContainer = testContainer().createChildContainer()
+    const childContainer = testContainer()
+      .createChildContainer()
       .registerInstance(SimpleScheduler, mockScheduler)
       .registerInstance(NowProvider, now);
 
@@ -37,7 +37,8 @@ describe("post dispatcher component", () => {
     childContainer.registerInstance(PostScheduler, postScheduler);
     const postDispatcher = childContainer.resolve(PostDispatcher);
     return {
-      postScheduler, postDispatcher
+      postScheduler,
+      postDispatcher,
     };
   }
 });

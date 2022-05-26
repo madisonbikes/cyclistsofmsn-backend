@@ -2,10 +2,10 @@ import { createLogger, format, transports } from "winston";
 
 const formatter = format.combine(
   format.timestamp({
-    format: "YYYY-MM-DD HH:mm:ss"
+    format: "YYYY-MM-DD HH:mm:ss",
   }),
   format.errors({ stack: true }),
-  format.printf(info => {
+  format.printf((info) => {
     const { timestamp, level, stack } = info;
     let { code, message } = info;
 
@@ -19,12 +19,9 @@ const formatter = format.combine(
 );
 
 export const logger = createLogger({
-
   level: "debug",
   format: formatter,
-  transports: [
-    new transports.File({ filename: "errors.log", level: "error" })
-  ]
+  transports: [new transports.File({ filename: "errors.log", level: "error" })],
 });
 
 //
@@ -32,10 +29,9 @@ export const logger = createLogger({
 // with the colorized simple format.
 //
 if (process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "prod") {
-  logger.add(new transports.Console({
-    format: format.combine(
-      format.colorize(),
-      formatter
-    )
-  }));
+  logger.add(
+    new transports.Console({
+      format: format.combine(format.colorize(), formatter),
+    })
+  );
 }

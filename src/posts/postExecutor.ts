@@ -6,27 +6,26 @@ import { ImageRepositoryScanner } from "../scan";
 import { ImageDocument } from "../database";
 import { error, logger, Result } from "../utils";
 
-
 @injectable()
 export class PostExecutor {
-  constructor(private photoTweeter: PhotoTwitterClient,
-              private postSelector: ImageSelector,
-              private repositoryScanner: ImageRepositoryScanner) {
-  }
+  constructor(
+    private photoTweeter: PhotoTwitterClient,
+    private postSelector: ImageSelector,
+    private repositoryScanner: ImageRepositoryScanner
+  ) {}
 
   async post(): Promise<Result<ImageDocument, PostError>> {
-
     // first, scan repository for new images
-    await this.repositoryScanner.start()
+    await this.repositoryScanner.start();
 
     // select image
     const nextImage = await this.postSelector.nextImage();
-    if(nextImage.isError()) {
+    if (nextImage.isError()) {
       logger.error(`Could not find an image to post: ${nextImage.value}`);
       return error(nextImage.value);
     }
     const result = await this.photoTweeter.post(nextImage.value);
     logger.info(`Posted new twitter post id ${result}`);
-    return nextImage
+    return nextImage;
   }
 }

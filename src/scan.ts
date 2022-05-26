@@ -8,13 +8,12 @@ import { injectable } from "tsyringe";
 /** expose scanning operation.  requires database connection to be established */
 @injectable()
 export class ImageRepositoryScanner implements Lifecycle {
-  constructor(private fsRepository: FilesystemRepository) {
-  }
+  constructor(private fsRepository: FilesystemRepository) {}
 
   async start(): Promise<void> {
     const [files, dbFiles] = await Promise.all([
       this.fsRepository.imageFiles(),
-      Image.find().exec()
+      Image.find().exec(),
     ]);
     const matchedFiles: ImageDocument[] = [];
     const filesToAdd: string[] = [];

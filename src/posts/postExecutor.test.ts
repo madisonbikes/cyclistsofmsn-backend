@@ -15,39 +15,41 @@ describe("test executor component", () => {
   });
 
   describe("with no images", () => {
-    it("should fail if no images in repository", async function() {
-      const executor = buildExecutor()
+    it("should fail if no images in repository", async function () {
+      const executor = buildExecutor();
 
-      const postedImage = await executor.post()
+      const postedImage = await executor.post();
       assertError(postedImage);
       expect(postedImage.value.message).toEqual("no images");
     });
   });
 
   describe("with images", () => {
-    it("should succeed if an image in the repository", async function() {
+    it("should succeed if an image in the repository", async function () {
       const newImage = new Image();
       newImage.filename = "blarg";
       newImage.fs_timestamp = new Date();
       await newImage.save();
 
-      const executor = buildExecutor()
+      const executor = buildExecutor();
 
-      const postedImage = await executor.post()
+      const postedImage = await executor.post();
       assertOk(postedImage);
-      expect(postedImage.value.filename).toEqual("blarg")
+      expect(postedImage.value.filename).toEqual("blarg");
     });
   });
 
   function buildExecutor() {
-    const noopScanner = testContainer().resolve(NoopRepositoryScanner)
-    const noopTweeter = testContainer().resolve(NoopPhotoTweeter)
+    const noopScanner = testContainer().resolve(NoopRepositoryScanner);
+    const noopTweeter = testContainer().resolve(NoopPhotoTweeter);
     return testContainer()
-      .register<ImageRepositoryScanner>(ImageRepositoryScanner, { useValue: noopScanner })
-      .register(PhotoTwitterClient, {useValue: noopTweeter})
-      .resolve(PostExecutor)
+      .register<ImageRepositoryScanner>(ImageRepositoryScanner, {
+        useValue: noopScanner,
+      })
+      .register(PhotoTwitterClient, { useValue: noopTweeter })
+      .resolve(PostExecutor);
   }
-})
+});
 
 @injectable()
 class NoopRepositoryScanner extends ImageRepositoryScanner {

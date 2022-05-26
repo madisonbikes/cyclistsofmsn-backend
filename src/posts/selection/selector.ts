@@ -2,7 +2,11 @@ import { injectable } from "tsyringe";
 import { error, ok, RandomProvider, Result, arrayShuffle } from "../../utils";
 import { Image, ImageDocument } from "../../database";
 import { PostError } from "../scheduler";
-import { RepostCriteria, SeasonalityCriteria, UnpostedCriteria } from "./criteria";
+import {
+  RepostCriteria,
+  SeasonalityCriteria,
+  UnpostedCriteria,
+} from "./criteria";
 
 @injectable()
 export class ImageSelector {
@@ -16,7 +20,7 @@ export class ImageSelector {
   }
 
   public async nextImage(): Promise<Result<ImageDocument, PostError>> {
-    const allImages = await Image.find().where({ deleted: false })
+    const allImages = await Image.find().where({ deleted: false });
     if (allImages.length == 0) {
       return error({ message: "no images" });
     }
@@ -33,34 +37,37 @@ export class ImageSelector {
       [this.unpostedCriteria],
 
       // any photos (posted or otherwise) outside of repost window (e.g. >180 days)
-      [this.repostCriteria]
-    ]
+      [this.repostCriteria],
+    ];
 
-    const orderedPhotoList = arrayShuffle(this.randomProvider, allImages)
+    const orderedPhotoList = arrayShuffle(this.randomProvider, allImages);
 
     // run through complete repo for each criteria list in order
     for (const activeCriteriaList of criteria) {
-
       // go through each photo in the list, looking for a criteria match
       for (const candidatePhoto of orderedPhotoList) {
-        const values = await Promise.all(activeCriteriaList.map(criteria => criteria.satisfiedBy(candidatePhoto)))
+        const values = await Promise.all(
+          activeCriteriaList.map((criteria) =>
+            criteria.satisfiedBy(candidatePhoto)
+          )
+        );
 
         // if any of the criteria were not satisfied, move on to next candidate
-        let failed = false
+        let failed = false;
         for (const value of values) {
-          if(!value) {
+          if (!value) {
             failed = true;
             break;
           }
         }
-        if(!failed) {
+        if (!failed) {
           // hooray!
-          return ok(candidatePhoto)
+          return ok(candidatePhoto);
         }
       }
     }
 
     // last resort, just return the first random photo
-    return ok(orderedPhotoList[0])
+    return ok(orderedPhotoList[0]);
   }
 }

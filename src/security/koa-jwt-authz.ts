@@ -13,7 +13,11 @@ import Koa, { Context, Middleware } from "koa";
  * @returns {function}           - next function
  * @api public
  */
-export function jwtAuthz(expectedScopes: string[], checkAllScopes = false, customScopeKey = "scope"): Middleware {
+export function jwtAuthz(
+  expectedScopes: string[],
+  checkAllScopes = false,
+  customScopeKey = "scope"
+): Middleware {
   return async (ctx: Context, next: Koa.Next) => {
     if (expectedScopes.length === 0) {
       await next();
@@ -71,8 +75,9 @@ function _error(ctx: Context, expectedScopes: string[], errorMessage: string) {
     error: "Unauthorized",
     message: errorMessage,
     headers: {
-      "WWW-Authenticate": `Bearer scope="${expectedScopes.join(" ")}", error="${errorMessage}"`
-    }
+      "WWW-Authenticate": `Bearer scope="${expectedScopes.join(
+        " "
+      )}", error="${errorMessage}"`,
+    },
   });
 }
-

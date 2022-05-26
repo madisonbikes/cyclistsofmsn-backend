@@ -1,4 +1,9 @@
-import { DocumentType, getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
+import {
+  DocumentType,
+  getModelForClass,
+  modelOptions,
+  prop,
+} from "@typegoose/typegoose";
 
 @modelOptions({ schemaOptions: { collection: "images" } })
 export class ImageClass {

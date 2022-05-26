@@ -13,11 +13,10 @@ export class PostRouter extends KoaRouter {
 
       // all posts
       .get("/", async (ctx) => {
-          ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-          const posts = await PostHistory.findOrderedPosts();
-          ctx.body = posts.map(mapPost);
-        }
-      )
+        ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
+        const posts = await PostHistory.findOrderedPosts();
+        ctx.body = posts.map(mapPost);
+      })
 
       // current post
       .get("/current", async (ctx) => {
@@ -28,17 +27,14 @@ export class PostRouter extends KoaRouter {
       })
 
       // post create operation is secured by jwt token
-      .post("/create",
-        jwt(["create:post"]),
-        async (ctx) => {
-          ctx.body = "Submitted new post";
-        }
-      );
+      .post("/create", jwt(["create:post"]), async (ctx) => {
+        ctx.body = "Submitted new post";
+      });
   }
 }
 
 function mapPost(post: PostHistoryDocument) {
-  if(isDocument(post.image)) {
+  if (isDocument(post.image)) {
     return { id: post.id, timestamp: post.timestamp, image: post.image._id };
   } else {
     return { id: post.id, timestamp: post.timestamp, image: post.image };
