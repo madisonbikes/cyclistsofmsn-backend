@@ -1,8 +1,9 @@
-import { config } from "dotenv";
-import { resolve } from "path";
+import dotenv from "dotenv";
 import { injectable, singleton } from "tsyringe";
 
-export const DEFAULT_SERVER_PORT = 3001;
+const isDev = process.env.NODE_ENV === "development";
+
+const DEFAULT_SERVER_PORT = 3001;
 
 @injectable()
 @singleton()
@@ -21,7 +22,8 @@ export class ServerConfiguration {
     process.env.TWITTER_ACCESS_TOKEN_SECRET || "";
 }
 
-// from dotenv samples:
-// https://github.com/motdotla/dotenv/blob/master/examples/typescript/src/lib/env.ts
-const file = resolve(__dirname, "../.env");
-config({ path: file });
+// this has to run first outside of constructor
+const result = dotenv.config();
+if (result.error && isDev) {
+  console.log(result.error);
+}
