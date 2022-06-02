@@ -37,7 +37,7 @@
     "koa-router": "^10.1.1",
     "koa-static": "^5.0.0",
     "lru-cache": "^7.10.1",
-    "mongoose": "^6.3.4",
+    "mongoose": "^6.3.5",
     "oauth-1.0a": "^2.2.6",
     "pm2": "^5.2.0",
     "readline-sync": "^1.4.10",
