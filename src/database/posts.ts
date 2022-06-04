@@ -46,7 +46,7 @@ class PostHistoryClass {
   ) {
     const val = this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
-      .sort({ timestamp: "-1" })
+      .sort({ timestamp: -1 })
       .populate("image", ["deleted"]);
     return val;
   }
@@ -55,7 +55,7 @@ class PostHistoryClass {
     this: ReturnModelType<typeof PostHistoryClass>
   ) {
     const posts = await this.find()
-      .sort({ timestamp: "1" })
+      .sort({ timestamp: 1 })
       .populate("image", ["deleted"])
       .where({ "image.deleted": false });
 
@@ -73,7 +73,7 @@ class PostHistoryClass {
   ) {
     return this.findOne()
       .where({ "status.flag": PostStatus.PENDING })
-      .sort({ timestamp: "-1" });
+      .sort({ timestamp: -1 });
   }
 }
 
