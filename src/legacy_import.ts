@@ -15,7 +15,7 @@ import { once } from "events";
 
 /** expose command-line launcher */
 if (require.main === module) {
-  if (process.argv.length != 3) {
+  if (process.argv.length !== 3) {
     console.error("supply logfile as only argument");
     process.exit(1);
   }

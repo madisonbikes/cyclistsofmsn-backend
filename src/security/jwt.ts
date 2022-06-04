@@ -21,7 +21,7 @@ const jwt_first = jwt_internal({
 });
 
 export function jwt(requiredScopes: string[] = []): Middleware {
-  if (requiredScopes.length == 0) {
+  if (requiredScopes.length === 0) {
     return jwt_first;
   } else {
     return compose([jwt_first, jwtAuthz(requiredScopes)]);

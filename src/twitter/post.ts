@@ -55,7 +55,7 @@ async function main(args: string[]) {
 }
 
 if (require.main === module) {
-  if (process.argv.length != 4) {
+  if (process.argv.length !== 4) {
     console.log("Requires a status and an image filename for arguments.");
   } else {
     const args = process.argv.slice(2);

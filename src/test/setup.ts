@@ -30,7 +30,7 @@ export type SuiteOptions = {
 /** entry point that should be included first in each describe block */
 export function setupSuite(options: Partial<SuiteOptions> = {}): void {
   beforeAll(async () => {
-    assert(tc == undefined);
+    assert(tc === undefined);
     tc = await initializeSuite(options);
 
     await createDatabaseConnection();

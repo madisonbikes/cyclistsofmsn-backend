@@ -5,8 +5,9 @@
     "preserveConstEnums": true,
     "noFallthroughCasesInSwitch": true,
     "emitDecoratorMetadata": true,
+    "strict": true,
     "experimentalDecorators": true,
-    "allowJs": true
+    "allowJs": false
   },
   "include": ["src"]
 }

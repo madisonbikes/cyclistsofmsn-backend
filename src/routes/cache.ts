@@ -24,7 +24,7 @@ export class MemoryCache {
   /** returns a koa middleware that enables caching downstream */
   middleware(): Middleware {
     const lruCache = this.lru;
-    const addCacheHeader = process.env.NODE_ENV == "test";
+    const addCacheHeader = process.env.NODE_ENV === "test";
 
     return koaCash({
       get(key): Promise<unknown | undefined> {

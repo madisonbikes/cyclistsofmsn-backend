@@ -15,7 +15,7 @@ interface MatchCriteria {
 export class UnpostedCriteria implements MatchCriteria {
   async satisfiedBy(image: ImageDocument): Promise<boolean> {
     const posts = await PostHistory.find().where("image", image);
-    return posts.length == 0;
+    return posts.length === 0;
   }
 }
 
@@ -32,7 +32,7 @@ export class RepostCriteria implements MatchCriteria {
       timestamp: { $gte: threshold },
     }).where("image", image);
 
-    return matchingPosts.length == 0;
+    return matchingPosts.length === 0;
   }
 }
 

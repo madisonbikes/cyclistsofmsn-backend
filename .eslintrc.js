@@ -25,5 +25,6 @@ module.exports = {
         caughtErrorsIgnorePattern: "^_",
       },
     ],
+    eqeqeq: ["warn", "smart"],
   },
 };

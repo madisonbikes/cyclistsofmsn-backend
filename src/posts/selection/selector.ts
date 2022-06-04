@@ -21,7 +21,7 @@ export class ImageSelector {
 
   public async nextImage(): Promise<Result<ImageDocument, PostError>> {
     const allImages = await Image.find().where({ deleted: false });
-    if (allImages.length == 0) {
+    if (allImages.length === 0) {
       return error({ message: "no images" });
     }
 

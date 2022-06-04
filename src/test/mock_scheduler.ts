@@ -47,7 +47,7 @@ export class MockSimpleScheduler extends SimpleScheduler {
     intervalInMillis: number,
     delayInMillis = 0
   ): Cancellable {
-    if (delayInMillis == 0) {
+    if (delayInMillis === 0) {
       delayInMillis = intervalInMillis;
     }
     const newItem: Scheduled = {
@@ -82,7 +82,7 @@ export class MockSimpleScheduler extends SimpleScheduler {
       if (interval > 0) {
         let current = this.lastRun;
         while (current < now) {
-          if (item.nextWhen == current) {
+          if (item.nextWhen === current) {
             await item.run();
             item.nextWhen += interval;
           }
