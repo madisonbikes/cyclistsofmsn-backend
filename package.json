@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
-    "@types/jest": "^28.1.0",
+    "@types/jest": "^28.1.1",
     "@types/koa": "^2.13.4",
     "@types/koa-cash": "^4.0.1",
     "@types/koa-compose": "^3.2.5",
