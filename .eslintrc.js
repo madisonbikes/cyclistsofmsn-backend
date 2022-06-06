@@ -26,5 +26,6 @@ module.exports = {
       },
     ],
     eqeqeq: ["warn", "smart"],
+    "func-style": ["warn"],
   },
 };
