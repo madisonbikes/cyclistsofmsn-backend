@@ -33,10 +33,10 @@ export class PostRouter extends KoaRouter {
   }
 }
 
-function mapPost(post: PostHistoryDocument) {
+const mapPost = (post: PostHistoryDocument) => {
   if (isDocument(post.image)) {
     return { id: post.id, timestamp: post.timestamp, image: post.image._id };
   } else {
     return { id: post.id, timestamp: post.timestamp, image: post.image };
   }
-}
+};

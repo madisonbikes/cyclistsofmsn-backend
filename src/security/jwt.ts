@@ -20,10 +20,10 @@ const jwt_first = jwt_internal({
   algorithms: ["RS256"],
 });
 
-export function jwt(requiredScopes: string[] = []): Middleware {
+export const jwt = (requiredScopes: string[] = []): Middleware => {
   if (requiredScopes.length === 0) {
     return jwt_first;
   } else {
     return compose([jwt_first, jwtAuthz(requiredScopes)]);
   }
-}
+};

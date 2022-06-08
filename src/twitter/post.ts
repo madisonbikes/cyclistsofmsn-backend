@@ -46,13 +46,13 @@ export class PhotoTwitterClient {
 }
 
 /** simple command-line capability for testing */
-async function main(args: string[]) {
+const main = async (args: string[]) => {
   const twitterClient = container.resolve(PhotoTwitterClient);
   const fileBuffer = await readFile(args[1]);
 
   console.log("loaded file");
   return twitterClient.postTweet(args[0], fileBuffer);
-}
+};
 
 if (require.main === module) {
   if (process.argv.length !== 4) {

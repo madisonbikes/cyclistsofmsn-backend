@@ -10,9 +10,9 @@ export * from "./setup";
 export type TestRequest = supertest.SuperTest<supertest.Test>;
 
 /** helper function to build a supertest test request from a server object */
-export function testRequest(server: Server): TestRequest {
+export const testRequest = (server: Server): TestRequest => {
   return supertest(server);
-}
+};
 
 /** Generates deterministric values that meet the randomInt() contract */
 export class NotVeryRandom extends RandomProvider {

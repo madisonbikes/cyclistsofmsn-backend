@@ -28,7 +28,7 @@ export type SuiteOptions = {
 };
 
 /** entry point that should be included first in each describe block */
-export function setupSuite(options: Partial<SuiteOptions> = {}): void {
+export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   beforeAll(async () => {
     assert(tc === undefined);
     tc = await initializeSuite(options);
@@ -43,25 +43,25 @@ export function setupSuite(options: Partial<SuiteOptions> = {}): void {
     await cleanupSuite();
     tc = undefined;
   });
-}
+};
 
 /**
  * Callers that make modifications to the container should do so in a CHILD container because the container is not reset
  * between test
  */
-export function testContainer(): DependencyContainer {
+export const testContainer = (): DependencyContainer => {
   assert(tc);
   return tc;
-}
+};
 
 /** return the object managing the connection to the mongodb instance */
-export function testDatabase(): Database {
+export const testDatabase = (): Database => {
   return testContainer().resolve(Database);
-}
+};
 
-async function initializeSuite(
+const initializeSuite = async (
   options: Partial<SuiteOptions>
-): Promise<DependencyContainer> {
+): Promise<DependencyContainer> => {
   const withDatabase = options.withDatabase;
   if (withDatabase) {
     // start the mongo in-memory server on an ephemeral port
@@ -94,12 +94,12 @@ async function initializeSuite(
     });
   }
   return testContainer;
-}
+};
 
-async function cleanupSuite(): Promise<void> {
+const cleanupSuite = async (): Promise<void> => {
   await mongoServer?.stop();
   mongoServer = undefined;
-}
+};
 
 @injectable()
 class TestConfiguration extends ServerConfiguration {
@@ -112,10 +112,10 @@ class TestConfiguration extends ServerConfiguration {
   }
 }
 
-async function clearDatabaseConnection() {
+const clearDatabaseConnection = async () => {
   await testDatabase().stop();
-}
+};
 
-async function createDatabaseConnection() {
+const createDatabaseConnection = async () => {
   await testDatabase().start();
-}
+};

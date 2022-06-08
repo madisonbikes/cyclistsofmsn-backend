@@ -2,11 +2,11 @@ import crypto from "crypto";
 import OAuth from "oauth-1.0a";
 import { Plugin } from "superagent";
 
-export function oauth_signer(
+export const oauth_signer = (
   apiKey: string,
   apiSecret: string,
   data: Record<string, string>
-): Plugin {
+): Plugin => {
   const oauth = new OAuth({
     consumer: { key: apiKey, secret: apiSecret },
     signature_method: "HMAC-SHA1",
@@ -27,4 +27,4 @@ export function oauth_signer(
     const header = oauth.toHeader(authorization);
     request.set(header);
   };
-}
+};

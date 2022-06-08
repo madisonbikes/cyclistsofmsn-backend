@@ -71,7 +71,7 @@ export class ImageRouter extends KoaRouter {
   }
 }
 
-function safeParseInt(value: string | string[] | undefined) {
+const safeParseInt = (value: string | string[] | undefined) => {
   if (!value) {
     return undefined;
   }
@@ -80,4 +80,4 @@ function safeParseInt(value: string | string[] | undefined) {
     return undefined;
   }
   return parsed;
-}
+};

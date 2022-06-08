@@ -13,11 +13,11 @@ import Koa, { Context, Middleware } from "koa";
  * @returns {function}           - next function
  * @api public
  */
-export function jwtAuthz(
+export const jwtAuthz = (
   expectedScopes: string[],
   checkAllScopes = false,
   customScopeKey = "scope"
-): Middleware {
+): Middleware => {
   return async (ctx: Context, next: Koa.Next) => {
     if (expectedScopes.length === 0) {
       await next();
@@ -58,7 +58,7 @@ export function jwtAuthz(
 
     _error(ctx, expectedScopes, "User not allowed");
   };
-}
+};
 
 /**
  * Helper
@@ -69,7 +69,11 @@ export function jwtAuthz(
  *
  * @api private
  */
-function _error(ctx: Context, expectedScopes: string[], errorMessage: string) {
+const _error = (
+  ctx: Context,
+  expectedScopes: string[],
+  errorMessage: string
+) => {
   ctx.throw(401, "Unauthorized", {
     statusCode: 401,
     error: "Unauthorized",
@@ -80,4 +84,4 @@ function _error(ctx: Context, expectedScopes: string[], errorMessage: string) {
       )}", error="${errorMessage}"`,
     },
   });
-}
+};
