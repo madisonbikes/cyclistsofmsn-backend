@@ -39,7 +39,7 @@ describe("test executor component", () => {
     });
   });
 
-  function buildExecutor() {
+  const buildExecutor = () => {
     const noopScanner = testContainer().resolve(NoopRepositoryScanner);
     const noopTweeter = testContainer().resolve(NoopPhotoTweeter);
     return testContainer()
@@ -48,19 +48,19 @@ describe("test executor component", () => {
       })
       .register(PhotoTwitterClient, { useValue: noopTweeter })
       .resolve(PostExecutor);
-  }
+  };
 });
 
 @injectable()
 class NoopRepositoryScanner extends ImageRepositoryScanner {
-  async start(): Promise<void> {
-    return;
+  start(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
 @injectable()
 class NoopPhotoTweeter extends PhotoTwitterClient {
-  async post(image: ImageDocument): Promise<number> {
-    return 0;
+  post(_image: ImageDocument): Promise<number> {
+    return Promise.resolve(0);
   }
 }

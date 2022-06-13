@@ -25,6 +25,6 @@ export const oauth_signer = (
     };
     const authorization = oauth.authorize(requestData);
     const header = oauth.toHeader(authorization);
-    request.set(header);
+    void request.set(header);
   };
 };

@@ -232,22 +232,22 @@ describe("test schedule component", () => {
     });
   });
 
-  async function getOkPostResult(now: Date): Promise<PostHistoryDocument> {
+  const getOkPostResult = async (now: Date): Promise<PostHistoryDocument> => {
     const result = await buildScheduler(now).scheduleNextPost();
     assertOk(result);
     const newPost = result.value;
     assertInstanceOf(newPost, PostHistory);
     return newPost;
-  }
+  };
 
-  async function getErrorPostResult(now: Date): Promise<PostError> {
+  const _getErrorPostResult = async (now: Date): Promise<PostError> => {
     const result = await buildScheduler(now).scheduleNextPost();
     assertError(result);
     return result.value;
-  }
+  };
 
   /** build a scheduler based on a specific time stamp or mutable now */
-  function buildScheduler(now: MutableNow | Date) {
+  const buildScheduler = (now: MutableNow | Date) => {
     if (now instanceof Date) {
       now = new MutableNow(now);
     }
@@ -258,9 +258,9 @@ describe("test schedule component", () => {
       })
       .register<NowProvider>(NowProvider, { useValue: now })
       .resolve(PostScheduler);
-  }
+  };
 
-  function configuration(): ServerConfiguration {
+  const configuration = (): ServerConfiguration => {
     return testContainer().resolve(ServerConfiguration);
-  }
+  };
 });

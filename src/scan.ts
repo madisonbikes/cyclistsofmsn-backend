@@ -46,7 +46,6 @@ export class ImageRepositoryScanner implements Lifecycle {
       const dateTime = (await this.fsRepository.exif(filename))
         .DateTimeOriginal;
       newImage.exif_createdon = this.parseImageTag(dateTime);
-      newImage.update();
       await newImage.save();
     }
 

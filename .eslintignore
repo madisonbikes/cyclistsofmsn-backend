@@ -1,2 +1,4 @@
-**/*.test.ts
 node_modules
+jest.config.js
+.eslintrc.js
+ecosystem.config.js

@@ -20,11 +20,11 @@ describe("server process", () => {
     await photoServer.stop();
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     memoryCache.clear();
   });
 
-  it("responds to image list api call", async () => {
+  it("responds to image list api call", () => {
     return request
       .get("/images")
       .expect(200)
@@ -44,7 +44,7 @@ describe("server process", () => {
     expect(imageResponse.ok).toBeTruthy();
   });
 
-  it("failed response to invalid image call", async () => {
+  it("failed response to invalid image call", () => {
     return request.get("/images/badid").expect(404);
   });
 
@@ -70,11 +70,11 @@ describe("server process", () => {
     expect(imageResponse.get("x-cached-response")).toEqual("HIT");
   });
 
-  async function requestGoodImage(id: string) {
+  const requestGoodImage = async (id: string) => {
     const response = await request.get(`/images/${id}`).expect(200);
 
     expect(response.get("content-type")).toEqual("image/jpeg");
     expect(response.body).toBeDefined();
     return response;
-  }
+  };
 });

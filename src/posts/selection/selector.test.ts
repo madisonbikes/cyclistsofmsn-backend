@@ -44,7 +44,7 @@ describe("test post image selector components", () => {
     });
 
     it("pick seasonal repost over non-seasonal unposted", async () => {
-      const nonSeasonalImage = await createImage(
+      const _nonSeasonalImage = await createImage(
         "nonSeasonalImage",
         subDays(startOfToday(), 60)
       );
@@ -60,30 +60,30 @@ describe("test post image selector components", () => {
     });
   });
 
-  async function createImage(
+  const createImage = (
     name = "testImage",
     exif_createdon: Date | undefined = startOfToday()
-  ) {
+  ) => {
     const image = new Image();
     image.filename = name;
     image.exif_createdon = exif_createdon;
     return image.save();
-  }
+  };
 
-  async function createPost(image: ImageDocument, postDate: Date) {
+  const createPost = (image: ImageDocument, postDate: Date) => {
     const post = new PostHistory();
     post.image = image;
     post.timestamp = postDate;
     return post.save();
-  }
+  };
 
   /** build post selector that uses deterministic RNG so testing is reliable */
-  function buildSelector() {
+  const buildSelector = () => {
     return testContainer()
       .createChildContainer()
       .register<RandomProvider>(RandomProvider, {
         useValue: new NotVeryRandom(101),
       })
       .resolve(ImageSelector);
-  }
+  };
 });

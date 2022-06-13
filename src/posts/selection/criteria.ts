@@ -40,13 +40,13 @@ export class RepostCriteria implements MatchCriteria {
 export class SeasonalityCriteria implements MatchCriteria {
   constructor(private nowProvider: NowProvider) {}
 
-  async satisfiedBy(image: ImageDocument): Promise<boolean> {
+  satisfiedBy(image: ImageDocument): Promise<boolean> {
     const createdOnDate = image.exif_createdon;
     if (!createdOnDate) {
-      return false;
+      return Promise.resolve(false);
     }
 
-    return (
+    return Promise.resolve(
       this.dayDifferencesBetweenDates(
         createdOnDate,
         startOfDay(this.nowProvider.now())

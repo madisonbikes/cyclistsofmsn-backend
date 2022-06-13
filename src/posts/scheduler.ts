@@ -41,12 +41,12 @@ export class PostScheduler {
   private async createNewScheduledPost(): Promise<PostResult> {
     const lastPost = await PostHistory.findCurrentPost();
     const newPost = new PostHistory();
-    newPost.timestamp = await this.selectNextTime(lastPost?.timestamp);
+    newPost.timestamp = this.selectNextTime(lastPost?.timestamp);
     newPost.status.flag = PostStatus.PENDING;
     return ok(await newPost.save());
   }
 
-  private async selectNextTime(lastPostTime: Date | undefined): Promise<Date> {
+  private selectNextTime(lastPostTime: Date | undefined): Date {
     const now = new Date(this.nowProvider.now());
     const startOfToday = startOfDay(now);
     const startOfTomorrow = date_add(startOfToday, { days: 1 });

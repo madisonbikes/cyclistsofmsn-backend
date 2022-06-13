@@ -19,7 +19,7 @@ if (require.main === module) {
     console.error("supply logfile as only argument");
     process.exit(1);
   }
-  Promise.resolve()
+  void Promise.resolve()
     .then(() => {
       const importer = container.resolve(Importer);
       return importer.perform_import(process.argv[2]);

@@ -41,14 +41,13 @@ class PostHistoryClass {
   @prop({ default: new PostHistoryStatus(), required: true, _id: false })
   public status!: PostHistoryStatus;
 
-  public static async findCurrentPost(
+  public static findCurrentPost(
     this: ReturnModelType<typeof PostHistoryClass>
   ) {
-    const val = this.findOne()
+    return this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
       .sort({ timestamp: -1 })
       .populate("image", ["deleted"]);
-    return val;
   }
 
   public static async findOrderedPosts(
@@ -68,7 +67,7 @@ class PostHistoryClass {
     });
   }
 
-  public static async findNextScheduledPost(
+  public static findNextScheduledPost(
     this: ReturnModelType<typeof PostHistoryClass>
   ) {
     return this.findOne()

@@ -27,7 +27,7 @@ export class PostRouter extends KoaRouter {
       })
 
       // post create operation is secured by jwt token
-      .post("/create", jwt(["create:post"]), async (ctx) => {
+      .post("/create", jwt(["create:post"]), (ctx) => {
         ctx.body = "Submitted new post";
       });
   }

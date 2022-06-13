@@ -27,7 +27,7 @@ export class PostDispatcher implements Lifecycle {
 
   start(): void {
     this.scheduled = this.simpleScheduler.scheduleRepeat(
-      async () => {
+      () => {
         return this.checkTimeToPost();
       },
       CHECK_INTERVAL,

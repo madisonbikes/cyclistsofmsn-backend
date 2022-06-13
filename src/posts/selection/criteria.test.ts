@@ -70,7 +70,7 @@ describe("test criteria components", () => {
 
     it("one post of a different image, a month ago", async () => {
       const differentImage = await createImage("differentImage");
-      const post = await createPost(
+      const _post = await createPost(
         differentImage,
         subDays(startOfToday(), 30)
       );
@@ -92,7 +92,7 @@ describe("test criteria components", () => {
 
     it("one post a month ago", async () => {
       const testImage = await createImage();
-      const post = await createPost(testImage, subDays(startOfToday(), 30));
+      const _post = await createPost(testImage, subDays(startOfToday(), 30));
 
       const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
@@ -100,7 +100,7 @@ describe("test criteria components", () => {
 
     it("one post a year ago", async () => {
       const testImage = await createImage();
-      const post = await createPost(testImage, subDays(startOfToday(), 365));
+      const _post = await createPost(testImage, subDays(startOfToday(), 365));
 
       const criteria = testContainer().resolve(RepostCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
@@ -108,7 +108,7 @@ describe("test criteria components", () => {
 
     it("one post of a different image, a month ago", async () => {
       const differentImage = await createImage("differentImage");
-      const post = await createPost(
+      const _post = await createPost(
         differentImage,
         subDays(startOfToday(), 30)
       );
@@ -130,7 +130,7 @@ describe("test criteria components", () => {
 
     it("one post a month ago", async () => {
       const testImage = await createImage();
-      const post = await createPost(testImage, subDays(startOfToday(), 30));
+      const _post = await createPost(testImage, subDays(startOfToday(), 30));
 
       const criteria = testContainer().resolve(UnpostedCriteria);
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
@@ -138,7 +138,7 @@ describe("test criteria components", () => {
 
     it("one post of a different image, a month ago", async () => {
       const differentImage = await createImage("differentImage");
-      const post = await createPost(
+      const _post = await createPost(
         differentImage,
         subDays(startOfToday(), 30)
       );
@@ -150,17 +150,17 @@ describe("test criteria components", () => {
     });
   });
 
-  async function createImage(name = "testImage", exif_createdon?: Date) {
+  const createImage = (name = "testImage", exif_createdon?: Date) => {
     const image = new Image();
     image.filename = name;
     image.exif_createdon = exif_createdon;
     return image.save();
-  }
+  };
 
-  async function createPost(image: ImageDocument, postDate: Date) {
+  const createPost = (image: ImageDocument, postDate: Date) => {
     const post = new PostHistory();
     post.image = image;
     post.timestamp = postDate;
     return post.save();
-  }
+  };
 });

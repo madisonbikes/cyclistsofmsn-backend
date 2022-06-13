@@ -5,7 +5,7 @@ import { PostResult, PostScheduler } from "../scheduler";
 export class MockPostScheduler extends PostScheduler {
   scheduledCount = 0;
 
-  async scheduleNextPost(): Promise<PostResult> {
+  scheduleNextPost(): Promise<PostResult> {
     this.scheduledCount++;
     return Promise.reject();
   }
