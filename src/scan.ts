@@ -33,37 +33,52 @@ export class ImageRepositoryScanner implements Lifecycle {
       return !found && !item.deleted;
     });
 
-    // actually remove cruft
-    for await (const element of dbCruft) {
-      await this.markImageRemoved(element);
-    }
+    // remove cruft
+    await Promise.all(dbCruft.map((elem) => this.markFileRemoved(elem)));
 
     // insert new items
-    for await (const filename of filesToAdd) {
-      logger.debug(`adding new image ${filename}`);
-      const newImage = new Image({ filename: filename });
-      newImage.fs_timestamp = await this.fsRepository.timestamp(filename);
+    await Promise.all(filesToAdd.map((filename) => this.addNewFile(filename)));
+
+    // update existing items
+    await Promise.all(
+      matchedFiles.map((image) => this.updateMatchedFile(image))
+    );
+
+    logger.info("Scan complete");
+  }
+
+  /** update a matched file */
+  private async updateMatchedFile(image: ImageDocument) {
+    const filename = image.filename;
+
+    const newTimestamp = await this.fsRepository.timestamp(filename);
+    if (image.fs_timestamp?.getTime() !== newTimestamp.getTime()) {
+      logger.debug(`updating existing image ${filename}`);
+      image.fs_timestamp = newTimestamp;
       const dateTime = (await this.fsRepository.exif(filename))
         .DateTimeOriginal;
-      newImage.exif_createdon = this.parseImageTag(dateTime);
-      await newImage.save();
+      image.exif_createdon = this.parseImageTag(dateTime);
+      image.deleted = false;
+      await image.save();
     }
+  }
 
-    for await (const image of matchedFiles) {
-      const filename = image.filename;
+  /** insert a newly discovered file */
+  private async addNewFile(filename: string) {
+    logger.debug(`adding new image ${filename}`);
+    const newImage = new Image({ filename: filename });
+    newImage.fs_timestamp = await this.fsRepository.timestamp(filename);
+    const dateTime = (await this.fsRepository.exif(filename)).DateTimeOriginal;
+    newImage.exif_createdon = this.parseImageTag(dateTime);
+    await newImage.save();
+  }
 
-      const newTimestamp = await this.fsRepository.timestamp(filename);
-      if (image.fs_timestamp?.getTime() !== newTimestamp.getTime()) {
-        logger.debug(`updating existing image ${filename}`);
-        image.fs_timestamp = newTimestamp;
-        const dateTime = (await this.fsRepository.exif(filename))
-          .DateTimeOriginal;
-        image.exif_createdon = this.parseImageTag(dateTime);
-        image.deleted = false;
-        await image.save();
-      }
-    }
-    logger.info("Scan complete");
+  /** mark a file removed that used to exist */
+  private async markFileRemoved(image: ImageDocument) {
+    logger.debug(`marking cruft db image ${image.filename}`);
+    image.deleted = true;
+    image.fs_timestamp = undefined;
+    await image.save();
   }
 
   private parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
@@ -71,12 +86,5 @@ export class ImageRepositoryScanner implements Lifecycle {
       return undefined;
     }
     return parseDate(tag?.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
-  }
-
-  private async markImageRemoved(image: ImageDocument) {
-    logger.debug(`marking cruft db image ${image.filename}`);
-    image.deleted = true;
-    image.fs_timestamp = undefined;
-    await image.save();
   }
 }
