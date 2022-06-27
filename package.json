@@ -22,6 +22,10 @@
   "engines": {
     "node": ">=16.x"
   },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "@typegoose/typegoose": "^9.9.0",
     "build-url": "^6.0.1",
