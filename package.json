@@ -14,7 +14,8 @@
     "lint": "eslint '**/*.ts'",
     "register_twitter": "ts-node src/twitter/register.ts",
     "test_tweet": "ts-node src/twitter/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
-    "check-package-updates": "npx npm-check-updates"
+    "check-package-updates": "npx npm-check-updates",
+    "prepare": "husky install"
   },
   "author": "Ben Sandee",
   "license": "Apache-2.0",
@@ -51,6 +52,8 @@
     "winston": "^3.7.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
     "@tsconfig/node16": "^1.0.3",
     "@types/jest": "^28.1.1",
     "@types/koa": "^2.13.4",
@@ -68,6 +71,7 @@
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-no-autofix": "^1.2.3",
+    "husky": "^8.0.1",
     "jest": "^28.1.1",
     "mongodb-memory-server": "^8.6.0",
     "prettier": "2.6.2",
