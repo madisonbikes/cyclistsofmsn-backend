@@ -7,8 +7,7 @@ import { injectable, singleton } from "tsyringe";
 @injectable()
 @singleton()
 export class Database implements Lifecycle {
-  constructor(private configuration: ServerConfiguration) {
-  }
+  constructor(private configuration: ServerConfiguration) {}
 
   private connection?: Mongoose;
 

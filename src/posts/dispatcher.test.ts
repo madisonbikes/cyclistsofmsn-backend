@@ -8,8 +8,8 @@ import { MockPostScheduler } from "./test/mocks";
 describe("post dispatcher component", () => {
   setupSuite({ withDatabase: true });
 
-  let now = new MutableNow(5000);
-  let mockScheduler = new MockSimpleScheduler(now);
+  const now = new MutableNow(5000);
+  const mockScheduler = new MockSimpleScheduler(now);
 
   beforeEach(() => {
     mockScheduler.mockReset();
@@ -26,9 +26,9 @@ describe("post dispatcher component", () => {
     postDispatcher.stop();
   });
 
-
-  function buildMocks() {
-    const childContainer = testContainer().createChildContainer()
+  const buildMocks = () => {
+    const childContainer = testContainer()
+      .createChildContainer()
       .registerInstance(SimpleScheduler, mockScheduler)
       .registerInstance(NowProvider, now);
 
@@ -37,7 +37,8 @@ describe("post dispatcher component", () => {
     childContainer.registerInstance(PostScheduler, postScheduler);
     const postDispatcher = childContainer.resolve(PostDispatcher);
     return {
-      postScheduler, postDispatcher
+      postScheduler,
+      postDispatcher,
     };
-  }
+  };
 });

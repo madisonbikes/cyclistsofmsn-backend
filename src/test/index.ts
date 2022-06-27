@@ -7,12 +7,12 @@ export * from "./assertions";
 export * from "./setup";
 
 /** helper type alias for supertest request object */
-export type TestRequest = supertest.SuperTest<supertest.Test>
+export type TestRequest = supertest.SuperTest<supertest.Test>;
 
 /** helper function to build a supertest test request from a server object */
-export function testRequest(server: Server): TestRequest {
+export const testRequest = (server: Server): TestRequest => {
   return supertest(server);
-}
+};
 
 /** Generates deterministric values that meet the randomInt() contract */
 export class NotVeryRandom extends RandomProvider {
@@ -49,6 +49,3 @@ export class MutableNow extends NowProvider {
     return this.when;
   }
 }
-
-
-

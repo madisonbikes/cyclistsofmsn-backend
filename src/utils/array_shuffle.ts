@@ -4,7 +4,10 @@ import { RandomProvider } from "./random";
  * Adapted from https://github.com/sindresorhus/array-shuffle/blob/main/index.js
  * modified to use supplied random provider and typescript
  */
-export function arrayShuffle<T>(random: RandomProvider, array: Array<T>): Array<T> {
+export const arrayShuffle = <T>(
+  random: RandomProvider,
+  array: Array<T>
+): Array<T> => {
   array = [...array];
 
   for (let index = array.length - 1; index > 0; index--) {
@@ -15,4 +18,4 @@ export function arrayShuffle<T>(random: RandomProvider, array: Array<T>): Array<
   }
 
   return array;
-}
+};

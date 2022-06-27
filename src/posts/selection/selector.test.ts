@@ -10,10 +10,7 @@ describe("test post image selector components", () => {
 
   beforeEach(async () => {
     // clear posts and images
-    await Promise.all([
-      PostHistory.deleteMany(),
-      Image.deleteMany()
-    ]);
+    await Promise.all([PostHistory.deleteMany(), Image.deleteMany()]);
   });
 
   describe("selector", () => {
@@ -47,7 +44,10 @@ describe("test post image selector components", () => {
     });
 
     it("pick seasonal repost over non-seasonal unposted", async () => {
-      const nonSeasonalImage = await createImage("nonSeasonalImage", subDays(startOfToday(), 60));
+      const _nonSeasonalImage = await createImage(
+        "nonSeasonalImage",
+        subDays(startOfToday(), 60)
+      );
 
       const seasonalImage = await createImage("seasonalImage");
       await createPost(seasonalImage, subDays(startOfToday(), 190));
@@ -60,26 +60,30 @@ describe("test post image selector components", () => {
     });
   });
 
-
-  async function createImage(name = "testImage", exif_createdon: Date | undefined = startOfToday()) {
+  const createImage = (
+    name = "testImage",
+    exif_createdon: Date | undefined = startOfToday()
+  ) => {
     const image = new Image();
     image.filename = name;
     image.exif_createdon = exif_createdon;
     return image.save();
-  }
+  };
 
-  async function createPost(image: ImageDocument, postDate: Date) {
+  const createPost = (image: ImageDocument, postDate: Date) => {
     const post = new PostHistory();
     post.image = image;
     post.timestamp = postDate;
     return post.save();
-  }
+  };
 
   /** build post selector that uses deterministic RNG so testing is reliable */
-  function buildSelector() {
+  const buildSelector = () => {
     return testContainer()
       .createChildContainer()
-      .register<RandomProvider>(RandomProvider, { useValue: new NotVeryRandom(101) })
+      .register<RandomProvider>(RandomProvider, {
+        useValue: new NotVeryRandom(101),
+      })
       .resolve(ImageSelector);
-  }
+  };
 });

@@ -11,7 +11,10 @@ import { isValidObjectId } from "mongoose";
 
 @injectable()
 export class ImageRouter extends KoaRouter {
-  constructor(private fsRepository: FilesystemRepository, private cache: MemoryCache) {
+  constructor(
+    private fsRepository: FilesystemRepository,
+    private cache: MemoryCache
+  ) {
     super({ prefix: "/images" });
 
     this
@@ -26,47 +29,49 @@ export class ImageRouter extends KoaRouter {
       })
 
       // single image, cached
-      .get("/:id", cache.middleware(),
-        async (ctx) => {
-          if (await cache.isCached(ctx)) return;
+      .get("/:id", cache.middleware(), async (ctx) => {
+        if (await cache.isCached(ctx)) return;
 
-          const id = ctx.params.id;
-          if (!isValidObjectId(id)) {
-            // bad object id throws exception later, so check early
-            return;
-          }
-          const filename = (await Image.findById(id).and([{ deleted: false }]))
-            ?.filename;
-          if (filename === undefined) return;
+        const id = ctx.params.id;
+        if (!isValidObjectId(id)) {
+          // bad object id throws exception later, so check early
+          return;
+        }
+        const filename = (await Image.findById(id).and([{ deleted: false }]))
+          ?.filename;
+        if (filename === undefined) return;
 
-          const imageFile = this.fsRepository.photoPath(filename);
+        const imageFile = this.fsRepository.photoPath(filename);
 
-          let width = safeParseInt(ctx.query.width);
-          const height = safeParseInt(ctx.query.height);
-          if (!width && !height) {
-            width = 1024;
-          }
+        let width = safeParseInt(ctx.query.width);
+        const height = safeParseInt(ctx.query.height);
+        if (!width && !height) {
+          width = 1024;
+        }
 
-          // FIXME let's find a better pattern for this instead of tight try/catch
-          try {
-            await access(imageFile, constants.R_OK);
-          } catch (err) {
-            logger.info("Requested file not found in image repository ", imageFile);
-            return;
-          }
+        // FIXME let's find a better pattern for this instead of tight try/catch
+        try {
+          await access(imageFile, constants.R_OK);
+        } catch (err) {
+          logger.info(
+            "Requested file not found in image repository ",
+            imageFile
+          );
+          return;
+        }
 
-          const buffer = await sharp(imageFile)
-            .resize({ width, height, withoutEnlargement: true })
-            .toFormat("jpeg")
-            .toBuffer();
-          ctx.type = "jpeg";
-          ctx.set("Cache-Control", "max-age=3600, s-max-age=36000");
-          ctx.body = buffer;
-        });
+        const buffer = await sharp(imageFile)
+          .resize({ width, height, withoutEnlargement: true })
+          .toFormat("jpeg")
+          .toBuffer();
+        ctx.type = "jpeg";
+        ctx.set("Cache-Control", "max-age=3600, s-max-age=36000");
+        ctx.body = buffer;
+      });
   }
 }
 
-function safeParseInt(value: string | string[] | undefined) {
+const safeParseInt = (value: string | string[] | undefined) => {
   if (!value) {
     return undefined;
   }
@@ -75,4 +80,4 @@ function safeParseInt(value: string | string[] | undefined) {
     return undefined;
   }
   return parsed;
-}
+};

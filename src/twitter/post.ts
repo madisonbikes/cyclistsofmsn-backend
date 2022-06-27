@@ -9,8 +9,10 @@ import { FilesystemRepository } from "../fs_repository";
 
 @injectable()
 export class PhotoTwitterClient {
-  constructor(private configuration: ServerConfiguration, private repository: FilesystemRepository) {
-  }
+  constructor(
+    private configuration: ServerConfiguration,
+    private repository: FilesystemRepository
+  ) {}
 
   async post(image: ImageDocument): Promise<number> {
     const photoFilename = this.repository.photoPath(image.filename);
@@ -26,32 +28,34 @@ export class PhotoTwitterClient {
       apiKey: this.configuration.twitterApiKey,
       apiSecret: this.configuration.twitterApiSecret,
       accessToken: this.configuration.twitterAccessToken,
-      accessTokenSecret: this.configuration.twitterAccessTokenSecret
+      accessTokenSecret: this.configuration.twitterAccessTokenSecret,
     });
     const base64Buffer = buffer.toString("base64");
 
-    const mediaResult = await twitterClient.media.mediaUpload({ media: base64Buffer });
+    const mediaResult = await twitterClient.media.mediaUpload({
+      media: base64Buffer,
+    });
     console.log(`uploaded media: ${JSON.stringify(mediaResult)}`);
 
     const tweetResult = await twitterClient.tweets.statusesUpdate({
       status: status,
-      media_ids: mediaResult.media_id_string
+      media_ids: mediaResult.media_id_string,
     });
     return tweetResult.id;
   }
 }
 
 /** simple command-line capability for testing */
-async function main(args: string[]) {
+const main = async (args: string[]) => {
   const twitterClient = container.resolve(PhotoTwitterClient);
   const fileBuffer = await readFile(args[1]);
 
   console.log("loaded file");
   return twitterClient.postTweet(args[0], fileBuffer);
-}
+};
 
 if (require.main === module) {
-  if (process.argv.length != 4) {
+  if (process.argv.length !== 4) {
     console.log("Requires a status and an image filename for arguments.");
   } else {
     const args = process.argv.slice(2);

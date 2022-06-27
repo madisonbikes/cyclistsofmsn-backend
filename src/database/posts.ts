@@ -5,17 +5,21 @@ import {
   modelOptions,
   prop,
   Ref,
-  ReturnModelType
+  ReturnModelType,
 } from "@typegoose/typegoose";
 import { ImageClass } from "./images";
 
-export enum PostStatus { PENDING = "pending", FAILED = "failed", COMPLETE = "complete" }
+export enum PostStatus {
+  PENDING = "pending",
+  FAILED = "failed",
+  COMPLETE = "complete",
+}
 
 export class PostHistoryStatus {
   @prop({
     enum: [PostStatus.PENDING, PostStatus.FAILED, PostStatus.COMPLETE],
     required: true,
-    default: PostStatus.PENDING
+    default: PostStatus.PENDING,
   })
   public flag!: string;
 
@@ -27,7 +31,7 @@ export class PostHistoryStatus {
 }
 
 @modelOptions({ schemaOptions: { collection: "posts" } })
-class PostHistoryClass  {
+class PostHistoryClass {
   @prop({ ref: () => ImageClass })
   public image?: Ref<ImageClass>;
 
@@ -37,35 +41,39 @@ class PostHistoryClass  {
   @prop({ default: new PostHistoryStatus(), required: true, _id: false })
   public status!: PostHistoryStatus;
 
-  public static async findCurrentPost(this: ReturnModelType<typeof PostHistoryClass>){
-    const val = this.findOne()
+  public static findCurrentPost(
+    this: ReturnModelType<typeof PostHistoryClass>
+  ) {
+    return this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
-      .sort({ timestamp: "-1" })
+      .sort({ timestamp: -1 })
       .populate("image", ["deleted"]);
-    return val;
-  };
+  }
 
-  public static async findOrderedPosts(this: ReturnModelType<typeof PostHistoryClass>) {
+  public static async findOrderedPosts(
+    this: ReturnModelType<typeof PostHistoryClass>
+  ) {
     const posts = await this.find()
-      .sort({ timestamp: "1" })
+      .sort({ timestamp: 1 })
       .populate("image", ["deleted"])
-      .where({"image.deleted": false})
+      .where({ "image.deleted": false });
 
-    return posts
-      .filter((post) => {
-        if(isDocument(post.image)) {
-          return !post.image.deleted
-        } else {
-          return false
-        }
-      });
-  };
+    return posts.filter((post) => {
+      if (isDocument(post.image)) {
+        return !post.image.deleted;
+      } else {
+        return false;
+      }
+    });
+  }
 
-  public static async findNextScheduledPost(this: ReturnModelType<typeof PostHistoryClass>){
+  public static findNextScheduledPost(
+    this: ReturnModelType<typeof PostHistoryClass>
+  ) {
     return this.findOne()
       .where({ "status.flag": PostStatus.PENDING })
-      .sort({ timestamp: "-1" });
-  };
+      .sort({ timestamp: -1 });
+  }
 }
 
 export type PostHistoryDocument = DocumentType<PostHistoryClass>;

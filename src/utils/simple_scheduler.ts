@@ -1,5 +1,5 @@
 /** simple schedule api that's easy to replace/mock with DI for testing */
-export type ScheduledFunction = (() => Promise<void>) | (() => void)
+export type ScheduledFunction = (() => Promise<void>) | (() => void);
 
 /** a thing that can be cancelled */
 export interface Cancellable {
@@ -13,11 +13,15 @@ export class SimpleScheduler {
     return {
       cancel: () => {
         clearTimeout(cancel);
-      }
+      },
     };
   }
 
-  scheduleRepeat(run: ScheduledFunction, intervalInMillis: number, delayInMillis = 0): Cancellable {
+  scheduleRepeat(
+    run: ScheduledFunction,
+    intervalInMillis: number,
+    delayInMillis = 0
+  ): Cancellable {
     if (delayInMillis === 0) {
       delayInMillis = intervalInMillis;
     }
@@ -37,7 +41,7 @@ export class SimpleScheduler {
           clearInterval(timeouts[1]);
           timeouts[1] = undefined;
         }
-      }
+      },
     };
   }
 }

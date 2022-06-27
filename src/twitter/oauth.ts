@@ -2,8 +2,11 @@ import crypto from "crypto";
 import OAuth from "oauth-1.0a";
 import { Plugin } from "superagent";
 
-export function oauth_signer(apiKey: string, apiSecret: string, data: Record<string, string>): Plugin {
-
+export const oauth_signer = (
+  apiKey: string,
+  apiSecret: string,
+  data: Record<string, string>
+): Plugin => {
   const oauth = new OAuth({
     consumer: { key: apiKey, secret: apiSecret },
     signature_method: "HMAC-SHA1",
@@ -12,16 +15,16 @@ export function oauth_signer(apiKey: string, apiSecret: string, data: Record<str
         .createHmac("sha1", key)
         .update(base_string)
         .digest("base64");
-    }
+    },
   });
-  return (request => {
+  return (request) => {
     const requestData = {
       url: request.url,
       method: request.method,
-      data: data
+      data: data,
     };
     const authorization = oauth.authorize(requestData);
     const header = oauth.toHeader(authorization);
-    request.set(header);
-  });
-}
+    void request.set(header);
+  };
+};

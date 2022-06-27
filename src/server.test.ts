@@ -20,11 +20,11 @@ describe("server process", () => {
     await photoServer.stop();
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     memoryCache.clear();
   });
 
-  it("responds to image list api call", async () => {
+  it("responds to image list api call", () => {
     return request
       .get("/images")
       .expect(200)
@@ -35,9 +35,7 @@ describe("server process", () => {
   });
 
   it("responds to single image api call", async () => {
-    const response = await request
-      .get("/images")
-      .expect(200);
+    const response = await request.get("/images").expect(200);
 
     const imageList = JSON.parse(response.text);
     expect(imageList.length).toBeGreaterThan(0);
@@ -46,10 +44,8 @@ describe("server process", () => {
     expect(imageResponse.ok).toBeTruthy();
   });
 
-  it("failed response to invalid image call", async () => {
-    return request
-      .get("/images/badid")
-      .expect(404);
+  it("failed response to invalid image call", () => {
+    return request.get("/images/badid").expect(404);
   });
 
   it("failed response to missing image call", async () => {
@@ -57,16 +53,11 @@ describe("server process", () => {
     badImage.filename = "bad.jpg";
     await badImage.save();
 
-    return request
-      .get(`/images/${badImage.id}`)
-      .expect(404);
+    return request.get(`/images/${badImage.id}`).expect(404);
   });
 
-
   it("returns second image request as cached", async () => {
-    const response = await request
-      .get("/images")
-      .expect(200);
+    const response = await request.get("/images").expect(200);
 
     const imageList = JSON.parse(response.text);
     expect(imageList.length).toBeGreaterThan(0);
@@ -79,14 +70,11 @@ describe("server process", () => {
     expect(imageResponse.get("x-cached-response")).toEqual("HIT");
   });
 
-  async function requestGoodImage(id: string) {
-    const response = await request
-      .get(`/images/${id}`)
-      .expect(200);
+  const requestGoodImage = async (id: string) => {
+    const response = await request.get(`/images/${id}`).expect(200);
 
-    expect(response.get("content-type"))
-      .toEqual("image/jpeg");
+    expect(response.get("content-type")).toEqual("image/jpeg");
     expect(response.body).toBeDefined();
     return response;
-  }
+  };
 });
