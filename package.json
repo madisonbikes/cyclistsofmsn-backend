@@ -27,7 +27,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^9.9.0",
+    "@typegoose/typegoose": "^9.10.1",
     "build-url": "^6.0.1",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.1",
