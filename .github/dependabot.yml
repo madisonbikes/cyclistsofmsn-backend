@@ -15,4 +15,4 @@ updates:
       interval: "weekly"
     target-branch: "main"
     commit-message:
-      prefix: "chore"
+      prefix: "ci"
