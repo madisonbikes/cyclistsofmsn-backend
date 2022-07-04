@@ -2,13 +2,13 @@
 /**
  * This has the routes defined.
  */
-import KoaRouter from "koa-router";
-import { PostRouter } from "./posts";
-import { ImageRouter } from "./images";
+import PostRouter from "./posts";
+import ImageRouter from "./images";
 import { injectable } from "tsyringe";
+import Router from "koa__router";
 
 @injectable()
-export class Router extends KoaRouter {
+class MainRouter extends Router {
   constructor(imageRouter: ImageRouter, postRouter: PostRouter) {
     super();
 
@@ -18,3 +18,5 @@ export class Router extends KoaRouter {
     );
   }
 }
+
+export default MainRouter;

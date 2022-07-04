@@ -1,11 +1,11 @@
-import KoaRouter from "koa-router";
+import Router from "koa__router";
 import { PostHistory, PostHistoryDocument } from "../../database";
 import { jwt } from "../../security/jwt";
 import { injectable } from "tsyringe";
 import { isDocument } from "@typegoose/typegoose";
 
 @injectable()
-export class PostRouter extends KoaRouter {
+class PostRouter extends Router {
   constructor() {
     super({ prefix: "/posts" });
 
@@ -40,3 +40,5 @@ const mapPost = (post: PostHistoryDocument) => {
     return { id: post.id, timestamp: post.timestamp, image: post.image };
   }
 };
+
+export default PostRouter;

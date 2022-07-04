@@ -9,7 +9,7 @@ import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
-import { Router } from "./routes";
+import MainRouter from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
 
 /** expose command-line launcher */
@@ -31,7 +31,7 @@ export class PhotoServer implements Lifecycle {
     private configuration: ServerConfiguration,
     scanner: ImageRepositoryScanner,
     database: Database,
-    private router: Router,
+    private router: MainRouter,
     postDispatcher: PostDispatcher
   ) {
     this.components.push(database);

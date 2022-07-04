@@ -1,4 +1,4 @@
-import KoaRouter from "koa-router";
+import Router from "koa__router";
 import sharp from "sharp";
 import { Image } from "../../database";
 import { FilesystemRepository } from "../../fs_repository";
@@ -10,7 +10,7 @@ import { MemoryCache } from "../cache";
 import { isValidObjectId } from "mongoose";
 
 @injectable()
-export class ImageRouter extends KoaRouter {
+class ImageRouter extends Router {
   constructor(
     private fsRepository: FilesystemRepository,
     private cache: MemoryCache
@@ -81,3 +81,5 @@ const safeParseInt = (value: string | string[] | undefined) => {
   }
   return parsed;
 };
+
+export default ImageRouter;
