@@ -1,29 +1,36 @@
-/** exposes a JWT-checking middleware that combines the JWT extraction and parsing along with an optional authorization check */
-import jwks from "jwks-rsa";
-import jwt_internal from "koa-jwt";
-import compose from "koa-compose";
-import { jwtAuthz } from "./koa-jwt-authz";
-import { Middleware } from "koa";
+import jwt from "jsonwebtoken";
+import { ExtractJwt, StrategyOptions } from "passport-jwt";
+import { injectable, singleton } from "tsyringe";
+import { ServerConfiguration } from "../config";
+import { AuthenticatedUser } from "./authentication";
 
-const secret = jwks.koaJwtSecret({
-  cache: true,
-  rateLimit: true,
-  jwksRequestsPerMinute: 5,
-  jwksUri: "https://db122.us.auth0.com/.well-known/jwks.json",
-});
-
-// fixme the audience might need to be more flexible in api
-const jwt_first = jwt_internal({
-  secret: secret,
-  audience: "https://cyclists_of_msn/api",
-  issuer: "https://db122.us.auth0.com/",
-  algorithms: ["RS256"],
-});
-
-export const jwt = (requiredScopes: string[] = []): Middleware => {
-  if (requiredScopes.length === 0) {
-    return jwt_first;
-  } else {
-    return compose([jwt_first, jwtAuthz(requiredScopes)]);
-  }
+export type JwtPayload = Omit<AuthenticatedUser, "username"> & {
+  sub?: string;
 };
+
+@singleton()
+@injectable()
+export class JwtManager {
+  constructor(private configuration: ServerConfiguration) {}
+
+  sign(user: AuthenticatedUser): string {
+    const { username, ...payload } = user;
+
+    return jwt.sign(payload, this.configuration.jwt.secret, {
+      expiresIn: this.configuration.jwt.expiresIn,
+      audience: this.configuration.jwt.audience,
+      issuer: this.configuration.jwt.issuer,
+      subject: username,
+    });
+  }
+
+  /** return configuration for passport strategy, localized here for comparity with sign function above */
+  strategyOptions(): StrategyOptions {
+    return {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: this.configuration.jwt.secret,
+      issuer: this.configuration.jwt.issuer,
+      audience: this.configuration.jwt.audience,
+    };
+  }
+}

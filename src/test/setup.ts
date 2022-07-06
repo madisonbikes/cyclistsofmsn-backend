@@ -103,6 +103,9 @@ const cleanupSuite = async (): Promise<void> => {
 
 @injectable()
 class TestConfiguration extends ServerConfiguration {
+  public photosDir: string;
+  public mongodbUri: string;
+
   constructor() {
     super();
 

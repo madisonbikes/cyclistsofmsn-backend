@@ -1,19 +1,19 @@
 import { setupSuite, testContainer, testRequest, TestRequest } from "./test";
 import { PhotoServer } from "./server";
 import { Image } from "./database";
-import { MemoryCache } from "./routes/cache";
+import Cache from "./routes/cache";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
   let request: TestRequest;
-  let memoryCache: MemoryCache;
+  let cache: Cache;
 
   setupSuite({ withDatabase: true });
 
   beforeAll(async () => {
     photoServer = testContainer().resolve(PhotoServer);
     request = testRequest(await photoServer.create());
-    memoryCache = testContainer().resolve(MemoryCache);
+    cache = testContainer().resolve(Cache);
   });
 
   afterAll(async () => {
@@ -21,7 +21,7 @@ describe("server process", () => {
   });
 
   beforeEach(() => {
-    memoryCache.clear();
+    cache.clear();
   });
 
   it("responds to image list api call", () => {

@@ -5,21 +5,39 @@ const isDev = process.env.NODE_ENV === "development";
 
 const DEFAULT_SERVER_PORT = 3001;
 
+export type JwtConfiguration = {
+  secret: string;
+  issuer: string;
+  audience: string;
+  expiresIn: string;
+};
+
 @injectable()
 @singleton()
 export class ServerConfiguration {
-  public serverPort = process.env.PORT || `${DEFAULT_SERVER_PORT}`;
-  public photosDir = process.env.PHOTOS_DIR || "photos";
-  public reactStaticRootDir?: string = process.env.STATIC_ROOT_DIR;
-  public mongodbUri =
+  public readonly serverPort = process.env.PORT || `${DEFAULT_SERVER_PORT}`;
+  public readonly photosDir = process.env.PHOTOS_DIR || "photos";
+  public readonly reactStaticRootDir?: string = process.env.STATIC_ROOT_DIR;
+  public readonly mongodbUri =
     process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
-  public firstPostHour = 8;
-  public lastPostHour = 16;
-  public twitterApiKey = process.env.TWITTER_API_KEY || "";
-  public twitterApiSecret = process.env.TWITTER_API_SECRET || "";
-  public twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || "";
-  public twitterAccessTokenSecret =
+  public readonly firstPostHour = 8;
+  public readonly lastPostHour = 16;
+  public readonly twitterApiKey = process.env.TWITTER_API_KEY || "";
+  public readonly twitterApiSecret = process.env.TWITTER_API_SECRET || "";
+  public readonly twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || "";
+  public readonly twitterAccessTokenSecret =
     process.env.TWITTER_ACCESS_TOKEN_SECRET || "";
+
+  public readonly jwt: JwtConfiguration;
+
+  constructor() {
+    this.jwt = {
+      secret: process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure",
+      audience: "cyclistsofmsn",
+      issuer: "cyclistsofmsn",
+      expiresIn: "14d",
+    };
+  }
 }
 
 // this has to run first outside of constructor
