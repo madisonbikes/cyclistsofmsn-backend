@@ -36,7 +36,7 @@
     "express": "^4.18.1",
     "helmet": "^5.1.0",
     "jwks-rsa": "^2.1.4",
-    "lru-cache": "^7.12.0",
+    "lru-cache": "^7.13.1",
     "mongoose": "^6.4.4",
     "oauth-1.0a": "^2.2.6",
     "passport": "^0.6.0",
