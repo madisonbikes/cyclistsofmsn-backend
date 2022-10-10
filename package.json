@@ -45,7 +45,7 @@
     "readline-sync": "^1.4.10",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.31.1",
-    "superagent": "^8.0.1",
+    "superagent": "^8.0.2",
     "ts-node": "^10.9.1",
     "tsyringe": "^4.7.0",
     "twitter-api-client": "^1.6.1",
