@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@typegoose/typegoose": "^10.0.0",
-    "build-url": "^6.0.1",
     "date-fns": "^2.29.3",
     "dotenv": "^16.0.3",
     "exifreader": "^4.8.1",

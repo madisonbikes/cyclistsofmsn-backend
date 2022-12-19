@@ -2,7 +2,6 @@ import "reflect-metadata";
 import superagent from "superagent";
 import { oauth_signer } from "./oauth";
 import qs from "querystring";
-import buildurl from "build-url";
 import readlinesync from "readline-sync";
 import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "../config";
@@ -46,7 +45,7 @@ export class TwitterRegisterConfiguration {
     }
     const response = await this.requestToken();
 
-    const url = this.getAuthenticateUrl(response.oauth_token);
+    const url = getAuthenticateUrl(response.oauth_token);
     const pin = readlinesync.questionInt(`Visit ${url} and key in PIN: `);
     const tokens = await this.requestAccessToken(
       response.oauth_token,
@@ -83,10 +82,11 @@ export class TwitterRegisterConfiguration {
       );
     return qs.parse(result.text) as unknown as AccessTokenResponse;
   }
-
-  private getAuthenticateUrl(oauth_token: string): string {
-    return buildurl("https://api.twitter.com/oauth/authenticate", {
-      queryParams: { oauth_token: oauth_token },
-    });
-  }
 }
+
+// exported for testing
+export const getAuthenticateUrl = (oauth_token: string): string => {
+  const url = new URL("https://api.twitter.com/oauth/authenticate");
+  url.searchParams.append("oauth_token", oauth_token);
+  return url.toString();
+};
