@@ -6,7 +6,7 @@ const CACHE_SIZE = 20 * 1024 * 1024;
 
 type Holder = {
   value: unknown;
-  contentType: string;
+  contentType: string | undefined;
   statusCode: number;
 };
 
@@ -34,9 +34,11 @@ class Cache {
     ) => {
       const cached = this.memoryCache.get(req.url);
       if (cached !== undefined) {
+        if (cached.contentType !== undefined) {
+          res.type(cached.contentType);
+        }
         res
           .set("x-cached-response", "HIT")
-          .type(cached.contentType)
           .status(cached.statusCode)
           .send(cached.value);
         return next();
