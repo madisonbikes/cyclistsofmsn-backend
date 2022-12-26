@@ -1,16 +1,16 @@
 import "reflect-metadata";
 import http, { Server } from "http";
-import Koa from "koa";
-import koaQueryString from "koa-qs";
-import koa_logger from "koa-logger";
-import serve from "koa-static";
 import { Lifecycle, logger } from "./utils";
 import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
-import { Router } from "./routes";
+import MainRouter from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
+
+import express from "express";
+import passport from "passport";
+import { Strategies } from "./security/authentication";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -31,8 +31,9 @@ export class PhotoServer implements Lifecycle {
     private configuration: ServerConfiguration,
     scanner: ImageRepositoryScanner,
     database: Database,
-    private router: Router,
-    postDispatcher: PostDispatcher
+    private apiRouter: MainRouter,
+    postDispatcher: PostDispatcher,
+    private strategies: Strategies
   ) {
     this.components.push(database);
     this.components.push(scanner);
@@ -48,30 +49,26 @@ export class PhotoServer implements Lifecycle {
       await c.start();
     }
 
-    const app = new Koa();
+    const app = express();
 
-    // for query strings, only the first value for the given parameter is passed
-    // to keep our APIs simple
-    koaQueryString(app, "first");
-    app.use(
-      koa_logger({
-        transporter: (str: string, args: unknown) => {
-          logger.debug(str, args);
-        },
-      })
-    );
+    app.use(express.json());
 
     // in production mode, serve the production React app from here
     if (this.configuration.reactStaticRootDir) {
-      app.use(serve(this.configuration.reactStaticRootDir));
+      app.use("/", express.static(this.configuration.reactStaticRootDir));
     }
-    app.use(this.router.routes());
-    app.use(this.router.allowedMethods());
+
+    // used for securing most api endpoints
+    passport.use(this.strategies.jwt);
+
+    app.use(passport.initialize());
+
+    app.use(this.apiRouter.routes);
     app.on("error", (err) => {
       logger.error(err);
     });
 
-    this.server = http.createServer(app.callback());
+    this.server = http.createServer(app);
     return this.server;
   }
 

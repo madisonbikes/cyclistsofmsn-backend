@@ -1,36 +1,35 @@
-import KoaRouter from "koa-router";
+import express from "express";
 import { PostHistory, PostHistoryDocument } from "../../database";
-import { jwt } from "../../security/jwt";
 import { injectable } from "tsyringe";
 import { isDocument } from "@typegoose/typegoose";
+import { jwtMiddleware } from "../../security/authentication";
 
 @injectable()
-export class PostRouter extends KoaRouter {
-  constructor() {
-    super({ prefix: "/posts" });
+class PostRouter {
+  readonly routes = express
+    .Router()
 
-    this
+    // all posts
+    .get("/", async (req, res) => {
+      res.set("Cache-Control", "max-age=60, s-max-age=3600");
+      const posts = await PostHistory.findOrderedPosts();
+      return res.send(posts.map(mapPost));
+    })
 
-      // all posts
-      .get("/", async (ctx) => {
-        ctx.set("Cache-Control", "max-age=60, s-max-age=3600");
-        const posts = await PostHistory.findOrderedPosts();
-        ctx.body = posts.map(mapPost);
-      })
+    // current post
+    .get("/current", async (req, res) => {
+      const post = await PostHistory.findCurrentPost();
+      if (post) {
+        return res.send(mapPost(post));
+      } else {
+        return res.sendStatus(404);
+      }
+    })
 
-      // current post
-      .get("/current", async (ctx) => {
-        const post = await PostHistory.findCurrentPost();
-        if (post) {
-          ctx.body = mapPost(post);
-        }
-      })
-
-      // post create operation is secured by jwt token
-      .post("/create", jwt(["create:post"]), (ctx) => {
-        ctx.body = "Submitted new post";
-      });
-  }
+    // post create operation is secured by jwt token
+    .post("/create", jwtMiddleware, (_req, res) => {
+      return res.send("Submitted new post");
+    });
 }
 
 const mapPost = (post: PostHistoryDocument) => {
@@ -40,3 +39,5 @@ const mapPost = (post: PostHistoryDocument) => {
     return { id: post.id, timestamp: post.timestamp, image: post.image };
   }
 };
+
+export default PostRouter;

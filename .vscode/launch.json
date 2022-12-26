@@ -5,12 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch tests via NPM",
+      "request": "launch",
+      "runtimeArgs": ["run", "test"],
+      "runtimeExecutable": "npm",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
       "name": "Launch dev server (hot reload)",
       "request": "launch",
       "runtimeArgs": ["run", "dev"],
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
-      "type": "pwa-node"
+      "type": "node"
     }
   ]
 }

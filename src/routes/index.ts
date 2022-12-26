@@ -2,19 +2,22 @@
 /**
  * This has the routes defined.
  */
-import KoaRouter from "koa-router";
-import { PostRouter } from "./posts";
-import { ImageRouter } from "./images";
+import express from "express";
+import PostRouter from "./posts";
+import ImageRouter from "./images";
 import { injectable } from "tsyringe";
 
 @injectable()
-export class Router extends KoaRouter {
-  constructor(imageRouter: ImageRouter, postRouter: PostRouter) {
-    super();
+class MainRouter {
+  constructor(
+    private imageRouter: ImageRouter,
+    private postRouter: PostRouter
+  ) {}
 
-    this.use(postRouter.routes(), postRouter.allowedMethods()).use(
-      imageRouter.routes(),
-      imageRouter.allowedMethods()
-    );
-  }
+  readonly routes = express
+    .Router()
+    .use("/posts", this.postRouter.routes)
+    .use("/images", this.imageRouter.routes);
 }
+
+export default MainRouter;

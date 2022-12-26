@@ -1,64 +1,72 @@
-import { injectable, singleton } from "tsyringe";
+import express, { RequestHandler } from "express";
 import LRUCache from "lru-cache";
-import Koa, { Middleware } from "koa";
-import koaCash from "koa-cash";
+import { injectable, singleton } from "tsyringe";
 
 const CACHE_SIZE = 20 * 1024 * 1024;
 
+type Holder = {
+  value: unknown;
+  contentType: string | undefined;
+  statusCode: number;
+};
+
 @injectable()
 @singleton()
-export class MemoryCache {
-  private lru = new LRUCache<string, Holder>({
+class Cache {
+  private memoryCache = new LRUCache<string, Holder>({
     maxSize: CACHE_SIZE,
     sizeCalculation: (holder: Holder): number => {
-      const v = holder.value as { body: { length: number } };
-      if (v !== undefined) {
-        return v.body.length;
+      const v = holder.value as { length: number };
+      if (v === undefined) {
+        throw new Error(
+          `Unable to calculate size of ${JSON.stringify(holder.value)}`
+        );
       }
-      throw new Error(
-        `Unable to calculate size of ${JSON.stringify(holder.value)}`
-      );
+      return v.length;
     },
   });
 
-  /** returns a koa middleware that enables caching downstream */
-  middleware(): Middleware {
-    const lruCache = this.lru;
-    const addCacheHeader = process.env.NODE_ENV === "test";
-
-    return koaCash({
-      get(key): Promise<unknown | undefined> {
-        const holder = lruCache.get(key);
-        if (!holder) {
-          return Promise.resolve(undefined);
+  middleware = (): RequestHandler => {
+    return (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const cached = this.memoryCache.get(req.url);
+      if (cached !== undefined) {
+        if (cached.contentType !== undefined) {
+          res.type(cached.contentType);
         }
-        return Promise.resolve(holder.value);
-      },
-      set(key, value): Promise<void> {
-        lruCache.set(key, { value });
-        return Promise.resolve();
-      },
-      setCachedHeader: addCacheHeader,
-    });
-  }
+        res
+          .set("x-cached-response", "HIT")
+          .status(cached.statusCode)
+          .send(cached.value);
+        return next();
+      }
 
-  /**
-   * Should be called in next downstream middleware to check if response is cached, if so
-   * return immediately.
-   * @param ctx
-   */
-  async isCached(ctx: Koa.Context): Promise<boolean> {
-    return await ctx.cashed();
-  }
+      // override the request.send() function to fill the cache
+      const downstreamSend = res.send;
+      res.send = (body) => {
+        const boundSend = downstreamSend.bind(res);
+        this.memoryCache.set(req.url, {
+          value: body,
+          contentType: res.get("content-type"),
+          statusCode: res.statusCode,
+        });
+        boundSend(body);
+        return body;
+      };
+      return next();
+    };
+  };
 
-  /**
-   * Clears the cache. Useful between test cases.
-   */
-  clear(): void {
-    this.lru.clear();
-  }
+  isCached = (res: express.Response): Promise<boolean> => {
+    return Promise.resolve(res.get("x-cached-response") === "HIT");
+  };
+
+  clear = () => {
+    this.memoryCache.clear();
+  };
 }
 
-type Holder = {
-  value: unknown;
-};
+export default Cache;

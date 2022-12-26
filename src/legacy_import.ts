@@ -29,7 +29,7 @@ if (require.main === module) {
       process.exit(1);
     })
     .then(() => {
-      process.exit(0);
+      return process.exit(0);
     });
 }
 
