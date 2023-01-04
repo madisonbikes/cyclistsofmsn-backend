@@ -7,6 +7,7 @@ import PostRouter from "./posts";
 import ImageRouter from "./images";
 import { injectable } from "tsyringe";
 
+/** Provide REST API routes for images, posts */
 @injectable()
 class MainRouter {
   constructor(
