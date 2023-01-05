@@ -5,11 +5,13 @@ import { ImageSelector } from "./selection/selector";
 import { ImageRepositoryScanner } from "../scan";
 import { ImageDocument } from "../database";
 import { error, logger, Result } from "../utils";
+import { PhotoMastadonClient } from "../mastadon/post";
 
 @injectable()
 export class PostExecutor {
   constructor(
     private photoTweeter: PhotoTwitterClient,
+    private photoTooter: PhotoMastadonClient,
     private postSelector: ImageSelector,
     private repositoryScanner: ImageRepositoryScanner
   ) {}
@@ -24,8 +26,14 @@ export class PostExecutor {
       logger.error(`Could not find an image to post: ${nextImage.value}`);
       return error(nextImage.value);
     }
-    const result = await this.photoTweeter.post(nextImage.value);
-    logger.info(`Posted new twitter post id ${result}`);
+    if (this.photoTweeter.isEnabled()) {
+      const result = await this.photoTweeter.post(nextImage.value.filename);
+      logger.info(`Posted new Twitter post id ${result}`);
+    }
+    if (this.photoTooter.isEnabled()) {
+      const result = await this.photoTooter.post(nextImage.value.filename);
+      logger.info(`Posted new Mastadon post id ${result}`);
+    }
     return nextImage;
   }
 }

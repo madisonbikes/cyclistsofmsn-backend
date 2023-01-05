@@ -22,11 +22,15 @@ export class ServerConfiguration {
     process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
   public readonly firstPostHour = 8;
   public readonly lastPostHour = 16;
+
   public readonly twitterApiKey = process.env.TWITTER_API_KEY || "";
   public readonly twitterApiSecret = process.env.TWITTER_API_SECRET || "";
   public readonly twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || "";
   public readonly twitterAccessTokenSecret =
     process.env.TWITTER_ACCESS_TOKEN_SECRET || "";
+
+  public readonly mastadonUri = process.env.MASTADON_URI || "";
+  public readonly mastadonAccessToken = process.env.MASTADON_ACCESS_TOKEN || "";
 
   public readonly jwt: JwtConfiguration;
 

@@ -1,12 +1,16 @@
-# Cyclists of Madison Server API
+# Cyclists of Madison Backend
 
-This is the next iteration Cyclists of Madison bot API.
+This is the Cyclists of Madison photo bot backend.
+
+## Features
+
+- (New!) Mastadon posting support
+- Twitter (boo!) posting support
 
 ## Goals
 
 Provide limited web access to Cyclists of Madison photos along with statistics and better photo post intelligence.
 
-- Source photos from Google Drive
 - Easier Twitter setup/integration
 - Track which posts get favorited, etc.
 

@@ -15,6 +15,7 @@
     "lint": "eslint '**/*.ts'",
     "register_twitter": "ts-node src/twitter/register.ts",
     "test_tweet": "ts-node src/twitter/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
+    "test_toot": "ts-node src/mastadon/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
     "check-package-updates": "npx npm-check-updates",
     "prepare": "husky install"
   },
@@ -49,7 +50,8 @@
     "tsyringe": "^4.7.0",
     "twitter-api-client": "^1.6.1",
     "typescript": "^4.9.4",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "zod": "^3.20.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",

@@ -1,9 +1,11 @@
 import { assertError, assertOk, setupSuite, testContainer } from "../test";
-import { Image, ImageDocument, PostHistory } from "../database";
+import { Image, PostHistory } from "../database";
 import { PostExecutor } from "./postExecutor";
 import { ImageRepositoryScanner } from "../scan";
 import { injectable } from "tsyringe";
 import { PhotoTwitterClient } from "../twitter/post";
+import { PhotoMastadonClient } from "../mastadon/post";
+import { ok, Result } from "../utils";
 
 describe("test executor component", () => {
   setupSuite({ withDatabase: true });
@@ -42,11 +44,14 @@ describe("test executor component", () => {
   const buildExecutor = () => {
     const noopScanner = testContainer().resolve(NoopRepositoryScanner);
     const noopTweeter = testContainer().resolve(NoopPhotoTweeter);
+    const noopTooter = testContainer().resolve(NoopPhotoTooter);
+
     return testContainer()
       .register<ImageRepositoryScanner>(ImageRepositoryScanner, {
         useValue: noopScanner,
       })
       .register(PhotoTwitterClient, { useValue: noopTweeter })
+      .register(PhotoMastadonClient, { useValue: noopTooter })
       .resolve(PostExecutor);
   };
 });
@@ -60,7 +65,14 @@ class NoopRepositoryScanner extends ImageRepositoryScanner {
 
 @injectable()
 class NoopPhotoTweeter extends PhotoTwitterClient {
-  post(_image: ImageDocument): Promise<number> {
+  post(_image: string): Promise<number> {
     return Promise.resolve(0);
+  }
+}
+
+@injectable()
+class NoopPhotoTooter extends PhotoMastadonClient {
+  post(_image: string): Promise<Result<string, string>> {
+    return Promise.resolve(ok(""));
   }
 }

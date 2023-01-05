@@ -3,7 +3,6 @@ import { TwitterClient } from "twitter-api-client";
 import { readFile } from "fs/promises";
 import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "../config";
-import { ImageDocument } from "../database";
 import sharp from "sharp";
 import { FilesystemRepository } from "../fs_repository";
 
@@ -14,8 +13,16 @@ export class PhotoTwitterClient {
     private repository: FilesystemRepository
   ) {}
 
-  async post(image: ImageDocument): Promise<number> {
-    const photoFilename = this.repository.photoPath(image.filename);
+  isEnabled() {
+    return (
+      this.configuration.twitterApiKey !== "" &&
+      this.configuration.twitterAccessToken !== "" &&
+      this.configuration.twitterAccessTokenSecret !== ""
+    );
+  }
+
+  async post(filename: string): Promise<number> {
+    const photoFilename = this.repository.photoPath(filename);
     const buffer = await sharp(photoFilename)
       .resize({ width: 1600, withoutEnlargement: true })
       .toFormat("jpeg")
