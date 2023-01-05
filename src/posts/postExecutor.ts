@@ -28,11 +28,11 @@ export class PostExecutor {
     }
     if (this.photoTweeter.isEnabled()) {
       const result = await this.photoTweeter.post(nextImage.value.filename);
-      logger.info(`Posted new Twitter post id ${result}`);
+      logger.info(`Posted new Twitter post id ${JSON.stringify(result)}`);
     }
     if (this.photoTooter.isEnabled()) {
       const result = await this.photoTooter.post(nextImage.value.filename);
-      logger.info(`Posted new Mastadon post id ${result}`);
+      logger.info(`Posted new Mastadon post id ${JSON.stringify(result)}`);
     }
     return nextImage;
   }

@@ -52,7 +52,7 @@ export class PhotoMastadonClient {
       .field("focus", "(0.0,0.0)");
 
     if (!mediaResponse.ok) {
-      console.log(`error: ${mediaResponse.text}`);
+      console.log(`Upload media error: ${JSON.stringify(mediaResponse.body)}`);
       return error(mediaResponse.text);
     }
 
@@ -76,7 +76,7 @@ export class PhotoMastadonClient {
       .send(requestBody);
 
     if (!tootResponse.ok) {
-      console.log(`error: ${tootResponse.text}`);
+      console.log(`Post status error: ${JSON.stringify(tootResponse.body)}`);
       return error(tootResponse.text);
     }
 
