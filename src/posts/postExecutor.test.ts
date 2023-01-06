@@ -5,7 +5,6 @@ import { ImageRepositoryScanner } from "../scan";
 import { injectable } from "tsyringe";
 import { PhotoTwitterClient } from "../twitter/post";
 import { PhotoMastadonClient } from "../mastadon/post";
-import { ok, Result } from "../utils";
 
 describe("test executor component", () => {
   setupSuite({ withDatabase: true });
@@ -72,7 +71,7 @@ class NoopPhotoTweeter extends PhotoTwitterClient {
 
 @injectable()
 class NoopPhotoTooter extends PhotoMastadonClient {
-  post(_image: string): Promise<Result<string, string>> {
-    return Promise.resolve(ok(""));
+  post(_image: string): Promise<string> {
+    return Promise.resolve("0");
   }
 }

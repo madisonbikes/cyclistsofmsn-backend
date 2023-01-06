@@ -72,7 +72,7 @@ export class PostDispatcher implements Lifecycle {
         await nextPost.save();
       }
     } catch (e) {
-      logger.error(e);
+      logger.error(JSON.stringify(e));
       return;
     }
   }

@@ -5,6 +5,7 @@ import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "../config";
 import sharp from "sharp";
 import { FilesystemRepository } from "../fs_repository";
+import { logger } from "../utils";
 
 @injectable()
 export class PhotoTwitterClient {
@@ -42,7 +43,7 @@ export class PhotoTwitterClient {
     const mediaResult = await twitterClient.media.mediaUpload({
       media: base64Buffer,
     });
-    console.log(`uploaded media: ${JSON.stringify(mediaResult)}`);
+    logger.info(`uploaded media: ${JSON.stringify(mediaResult)}`);
 
     const tweetResult = await twitterClient.tweets.statusesUpdate({
       status: status,
@@ -57,7 +58,7 @@ const main = async (args: string[]) => {
   const twitterClient = container.resolve(PhotoTwitterClient);
   const fileBuffer = await readFile(args[1]);
 
-  console.log("loaded file");
+  logger.debug("loaded file");
   return twitterClient.postTweet(args[0], fileBuffer);
 };
 

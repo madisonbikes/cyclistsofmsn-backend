@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { ServerConfiguration } from "../config";
-import winston from "winston";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import {
   container as rootContainer,
@@ -11,10 +10,6 @@ import {
 import path from "path";
 import { Database } from "../database";
 import assert from "assert";
-
-// no logging for test
-winston.remove(winston.transports.Console);
-winston.remove(winston.transports.File);
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;

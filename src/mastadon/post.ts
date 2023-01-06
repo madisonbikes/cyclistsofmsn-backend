@@ -7,7 +7,7 @@ import { FilesystemRepository } from "../fs_repository";
 import request from "superagent";
 import crypto from "crypto";
 import { z } from "zod";
-import { Result, error, ok } from "../utils";
+import { logger } from "../utils";
 
 const mediaUploadResponseSchema = z.object({ id: z.string() });
 const statusUpdateRequestSchema = z.object({
@@ -31,7 +31,7 @@ export class PhotoMastadonClient {
     );
   }
 
-  async post(filename: string): Promise<Result<string, string>> {
+  async post(filename: string): Promise<string> {
     const photoFilename = this.repository.photoPath(filename);
     const buffer = await sharp(photoFilename)
       .resize({ width: 1600, withoutEnlargement: true })
@@ -44,7 +44,7 @@ export class PhotoMastadonClient {
     status: string,
     filename: string,
     buffer: Buffer
-  ): Promise<Result<string, string>> {
+  ): Promise<string> {
     const mediaResponse = await this.buildAuthorizedMastadonPostRequest(
       "/api/v2/media"
     )
@@ -52,11 +52,12 @@ export class PhotoMastadonClient {
       .field("focus", "(0.0,0.0)");
 
     if (!mediaResponse.ok) {
-      console.log(`Upload media error: ${JSON.stringify(mediaResponse.body)}`);
-      return error(mediaResponse.text);
+      throw new Error(
+        `Upload media error: ${JSON.stringify(mediaResponse.body)}`
+      );
     }
 
-    console.log(
+    logger.debug(
       `Uploaded media response: ${JSON.stringify(mediaResponse.body)}`
     );
 
@@ -76,13 +77,15 @@ export class PhotoMastadonClient {
       .send(requestBody);
 
     if (!tootResponse.ok) {
-      console.log(`Post status error: ${JSON.stringify(tootResponse.body)}`);
-      return error(tootResponse.text);
+      throw new Error(
+        `Post status error: ${JSON.stringify(tootResponse.body)}`
+      );
     }
 
-    console.log(`Posted status response: ${JSON.stringify(tootResponse.body)}`);
-    const bodyId = statusUpdateResponseSchema.parse(tootResponse.body).id;
-    return ok(bodyId);
+    logger.debug(
+      `Posted status response: ${JSON.stringify(tootResponse.body)}`
+    );
+    return statusUpdateResponseSchema.parse(tootResponse.body).id;
   }
 
   buildAuthorizedMastadonPostRequest(api: string) {
