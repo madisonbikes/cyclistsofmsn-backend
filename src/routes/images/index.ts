@@ -8,11 +8,12 @@ import { injectable } from "tsyringe";
 import { logger } from "../../utils";
 import { isValidObjectId } from "mongoose";
 import Cache from "../cache";
+import { z } from "zod";
 
-type GetQuery = {
-  width?: number;
-  height?: number;
-};
+const getQuerySchema = z.object({
+  width: z.number().optional(),
+  height: z.number().optional(),
+});
 
 @injectable()
 class ImageRouter {
@@ -37,7 +38,7 @@ class ImageRouter {
     // single image, cached
     .get("/:id", this.cache.middleware(), async (req, res) => {
       if (await this.cache.isCached(res)) return;
-      const query = req.query as unknown as GetQuery;
+      const query = getQuerySchema.parse(req.query);
 
       const id = req.params.id;
       if (!isValidObjectId(id)) {
