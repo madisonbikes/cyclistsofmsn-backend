@@ -45,7 +45,10 @@ export class PostDispatcher implements Lifecycle {
     try {
       const scheduledResult = await this.scheduler.scheduleNextPost();
       if (scheduledResult.isError()) {
-        logger.error("Error scheduling post", scheduledResult.value);
+        logger.error(
+          { message: scheduledResult.value.message },
+          `Error scheduling post`
+        );
         return;
       }
       const nextPost = scheduledResult.value;
@@ -72,8 +75,7 @@ export class PostDispatcher implements Lifecycle {
         await nextPost.save();
       }
     } catch (e) {
-      logger.error(JSON.stringify(e));
-      return;
+      logger.error(e);
     }
   }
 }

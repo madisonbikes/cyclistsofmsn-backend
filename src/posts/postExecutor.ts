@@ -32,20 +32,18 @@ export class PostExecutor {
       try {
         logger.debug("Twitter enabled");
         const result = await this.photoTweeter.post(nextImage.value.filename);
-        logger.info(`Posted new Twitter post id ${JSON.stringify(result)}`);
+        logger.info(result, `Posted new Twitter post id`);
       } catch (e) {
-        logger.error("Error posting tweet");
-        logger.error(e);
+        logger.error(e, "Error posting tweet");
       }
     }
     if (this.photoTooter.isEnabled()) {
       try {
         logger.debug("Mastadon enabled");
         const result = await this.photoTooter.post(nextImage.value.filename);
-        logger.info(`Posted new Mastadon post id ${JSON.stringify(result)}`);
+        logger.info(result, `Posted new Mastadon post id`);
       } catch (e) {
-        logger.error("Error posting to Mastadon");
-        logger.error(e);
+        logger.error(e, "Error posting to Mastadon");
       }
     }
     return nextImage;

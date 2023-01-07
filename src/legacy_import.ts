@@ -41,7 +41,7 @@ export class Importer {
   constructor(private database: Database) {}
 
   async perform_import(logFile: string): Promise<number> {
-    logger.info(`importing ${logFile}`);
+    logger.info({ logFile }, `importing log`);
     const readInterface = rl.createInterface(fs.createReadStream(logFile));
     const posts: Post[] = [];
     readInterface.on("line", (data) => {

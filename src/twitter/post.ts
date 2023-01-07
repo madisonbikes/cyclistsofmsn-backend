@@ -43,7 +43,7 @@ export class PhotoTwitterClient {
     const mediaResult = await twitterClient.media.mediaUpload({
       media: base64Buffer,
     });
-    logger.info(`uploaded media: ${JSON.stringify(mediaResult)}`);
+    logger.info(mediaResult, `uploaded media`);
 
     const tweetResult = await twitterClient.tweets.statusesUpdate({
       status: status,

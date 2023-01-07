@@ -62,7 +62,10 @@ class ImageRouter {
       try {
         await access(imageFile, constants.R_OK);
       } catch (err) {
-        logger.info("Requested file not found in image repository ", imageFile);
+        logger.info(
+          { imageFile },
+          `Requested file not found in image repository`
+        );
         return res.sendStatus(404);
       }
 

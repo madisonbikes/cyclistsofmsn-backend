@@ -34,7 +34,7 @@ export class PostScheduler {
 
     const createdPost = await this.createNewScheduledPost();
     return createdPost.alsoOnOk((value) => {
-      logger.info(`Scheduled new post @ ${value.timestamp}`);
+      logger.info({ timestamp: value.timestamp }, `Scheduled new post`);
     });
   }
 
