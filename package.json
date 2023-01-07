@@ -11,7 +11,6 @@
     "test": "NODE_ENV=test npx jest",
     "test-watch": "NODE_ENV=test npx jest --watch",
     "coverage": "NODE_ENV=test npx jest --coverage=true",
-    "import": "ts-node src/legacy_import.ts test_resources/test_post_history_325.log",
     "lint": "eslint '**/*.ts'",
     "register_twitter": "ts-node src/twitter/register.ts",
     "test_tweet": "ts-node src/twitter/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
