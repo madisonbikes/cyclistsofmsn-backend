@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
 import { injectable, singleton } from "tsyringe";
+import { initEnv } from "./utils/env";
 
-const isDev = process.env.NODE_ENV === "development";
+initEnv();
 
 const DEFAULT_SERVER_PORT = 3001;
 
@@ -34,6 +34,8 @@ export class ServerConfiguration {
 
   public readonly jwt: JwtConfiguration;
 
+  // note that logging configuration is handled in util/logger.ts
+
   constructor() {
     this.jwt = {
       secret: process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure",
@@ -42,10 +44,4 @@ export class ServerConfiguration {
       expiresIn: "14d",
     };
   }
-}
-
-// this has to run first outside of constructor
-const result = dotenv.config();
-if (result.error && isDev) {
-  console.log(result.error);
 }
