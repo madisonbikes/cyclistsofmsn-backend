@@ -31,7 +31,7 @@ jobs:
       - run: npm run lint
 
       - name: Deploy on Server
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
