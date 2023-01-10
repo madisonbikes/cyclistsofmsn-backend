@@ -26,6 +26,14 @@ if (process.env.NODE_ENV === "test") {
       },
     ],
   });
-  newLogger = pino(transport);
+
+  // ensure pino base logger level is set to minimum of the two transports
+  const minLevel = Math.min(
+    pino.levels.values[consoleLogLevel],
+    pino.levels.values[logLevel]
+  );
+  const minLevelAsString = pino.levels.labels[minLevel];
+  console.log(minLevelAsString);
+  newLogger = pino({ level: minLevelAsString }, transport);
 }
 export const logger = newLogger;
