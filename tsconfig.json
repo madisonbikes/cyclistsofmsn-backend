@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
+  "extends": "@tsconfig/node16/tsconfig.json",
 
   "compilerOptions": {
     "preserveConstEnums": true,
@@ -7,7 +7,9 @@
     "emitDecoratorMetadata": true,
     "strict": true,
     "experimentalDecorators": true,
-    "allowJs": false
+    "allowJs": false,
+    "target": "ES2019",
+    "typeRoots": ["@types", "./node_modules/@types"]
   },
   "include": ["src"]
 }

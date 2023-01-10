@@ -1,7 +1,7 @@
-import { setupSuite, testContainer, testRequest, TestRequest } from "./test";
-import { PhotoServer } from "./server";
-import { Image } from "./database";
-import Cache from "./routes/cache";
+import { setupSuite, testContainer, testRequest, TestRequest } from "../test";
+import { PhotoServer } from "../server";
+import { Image } from "../database";
+import Cache from "./cache";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
