@@ -6,10 +6,11 @@ initEnv();
 const logFile = process.env.LOG_FILE || "backend.log";
 const logLevel = process.env.LOG_LEVEL || "info";
 const consoleLogLevel = process.env.CONSOLE_LOG_LEVEL || "info";
+const testLogLevel = process.env.TEST_LOG_LEVEL || "silent";
 
 let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
-  newLogger = pino({ level: "silent" });
+  newLogger = pino({ level: testLogLevel });
 } else {
   const transport = pino.transport({
     targets: [
