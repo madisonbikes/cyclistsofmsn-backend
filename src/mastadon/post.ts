@@ -10,8 +10,16 @@ import { z } from "zod";
 import { logger } from "../utils";
 
 const mediaUploadResponseSchema = z.object({ id: z.string() });
+
+const statusUpdateVisibilitySchema = z.enum([
+  "public",
+  "unlisted",
+  "private",
+  "direct",
+]);
 const statusUpdateRequestSchema = z.object({
   status: z.string(),
+  visibility: statusUpdateVisibilitySchema.optional(),
   media_ids: z.string().array(),
 });
 type StatusUpdateRequestSchema = z.infer<typeof statusUpdateRequestSchema>;
@@ -65,6 +73,9 @@ export class PhotoMastadonClient {
 
     const requestBody: StatusUpdateRequestSchema = {
       status: status,
+      visibility: statusUpdateVisibilitySchema.parse(
+        this.configuration.mastadonStatusVisibility
+      ),
       media_ids: [mediaId],
     };
 
@@ -97,11 +108,11 @@ export class PhotoMastadonClient {
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {
-  const twitterClient = container.resolve(PhotoMastadonClient);
+  const client = container.resolve(PhotoMastadonClient);
   const fileBuffer = await readFile(args[1]);
 
   console.log("loaded file");
-  return twitterClient.postToot(args[0], args[1], fileBuffer);
+  return client.postToot(args[0], args[1], fileBuffer);
 };
 
 if (require.main === module) {
@@ -109,7 +120,7 @@ if (require.main === module) {
     console.log("Requires a status and an image filename for arguments.");
   } else {
     const args = process.argv.slice(2);
-    /** launches test tweet */
+    /** launches test post */
     Promise.resolve()
       .then(() => {
         return main(args);

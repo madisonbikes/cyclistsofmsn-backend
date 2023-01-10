@@ -31,6 +31,8 @@ export class ServerConfiguration {
 
   public readonly mastadonUri = process.env.MASTADON_URI || "";
   public readonly mastadonAccessToken = process.env.MASTADON_ACCESS_TOKEN || "";
+  public readonly mastadonStatusVisibility =
+    process.env.MASTADON_STATUS_VISIBILITY;
 
   public readonly jwt: JwtConfiguration;
 
