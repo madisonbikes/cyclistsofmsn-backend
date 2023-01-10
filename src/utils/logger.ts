@@ -1,4 +1,4 @@
-import pino, { Logger } from "pino";
+import pino, { Logger, TransportTargetOptions } from "pino";
 import { initEnv } from "./env";
 
 initEnv();
@@ -12,28 +12,26 @@ let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
   newLogger = pino({ level: testLogLevel });
 } else {
+  const targets: TransportTargetOptions[] = [
+    {
+      level: consoleLogLevel,
+      target: "pino-pretty",
+      options: { destination: 1 }, // stdout
+    },
+    {
+      level: logLevel,
+      target: "pino-pretty",
+      options: { colorize: false, destination: logFile },
+    },
+  ];
   const transport = pino.transport({
-    targets: [
-      {
-        level: consoleLogLevel,
-        target: "pino-pretty",
-        options: { destination: 1 }, // stdout
-      },
-      {
-        level: logLevel,
-        target: "pino-pretty",
-        options: { colorize: false, destination: logFile },
-      },
-    ],
+    targets,
   });
 
-  // ensure pino base logger level is set to minimum of the two transports
-  const minLevel = Math.min(
-    pino.levels.values[consoleLogLevel],
-    pino.levels.values[logLevel]
-  );
+  // ensure pino base logger level is set to minimum of the transports
+  const levels = targets.map((t) => t.level).map((l) => pino.levels.values[l]);
+  const minLevel = Math.min(...levels);
   const minLevelAsString = pino.levels.labels[minLevel];
-  console.log(minLevelAsString);
   newLogger = pino({ level: minLevelAsString }, transport);
 }
 export const logger = newLogger;
