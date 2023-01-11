@@ -16,6 +16,9 @@ export class ImageClass {
   @prop()
   public exif_createdon?: Date;
 
+  @prop()
+  public description?: string;
+
   @prop({ default: false, required: true })
   public deleted!: boolean;
 }
