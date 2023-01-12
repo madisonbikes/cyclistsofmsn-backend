@@ -41,7 +41,9 @@ jobs:
         with:
           node-version: 18.x
           cache: "npm"
-      - run: npm ci
+
+      # ignore scripts to avoid husky/commitlint checks
+      - run: npm ci --ignore-scripts
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # use supplied semantic release gh-token with extra permissions
