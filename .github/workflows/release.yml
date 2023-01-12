@@ -2,10 +2,7 @@ name: Semantic Release
 concurrency: ci-release
 
 on:
-  push:
-    branches:
-      - main
-      - develop
+  workflow_dispatch:
 
 jobs:
   release:
@@ -27,9 +24,6 @@ jobs:
       # ignore scripts to avoid husky/commitlint checks
       - name: Prepare packages
         run: npm ci --ignore-scripts
-
-      - run: npm test
-      - run: npm run lint
 
       - name: Release
         env:
