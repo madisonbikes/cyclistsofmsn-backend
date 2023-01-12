@@ -1,7 +1,13 @@
-import { setupSuite, testContainer, testRequest, TestRequest } from "./test";
-import { PhotoServer } from "./server";
-import { Image } from "./database";
-import Cache from "./routes/cache";
+import {
+  setupSuite,
+  testContainer,
+  testRequest,
+  TestRequest,
+} from "../../test";
+import { PhotoServer } from "../../server";
+import { Image } from "../../database";
+import Cache from "../cache";
+import { imageListSchema } from "../types";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
@@ -20,7 +26,9 @@ describe("server process", () => {
     await photoServer.stop();
   });
 
-  beforeEach(() => {
+  afterEach(async () => {
+    // reset database
+    await Image.deleteMany({ filename: "bad.jpg" });
     cache.clear();
   });
 
@@ -30,14 +38,14 @@ describe("server process", () => {
       .expect(200)
       .expect(({ text }) => {
         const o = JSON.parse(text);
-        expect(o).toHaveLength(5);
+        expect(o).toHaveLength(6);
       });
   });
 
   it("responds to single image api call", async () => {
     const response = await request.get("/images").expect(200);
 
-    const imageList = JSON.parse(response.text);
+    const imageList = imageListSchema.parse(response.body);
     expect(imageList.length).toBeGreaterThan(0);
 
     const imageResponse = await requestGoodImage(imageList[0].id);
@@ -59,7 +67,7 @@ describe("server process", () => {
   it("returns second image request as cached", async () => {
     const response = await request.get("/images").expect(200);
 
-    const imageList = JSON.parse(response.text);
+    const imageList = imageListSchema.parse(response.body);
     expect(imageList.length).toBeGreaterThan(0);
 
     // first image call
@@ -68,6 +76,16 @@ describe("server process", () => {
 
     imageResponse = await requestGoodImage(imageList[0].id);
     expect(imageResponse.get("x-cached-response")).toEqual("HIT");
+  });
+
+  it("there is an image with an extracted description", async () => {
+    const value = await request.get("/images").expect(200);
+    const images = imageListSchema.parse(value.body);
+    const testImage = images.find(
+      (v) => v.filename === "test_DSC07588_with_description.jpg"
+    );
+    expect(testImage).toBeDefined();
+    expect(testImage?.description).toContain("riding a bike");
   });
 
   const requestGoodImage = async (id: string) => {

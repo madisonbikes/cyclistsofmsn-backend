@@ -6,16 +6,28 @@ import sharp from "sharp";
 import { FilesystemRepository } from "../fs_repository";
 import request from "superagent";
 import crypto from "crypto";
-import { z } from "zod";
 import { logger } from "../utils";
+import {
+  mediaUploadResponseSchema,
+  StatusUpdateRequest,
+  statusUpdateResponseSchema,
+  MediaUploadRequest,
+  StatusUpdateVisibility,
+  statusUpdateVisibilitySchema,
+} from "./types";
 
-const mediaUploadResponseSchema = z.object({ id: z.string() });
-const statusUpdateRequestSchema = z.object({
-  status: z.string(),
-  media_ids: z.string().array(),
-});
-type StatusUpdateRequestSchema = z.infer<typeof statusUpdateRequestSchema>;
-const statusUpdateResponseSchema = z.object({ id: z.string() });
+type TootPostImageOptions = {
+  filename: string;
+  buffer: Buffer;
+  description?: string;
+  focus?: string;
+};
+
+type TootPostOptions = {
+  status: string;
+  visibility?: StatusUpdateVisibility;
+  image?: TootPostImageOptions;
+};
 
 @injectable()
 export class PhotoMastadonClient {
@@ -31,41 +43,57 @@ export class PhotoMastadonClient {
     );
   }
 
-  async post(filename: string): Promise<string> {
+  async post(filename: string, description?: string): Promise<string> {
     const photoFilename = this.repository.photoPath(filename);
     const buffer = await sharp(photoFilename)
       .resize({ width: 1600, withoutEnlargement: true })
       .toFormat("jpeg")
       .toBuffer();
-    return this.postToot("#cyclistsofmadison", filename, buffer);
+
+    const visibility = statusUpdateVisibilitySchema
+      .optional()
+      .parse(this.configuration.mastadonStatusVisibility);
+    return this.postToot({
+      status: "#cyclistsofmadison",
+      visibility,
+      image: { filename, buffer, description },
+    });
   }
 
-  async postToot(
-    status: string,
-    filename: string,
-    buffer: Buffer
-  ): Promise<string> {
-    const mediaResponse = await this.buildAuthorizedMastadonPostRequest(
-      "/api/v2/media"
-    )
-      .attach("file", buffer, filename)
-      .field("focus", "(0.0,0.0)");
+  async postToot(options: TootPostOptions): Promise<string> {
+    let mediaId: string[] = [];
+    if (options.image !== undefined) {
+      const mediaFields: MediaUploadRequest = {
+        focus: options.image.focus,
+        description: options.image.description,
+      };
+      const mediaRequest = this.buildAuthorizedMastadonPostRequest(
+        "/api/v2/media"
+      ).attach("file", options.image.buffer, options.image.filename);
 
-    if (!mediaResponse.ok) {
-      throw new Error(
-        `Upload media error: ${JSON.stringify(mediaResponse.body)}`
-      );
+      for (const [key, value] of Object.entries(mediaFields)) {
+        if (value !== undefined) {
+          void mediaRequest.field(key, value);
+        }
+      }
+
+      const mediaResponse = await mediaRequest;
+      if (!mediaResponse.ok) {
+        throw new Error(
+          `Upload media error: ${JSON.stringify(mediaResponse.body)}`
+        );
+      }
+
+      logger.debug({ response: mediaResponse.body }, `Uploaded media response`);
+
+      const { id } = mediaUploadResponseSchema.parse(mediaResponse.body);
+      mediaId = [id];
     }
 
-    logger.debug(
-      `Uploaded media response: ${JSON.stringify(mediaResponse.body)}`
-    );
-
-    const mediaId = mediaUploadResponseSchema.parse(mediaResponse.body).id;
-
-    const requestBody: StatusUpdateRequestSchema = {
-      status: status,
-      media_ids: [mediaId],
+    const requestBody: StatusUpdateRequest = {
+      status: options.status,
+      visibility: options.visibility,
+      media_ids: mediaId,
     };
 
     // FIXME when we introduce message queue/etc use same UUID for retries
@@ -82,13 +110,11 @@ export class PhotoMastadonClient {
       );
     }
 
-    logger.debug(
-      `Posted status response: ${JSON.stringify(tootResponse.body)}`
-    );
+    logger.debug({ response: tootResponse.body }, `Posted status response`);
     return statusUpdateResponseSchema.parse(tootResponse.body).id;
   }
 
-  buildAuthorizedMastadonPostRequest(api: string) {
+  private buildAuthorizedMastadonPostRequest(api: string) {
     return request
       .post(`${this.configuration.mastadonUri}/${api}`)
       .set("Authorization", `Bearer ${this.configuration.mastadonAccessToken}`);
@@ -97,11 +123,20 @@ export class PhotoMastadonClient {
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {
-  const twitterClient = container.resolve(PhotoMastadonClient);
+  const client = container.resolve(PhotoMastadonClient);
   const fileBuffer = await readFile(args[1]);
 
   console.log("loaded file");
-  return twitterClient.postToot(args[0], args[1], fileBuffer);
+  return client.postToot({
+    status: args[0],
+    visibility: "direct",
+    image: {
+      filename: args[1],
+      buffer: fileBuffer,
+      description: "useful alt tag description",
+      focus: "(0.25,0.25)",
+    },
+  });
 };
 
 if (require.main === module) {
@@ -109,7 +144,7 @@ if (require.main === module) {
     console.log("Requires a status and an image filename for arguments.");
   } else {
     const args = process.argv.slice(2);
-    /** launches test tweet */
+    /** launches test post */
     Promise.resolve()
       .then(() => {
         return main(args);

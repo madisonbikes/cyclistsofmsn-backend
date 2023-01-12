@@ -24,7 +24,8 @@ export class PostExecutor {
     const nextImage = await this.postSelector.nextImage();
     if (nextImage.isError()) {
       logger.error(
-        `Could not find an image to post: ${nextImage.value.message}`
+        { error: nextImage.value },
+        `Could not find an image to post`
       );
       return error(nextImage.value);
     }
@@ -32,7 +33,7 @@ export class PostExecutor {
       try {
         logger.debug("Twitter enabled");
         const result = await this.photoTweeter.post(nextImage.value.filename);
-        logger.info(result, `Posted new Twitter post id`);
+        logger.info({ id: result }, `Posted new Twitter post`);
       } catch (e) {
         logger.error(e, "Error posting tweet");
       }
@@ -40,8 +41,11 @@ export class PostExecutor {
     if (this.photoTooter.isEnabled()) {
       try {
         logger.debug("Mastadon enabled");
-        const result = await this.photoTooter.post(nextImage.value.filename);
-        logger.info(result, `Posted new Mastadon post id`);
+        const result = await this.photoTooter.post(
+          nextImage.value.filename,
+          nextImage.value.description
+        );
+        logger.info({ id: result }, `Posted new Mastadon post`);
       } catch (e) {
         logger.error(e, "Error posting to Mastadon");
       }

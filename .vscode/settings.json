@@ -3,5 +3,6 @@
   "editor.formatOnSave": true,
   "files.exclude": {
     "node_modules": true
-  }
+  },
+  "editor.rulers": [100, 160]
 }

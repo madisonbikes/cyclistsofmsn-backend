@@ -1,6 +1,7 @@
 import express, { RequestHandler } from "express";
 import LRUCache from "lru-cache";
 import { injectable, singleton } from "tsyringe";
+import { logger } from "../utils";
 
 const CACHE_SIZE = 20 * 1024 * 1024;
 
@@ -8,6 +9,10 @@ type Holder = {
   value: unknown;
   contentType: string | undefined;
   statusCode: number;
+};
+
+type MiddlewareOptions = {
+  callNextWhenCacheable: boolean;
 };
 
 @injectable()
@@ -26,7 +31,27 @@ class Cache {
     },
   });
 
-  middleware = (): RequestHandler => {
+  wrapper = (
+    fn: (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => Promise<express.Response | void>
+  ) => {
+    return async (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      if (await this.isCached(res)) return;
+      // eslint-disable-next-line promise/no-callback-in-promise
+      return fn(req, res, next).catch(next);
+    };
+  };
+
+  middleware = (
+    options: MiddlewareOptions = { callNextWhenCacheable: false }
+  ): RequestHandler => {
     return (
       req: express.Request,
       res: express.Response,
@@ -41,7 +66,12 @@ class Cache {
           .set("x-cached-response", "HIT")
           .status(cached.statusCode)
           .send(cached.value);
-        return next();
+        logger.debug({ url: req.url }, "cache hit");
+        if (options.callNextWhenCacheable) {
+          return next();
+        } else {
+          return;
+        }
       }
 
       // override the request.send() function to fill the cache

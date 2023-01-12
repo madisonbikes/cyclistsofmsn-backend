@@ -17,24 +17,27 @@ export class PostScheduler {
     private configuration: ServerConfiguration
   ) {}
 
-  private lastScheduledPostLog: string | undefined;
+  private lastScheduledPostTimestamp: number | undefined;
 
   /** returns the next post after scheduling or if it still needs to be posted */
   async scheduleNextPost(): Promise<PostResult> {
     const nextPost = await PostHistory.findNextScheduledPost();
     if (nextPost != null) {
       // to reduce log spam, only output this once even though we are polling every 5 minutes or so
-      const newLog = `Using existing scheduled post @ ${nextPost.timestamp}`;
-      if (this.lastScheduledPostLog !== newLog) {
-        logger.info(newLog);
-        this.lastScheduledPostLog = newLog;
+
+      if (this.lastScheduledPostTimestamp !== nextPost.timestamp.getTime()) {
+        logger.info(
+          { when: nextPost.timestamp },
+          "Using existing scheduled post"
+        );
+        this.lastScheduledPostTimestamp = nextPost.timestamp.getTime();
       }
       return ok(nextPost);
     }
 
     const createdPost = await this.createNewScheduledPost();
     return createdPost.alsoOnOk((value) => {
-      logger.info({ timestamp: value.timestamp }, `Scheduled new post`);
+      logger.info({ when: value.timestamp }, `Scheduled new post`);
     });
   }
 
