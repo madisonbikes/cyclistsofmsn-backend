@@ -1,0 +1,37 @@
+name: Semantic Release
+concurrency: ci-release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      # semantic-release requires node 18
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: "npm"
+
+      # ignore scripts to avoid husky/commitlint checks
+      - name: Prepare packages
+        run: npm ci --ignore-scripts
+
+      - run: npm test
+      - run: npm run lint
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # use supplied semantic release gh-token with extra permissions
+        run: npx semantic-release
