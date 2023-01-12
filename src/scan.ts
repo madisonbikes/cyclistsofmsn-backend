@@ -60,11 +60,16 @@ export class ImageRepositoryScanner implements Lifecycle {
       this.database.refreshAllMetadata
     ) {
       logger.debug(`updating existing image ${filename}`);
-
       const metadata = await this.getFileMetadata(filename);
 
+      // existing image row has modified the description
       if (!image.description_from_exif) {
+        delete metadata.description_from_exif;
         delete metadata.description;
+      }
+      // clean up situations where description was unset but also this field is set to false
+      if (image.description === undefined) {
+        image.description_from_exif = true;
       }
       Object.assign(image, metadata);
       image.deleted = false;
@@ -77,9 +82,6 @@ export class ImageRepositoryScanner implements Lifecycle {
     logger.debug(`adding new image ${filename}`);
     const metadata = await this.getFileMetadata(filename);
     const newImage = new Image({ filename, ...metadata });
-    if (newImage.description !== undefined) {
-      newImage.description_from_exif = true;
-    }
     logger.trace(newImage, "image data");
     await newImage.save();
   }
@@ -88,6 +90,7 @@ export class ImageRepositoryScanner implements Lifecycle {
   private async markFileRemoved(image: ImageDocument) {
     logger.debug(`marking cruft db image ${image.filename}`);
     image.deleted = true;
+    image.description_from_exif = true;
     image.fs_timestamp = undefined;
     await image.save();
   }
@@ -118,11 +121,13 @@ export class ImageRepositoryScanner implements Lifecycle {
     ]);
     const description = this.parseStringTag(rawDescription);
     const exif_createdon = this.parseImageDateTimeTag(rawCreatedOn);
+    const description_from_exif = description !== undefined;
 
     const retval: Partial<ImageClass> = {
       fs_timestamp,
       exif_createdon,
       description,
+      description_from_exif,
     };
     return retval;
   };

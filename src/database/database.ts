@@ -4,7 +4,8 @@ import { Lifecycle, logger } from "../utils";
 import { injectable, singleton } from "tsyringe";
 import { Version } from "./version";
 
-const CURRENT_DATABASE_VERSION = 1;
+/** make sure you update switch statement below when bumping db version */
+const CURRENT_DATABASE_VERSION = 2;
 
 /** provide unified access to database connection */
 @injectable()
@@ -77,6 +78,7 @@ export class Database implements Lifecycle {
     while (version < CURRENT_DATABASE_VERSION) {
       switch (version) {
         case 0:
+        case 1:
           logger.info(
             "Forcing refresh of all metadata due to database upgrade"
           );

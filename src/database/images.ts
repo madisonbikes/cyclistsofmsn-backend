@@ -23,7 +23,7 @@ export class ImageClass {
    * if description is updated through admin UI, set this to false and it will not be updated
    * when scanning
    */
-  @prop({ default: false, required: true })
+  @prop({ default: true, required: true })
   public description_from_exif!: boolean;
 
   /**
