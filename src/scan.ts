@@ -4,6 +4,7 @@ import { StringArrayTag } from "exifreader";
 import parseDate from "date-fns/parse";
 import { Lifecycle, logger } from "./utils";
 import { injectable } from "tsyringe";
+import pLimit from "p-limit";
 
 /** expose scanning operation.  requires database connection to be established */
 @injectable()
@@ -36,16 +37,26 @@ export class ImageRepositoryScanner implements Lifecycle {
       return !found && !item.deleted;
     });
 
+    const limit = pLimit(4);
+
+    const array: Promise<unknown>[] = [];
+
     // remove cruft
-    await Promise.all(dbCruft.map((elem) => this.markFileRemoved(elem)));
+    array.push(
+      ...dbCruft.map((elem) => limit(() => this.markFileRemoved(elem)))
+    );
 
     // insert new items
-    await Promise.all(filesToAdd.map((filename) => this.addNewFile(filename)));
+    array.push(
+      ...filesToAdd.map((filename) => limit(() => this.addNewFile(filename)))
+    );
 
     // update existing items
-    await Promise.all(
-      matchedFiles.map((image) => this.updateMatchedFile(image))
+    array.push(
+      ...matchedFiles.map((image) => limit(() => this.updateMatchedFile(image)))
     );
+
+    await Promise.all(array);
 
     logger.info("Scan complete");
   }
