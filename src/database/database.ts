@@ -5,7 +5,7 @@ import { injectable, singleton } from "tsyringe";
 import { Version } from "./version";
 
 /** make sure you update switch statement below when bumping db version */
-const CURRENT_DATABASE_VERSION = 2;
+const CURRENT_DATABASE_VERSION = 1;
 
 /** provide unified access to database connection */
 @injectable()
@@ -51,46 +51,52 @@ export class Database implements Lifecycle {
 
   /** checks if database is at current version and if not, upgrades it */
   private async versionCheck() {
-    let dbVersion = 0;
     const values = await Version.find();
     if (values.length === 0) {
-      logger.info("Database version unset, forcing migration");
+      logger.info(
+        `Initializing database version to ${CURRENT_DATABASE_VERSION}`
+      );
+      await this.setCurrentVersion();
     } else if (values.length > 1) {
       throw new Error(
         "Database has multiple versions, cannot proceeed with migration"
       );
     } else {
-      dbVersion = values[0].version;
-    }
+      let version = values[0].version;
+      if (version === CURRENT_DATABASE_VERSION) {
+        logger.debug("Database version is current");
+      } else {
+        logger.info(
+          { oldVersion: version, currentVersion: CURRENT_DATABASE_VERSION },
+          "Migrating database"
+        );
 
-    if (dbVersion !== CURRENT_DATABASE_VERSION) {
-      logger.info(
-        { oldVersion: dbVersion, currentVersion: CURRENT_DATABASE_VERSION },
-        "Migrating database"
-      );
-      await this.migrateFrom(dbVersion);
-    } else {
-      logger.debug({ version: dbVersion }, "Database version current");
+        while (version < CURRENT_DATABASE_VERSION) {
+          switch (version) {
+            /*
+          if (!this._refreshAllMetadata) {
+            logger.info(
+              "Forcing refresh of all metadata due to database upgrade"
+            );
+            this._refreshAllMetadata = true;
+          }
+          break;
+          */
+            default:
+              break;
+          }
+          version++;
+        }
+        await this.setCurrentVersion();
+      }
     }
   }
 
-  private async migrateFrom(version: number) {
-    while (version < CURRENT_DATABASE_VERSION) {
-      switch (version) {
-        case 0:
-        case 1:
-          logger.info(
-            "Forcing refresh of all metadata due to database upgrade"
-          );
-          this._refreshAllMetadata = true;
-          break;
-        default:
-          break;
-      }
-      version++;
-    }
+  private async setCurrentVersion() {
     await Version.deleteMany();
     const versionRecord = new Version({ version: CURRENT_DATABASE_VERSION });
     await versionRecord.save();
   }
+
+  private migrateFrom(version: number) {}
 }
