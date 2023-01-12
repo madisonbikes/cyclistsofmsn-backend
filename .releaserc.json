@@ -1,0 +1,36 @@
+{
+  "branches": [
+    "main",
+    {
+      "name": "develop",
+      "prerelease": true
+    }
+  ],
+  "repositoryUrl": "https://github.com/madisonbikes/cyclistsofmsn-backend.git",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md"
+        ],
+        "message": "chore(release): cyclistsofmsn-backend ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    "semantic-release-export-data"
+  ],
+  "ci": true
+}
