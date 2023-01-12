@@ -1,4 +1,4 @@
-import { Image, ImageDocument } from "./database";
+import { Database, Image, ImageClass, ImageDocument } from "./database";
 import { FilesystemRepository } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
 import parseDate from "date-fns/parse";
@@ -8,7 +8,10 @@ import { injectable } from "tsyringe";
 /** expose scanning operation.  requires database connection to be established */
 @injectable()
 export class ImageRepositoryScanner implements Lifecycle {
-  constructor(private fsRepository: FilesystemRepository) {}
+  constructor(
+    private fsRepository: FilesystemRepository,
+    private database: Database
+  ) {}
 
   async start(): Promise<void> {
     const [files, dbFiles] = await Promise.all([
@@ -52,12 +55,18 @@ export class ImageRepositoryScanner implements Lifecycle {
     const filename = image.filename;
 
     const newTimestamp = await this.fsRepository.timestamp(filename);
-    if (image.fs_timestamp?.getTime() !== newTimestamp.getTime()) {
+    if (
+      image.fs_timestamp?.getTime() !== newTimestamp.getTime() ||
+      this.database.refreshAllMetadata
+    ) {
       logger.debug(`updating existing image ${filename}`);
-      image.fs_timestamp = newTimestamp;
-      const dateTime = (await this.fsRepository.exif(filename))
-        .DateTimeOriginal;
-      image.exif_createdon = this.parseImageTag(dateTime);
+
+      const metadata = await this.getFileMetadata(filename);
+
+      if (!image.description_from_exif) {
+        delete metadata.description;
+      }
+      Object.assign(image, metadata);
       image.deleted = false;
       await image.save();
     }
@@ -66,10 +75,12 @@ export class ImageRepositoryScanner implements Lifecycle {
   /** insert a newly discovered file */
   private async addNewFile(filename: string) {
     logger.debug(`adding new image ${filename}`);
-    const newImage = new Image({ filename: filename });
-    newImage.fs_timestamp = await this.fsRepository.timestamp(filename);
-    const dateTime = (await this.fsRepository.exif(filename)).DateTimeOriginal;
-    newImage.exif_createdon = this.parseImageTag(dateTime);
+    const metadata = await this.getFileMetadata(filename);
+    const newImage = new Image({ filename, ...metadata });
+    if (newImage.description !== undefined) {
+      newImage.description_from_exif = true;
+    }
+    logger.trace(newImage, "image data");
     await newImage.save();
   }
 
@@ -81,10 +92,38 @@ export class ImageRepositoryScanner implements Lifecycle {
     await image.save();
   }
 
-  private parseImageTag(tag: StringArrayTag | undefined): Date | undefined {
+  private parseImageDateTimeTag(
+    tag: StringArrayTag | undefined
+  ): Date | undefined {
     if (!tag || tag.value.length === 0) {
       return undefined;
     }
     return parseDate(tag?.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
   }
+
+  private parseStringTag(tag: StringArrayTag | undefined): string | undefined {
+    if (!tag || tag.value.length === 0) {
+      return undefined;
+    }
+    return tag?.value[0];
+  }
+
+  private getFileMetadata = async (filename: string) => {
+    const [
+      fs_timestamp,
+      { DateTimeOriginal: rawCreatedOn, ImageDescription: rawDescription },
+    ] = await Promise.all([
+      this.fsRepository.timestamp(filename),
+      this.fsRepository.exif(filename),
+    ]);
+    const description = this.parseStringTag(rawDescription);
+    const exif_createdon = this.parseImageDateTimeTag(rawCreatedOn);
+
+    const retval: Partial<ImageClass> = {
+      fs_timestamp,
+      exif_createdon,
+      description,
+    };
+    return retval;
+  };
 }

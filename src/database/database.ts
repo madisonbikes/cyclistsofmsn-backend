@@ -14,6 +14,12 @@ export class Database implements Lifecycle {
 
   private connection?: Mongoose;
 
+  /** set to true if db version change should force a rescan of all existing files */
+  private _refreshAllMetadata = false;
+  public get refreshAllMetadata() {
+    return this._refreshAllMetadata;
+  }
+
   async start(): Promise<boolean> {
     if (this.connection) {
       logger.debug(
@@ -71,7 +77,10 @@ export class Database implements Lifecycle {
     while (version < CURRENT_DATABASE_VERSION) {
       switch (version) {
         case 0:
-          // TODO force rescan to extract initial image descriptions
+          logger.info(
+            "Forcing refresh of all metadata due to database upgrade"
+          );
+          this._refreshAllMetadata = true;
           break;
         default:
           break;

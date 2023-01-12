@@ -3,7 +3,7 @@ import { injectable } from "tsyringe";
 import { validateQuerySchema } from "../../security/validateSchema";
 import { asyncWrapper } from "../async";
 import { SingleImageHandler } from "./singleImage";
-import { handler } from "./allImages";
+import { handler } from "./imageList";
 import Cache from "../cache";
 
 @injectable()

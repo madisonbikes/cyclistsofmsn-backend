@@ -7,17 +7,16 @@ import { access } from "fs/promises";
 import { constants } from "fs";
 import sharp from "sharp";
 import { logger } from "../../utils";
-import { GetImageQuerySchema } from "../types";
-import { z } from "zod";
+import { getImageQuerySchema, GetImageQuery } from "../types";
 
 @injectable()
 export class SingleImageHandler {
   constructor(private fsRepository: FilesystemRepository) {}
 
-  readonly schema = GetImageQuerySchema;
+  readonly schema = getImageQuerySchema;
 
   handler = async (req: Request, res: Response) => {
-    const query = req.validated as z.infer<typeof GetImageQuerySchema>;
+    const query = req.validated as GetImageQuery;
 
     const id = req.params.id;
     if (!isValidObjectId(id)) {
