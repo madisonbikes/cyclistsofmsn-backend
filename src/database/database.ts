@@ -52,15 +52,17 @@ export class Database implements Lifecycle {
   /** checks if database is at current version and if not, upgrades it */
   private async versionCheck() {
     const values = await Version.find();
+    if (values.length > 1) {
+      throw new Error(
+        "Database has multiple versions, cannot proceeed with migration"
+      );
+    }
+
     if (values.length === 0) {
       logger.info(
         `Initializing database version to ${CURRENT_DATABASE_VERSION}`
       );
       await this.setCurrentVersion();
-    } else if (values.length > 1) {
-      throw new Error(
-        "Database has multiple versions, cannot proceeed with migration"
-      );
     } else {
       let version = values[0].version;
       if (version === CURRENT_DATABASE_VERSION) {
@@ -97,6 +99,4 @@ export class Database implements Lifecycle {
     const versionRecord = new Version({ version: CURRENT_DATABASE_VERSION });
     await versionRecord.save();
   }
-
-  private migrateFrom(version: number) {}
 }
