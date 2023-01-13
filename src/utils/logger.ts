@@ -1,4 +1,4 @@
-import pino, { Logger, TransportTargetOptions } from "pino";
+import pino, { Logger, stdSerializers, TransportTargetOptions } from "pino";
 import { initEnv } from "./env";
 
 initEnv();
@@ -8,9 +8,20 @@ const logLevel = process.env.LOG_LEVEL || "info";
 const consoleLogLevel = process.env.CONSOLE_LOG_LEVEL || "info";
 const testLogLevel = process.env.TEST_LOG_LEVEL || "silent";
 
+const serializers = {
+  err: stdSerializers.err,
+  when: (date: unknown) => {
+    if (date instanceof Date) {
+      return date.toLocaleString();
+    } else {
+      return date;
+    }
+  },
+};
+
 let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
-  newLogger = pino({ level: testLogLevel });
+  newLogger = pino({ level: testLogLevel, serializers });
 } else {
   const targets: TransportTargetOptions[] = [
     {
@@ -24,6 +35,7 @@ if (process.env.NODE_ENV === "test") {
       options: { colorize: false, destination: logFile },
     },
   ];
+
   const transport = pino.transport({
     targets,
   });
@@ -31,7 +43,7 @@ if (process.env.NODE_ENV === "test") {
   // ensure pino base logger level is set to minimum of the transports
   const levels = targets.map((t) => t.level).map((l) => pino.levels.values[l]);
   const minLevel = Math.min(...levels);
-  const minLevelAsString = pino.levels.labels[minLevel];
-  newLogger = pino({ level: minLevelAsString }, transport);
+  const level = pino.levels.labels[minLevel];
+  newLogger = pino({ level, serializers }, transport);
 }
 export const logger = newLogger;
