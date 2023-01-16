@@ -34,7 +34,7 @@
     "exifreader": "^4.9.1",
     "express": "^4.18.2",
     "helmet": "^6.0.1",
-    "jwks-rsa": "^3.0.0",
+    "jwks-rsa": "^3.0.1",
     "lru-cache": "^7.14.1",
     "mongoose": "^6.8.3",
     "oauth-1.0a": "^2.2.6",
