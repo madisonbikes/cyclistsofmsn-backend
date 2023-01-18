@@ -5,13 +5,6 @@ initEnv();
 
 const DEFAULT_SERVER_PORT = 3001;
 
-export type JwtConfiguration = {
-  secret: string;
-  issuer: string;
-  audience: string;
-  expiresIn: string;
-};
-
 @injectable()
 @singleton()
 export class ServerConfiguration {
@@ -34,16 +27,10 @@ export class ServerConfiguration {
   public readonly mastadonStatusVisibility =
     process.env.MASTADON_STATUS_VISIBILITY;
 
-  public readonly jwt: JwtConfiguration;
+  public readonly redisUri = process.env.REDIS_URI || "";
+
+  public readonly sessionStoreSecret =
+    process.env.SESSION_STORE_SECRET || "notverysecret";
 
   // note that logging configuration is handled in util/logger.ts
-
-  constructor() {
-    this.jwt = {
-      secret: process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure",
-      audience: "cyclistsofmsn",
-      issuer: "cyclistsofmsn",
-      expiresIn: "14d",
-    };
-  }
 }

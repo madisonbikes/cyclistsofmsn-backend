@@ -13,7 +13,7 @@ interface MatchCriteria {
 /** returns true if the photo has never been posted */
 @injectable()
 export class UnpostedCriteria implements MatchCriteria {
-  async satisfiedBy(image: ImageDocument): Promise<boolean> {
+  async satisfiedBy(image: ImageDocument) {
     const posts = await PostHistory.find().where("image", image);
     return posts.length === 0;
   }
@@ -23,7 +23,7 @@ export class UnpostedCriteria implements MatchCriteria {
 export class RepostCriteria implements MatchCriteria {
   constructor(private nowProvider: NowProvider) {}
 
-  async satisfiedBy(image: ImageDocument): Promise<boolean> {
+  async satisfiedBy(image: ImageDocument) {
     const threshold = subDays(
       startOfDay(this.nowProvider.now()),
       MINIMUM_REPOST_INTERVAL_IN_DAYS
@@ -40,7 +40,7 @@ export class RepostCriteria implements MatchCriteria {
 export class SeasonalityCriteria implements MatchCriteria {
   constructor(private nowProvider: NowProvider) {}
 
-  satisfiedBy(image: ImageDocument): Promise<boolean> {
+  satisfiedBy(image: ImageDocument) {
     const createdOnDate = image.exif_createdon;
     if (!createdOnDate) {
       return Promise.resolve(false);

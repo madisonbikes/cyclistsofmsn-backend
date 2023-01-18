@@ -9,8 +9,10 @@ import MainRouter from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
 
 import express from "express";
+import session from "express-session";
 import passport from "passport";
 import { Strategies } from "./security/authentication";
+import { RedisConnection } from "./redis";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -31,11 +33,13 @@ export class PhotoServer implements Lifecycle {
     private configuration: ServerConfiguration,
     scanner: ImageRepositoryScanner,
     database: Database,
+    private redis: RedisConnection,
     private apiRouter: MainRouter,
     postDispatcher: PostDispatcher,
     private strategies: Strategies
   ) {
     this.components.push(database);
+    this.components.push(redis);
     this.components.push(scanner);
     this.components.push(postDispatcher);
   }
@@ -58,10 +62,20 @@ export class PhotoServer implements Lifecycle {
       app.use("/", express.static(this.configuration.reactStaticRootDir));
     }
 
-    // used for securing most api endpoints
-    passport.use(this.strategies.jwt);
+    // init passport
+    passport.use(this.strategies.local);
 
+    const sessionOptions: session.SessionOptions = {
+      secret: this.configuration.sessionStoreSecret,
+      resave: false,
+      saveUninitialized: false,
+    };
+    if (this.redis.isEnabled()) {
+      sessionOptions.store = this.redis.createStore();
+    }
+    app.use(session(sessionOptions));
     app.use(passport.initialize());
+    app.use(passport.session());
 
     app.use(this.apiRouter.routes);
     app.on("error", (err) => {
