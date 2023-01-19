@@ -1,29 +1,43 @@
 import express from "express";
 import { injectable } from "tsyringe";
-import { validateQuerySchema } from "../../security/validateSchema";
+import {
+  validateBodySchema,
+  validateQuerySchema,
+} from "../../security/validateSchema";
 import { asyncWrapper } from "../async";
-import { SingleImageHandler } from "./singleImage";
-import { handler } from "./imageList";
+import { GetSingleImageHandler } from "./getSingleImage";
+import imageListHandler from "./imageList";
 import Cache from "../cache";
+import validateAdmin from "../../security/validateAdmin";
+import { PutSingleImageHandler } from "./putSingleImage";
 
 @injectable()
 class ImageRouter {
   constructor(
     private cache: Cache,
-    private singleImageHandler: SingleImageHandler
+    private getSingleImageHandler: GetSingleImageHandler,
+    private putSingleImageHandler: PutSingleImageHandler
   ) {}
 
   readonly routes = express
     .Router()
+
     // all images
-    .get("/", asyncWrapper(handler))
+    .get("/", asyncWrapper(imageListHandler))
+
+    .put(
+      "/:id",
+      validateBodySchema(this.putSingleImageHandler.schema),
+      validateAdmin,
+      asyncWrapper(this.putSingleImageHandler.handler)
+    )
 
     // single image, cached
     .get(
       "/:id",
       this.cache.middleware({ callNextWhenCacheable: false }),
-      validateQuerySchema(this.singleImageHandler.schema),
-      asyncWrapper(this.singleImageHandler.handler)
+      validateQuerySchema(this.getSingleImageHandler.schema),
+      asyncWrapper(this.getSingleImageHandler.handler)
     );
 }
 

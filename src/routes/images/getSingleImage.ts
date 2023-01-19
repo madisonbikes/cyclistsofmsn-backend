@@ -10,7 +10,7 @@ import { logger } from "../../utils";
 import { getImageQuerySchema, GetImageQuery } from "../types";
 
 @injectable()
-export class SingleImageHandler {
+export class GetSingleImageHandler {
   constructor(private fsRepository: FilesystemRepository) {}
 
   readonly schema = getImageQuerySchema;

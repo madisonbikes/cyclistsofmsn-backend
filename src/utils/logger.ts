@@ -21,7 +21,16 @@ const serializers = {
 
 let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
-  newLogger = pino({ level: testLogLevel, serializers });
+  const transport = pino.transport({
+    targets: [
+      {
+        level: testLogLevel,
+        target: "pino-pretty",
+        options: { destination: 1 }, // stdout
+      },
+    ],
+  });
+  newLogger = pino({ level: testLogLevel, serializers }, transport);
 } else {
   const targets: TransportTargetOptions[] = [
     {

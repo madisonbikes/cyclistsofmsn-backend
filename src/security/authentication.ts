@@ -2,6 +2,7 @@ import { injectable } from "tsyringe";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { User, UserDocument } from "../database";
+import { logger } from "../utils";
 
 export type AuthenticatedUser = Express.User & {
   username: string;
@@ -16,6 +17,7 @@ export const localMiddleware = passport.authenticate("local", {
 export class Strategies {
   /** passport strategy implementation for username/pw against mongodb */
   readonly local = new LocalStrategy(async (username, password, done) => {
+    logger.trace({ username }, "local passport auth");
     let success = false;
     if (!username) {
       done("null username", false);
@@ -35,6 +37,9 @@ export class Strategies {
 
   /** sanitizes user info for export to JWT and into request object */
   private authenticatedUser(user: UserDocument): AuthenticatedUser {
-    return { username: user.username, admin: user.admin ?? false };
+    return {
+      username: user.username,
+      admin: user.admin ?? false,
+    };
   }
 }

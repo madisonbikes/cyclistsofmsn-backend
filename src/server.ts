@@ -64,6 +64,16 @@ export class PhotoServer implements Lifecycle {
 
     // init passport
     passport.use(this.strategies.local);
+    passport.serializeUser<string>((user, done) => {
+      logger.trace(user, "serialize user");
+      done(null, JSON.stringify(user));
+    });
+
+    passport.deserializeUser<string>((user, done) => {
+      const parsed = JSON.parse(user);
+      logger.trace(parsed, "deserialize user");
+      done(null, parsed);
+    });
 
     const sessionOptions: session.SessionOptions = {
       secret: this.configuration.sessionStoreSecret,
@@ -77,7 +87,7 @@ export class PhotoServer implements Lifecycle {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use(this.apiRouter.routes);
+    app.use("/api/v1", this.apiRouter.routes);
     app.on("error", (err) => {
       logger.error(err);
     });

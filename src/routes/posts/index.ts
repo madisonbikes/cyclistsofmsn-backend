@@ -3,7 +3,7 @@ import { PostHistory, PostHistoryDocument } from "../../database";
 import { injectable } from "tsyringe";
 import { isDocument } from "@typegoose/typegoose";
 import { localMiddleware } from "../../security/authentication";
-import { verifyAdmin } from "../../security/validateAdmin";
+import validateAdmin from "../../security/validateAdmin";
 
 @injectable()
 class PostRouter {
@@ -28,7 +28,7 @@ class PostRouter {
     })
 
     // post create operation is secured by admin
-    .post("/create", localMiddleware, verifyAdmin, (_req, res) => {
+    .post("/create", localMiddleware, validateAdmin, (_req, res) => {
       return res.send("Submitted new post");
     });
 }

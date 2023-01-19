@@ -34,7 +34,7 @@ describe("server process", () => {
 
   it("responds to image list api call", () => {
     return request
-      .get("/images")
+      .get("/api/v1/images")
       .expect(200)
       .expect(({ text }) => {
         const o = JSON.parse(text);
@@ -43,7 +43,7 @@ describe("server process", () => {
   });
 
   it("responds to single image api call", async () => {
-    const response = await request.get("/images").expect(200);
+    const response = await request.get("/api/v1/images").expect(200);
 
     const imageList = imageListSchema.parse(response.body);
     expect(imageList.length).toBeGreaterThan(0);
@@ -53,7 +53,7 @@ describe("server process", () => {
   });
 
   it("failed response to invalid image call", () => {
-    return request.get("/images/badid").expect(404);
+    return request.get("/api/v1/images/badid").expect(404);
   });
 
   it("failed response to missing image call", async () => {
@@ -61,11 +61,11 @@ describe("server process", () => {
     badImage.filename = "bad.jpg";
     await badImage.save();
 
-    return request.get(`/images/${badImage.id}`).expect(404);
+    return request.get(`/api/v1/images/${badImage.id}`).expect(404);
   });
 
   it("returns second image request as cached", async () => {
-    const response = await request.get("/images").expect(200);
+    const response = await request.get("/api/v1/images").expect(200);
 
     const imageList = imageListSchema.parse(response.body);
     expect(imageList.length).toBeGreaterThan(0);
@@ -79,7 +79,7 @@ describe("server process", () => {
   });
 
   it("there is an image with an extracted description", async () => {
-    const value = await request.get("/images").expect(200);
+    const value = await request.get("/api/v1/images").expect(200);
     const images = imageListSchema.parse(value.body);
     const testImage = images.find(
       (v) => v.filename === "test_DSC07588_with_description.jpg"
@@ -89,7 +89,7 @@ describe("server process", () => {
   });
 
   const requestGoodImage = async (id: string) => {
-    const response = await request.get(`/images/${id}`).expect(200);
+    const response = await request.get(`/api/v1/images/${id}`).expect(200);
 
     expect(response.get("content-type")).toEqual("image/jpeg");
     expect(response.body).toBeDefined();

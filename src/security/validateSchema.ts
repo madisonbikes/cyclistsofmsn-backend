@@ -13,6 +13,7 @@ export const validateBodySchema = <T extends z.ZodTypeAny>(
   schema: T
 ): Middleware => {
   return (request, response, next) => {
+    logger.trace("validating body schema");
     const parseResult = schema.safeParse(request.body);
     if (parseResult.success) {
       request.validated = parseResult.data;
@@ -31,6 +32,7 @@ export const validateQuerySchema = <T extends z.ZodTypeAny>(
   schema: T
 ): Middleware => {
   return (request, response, next) => {
+    logger.debug("validating query schema");
     const parseResult = schema.safeParse(request.query);
     if (parseResult.success) {
       request.validated = parseResult.data;

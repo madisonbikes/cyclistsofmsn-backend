@@ -6,6 +6,11 @@ export const getImageQuerySchema = z.object({
 });
 export type GetImageQuery = z.infer<typeof getImageQuerySchema>;
 
+export const putImageQuerySchema = z.object({
+  description: z.string().optional(),
+});
+export type PutImageQuery = z.infer<typeof putImageQuerySchema>;
+
 export const imageListSchema = z
   .object({
     id: z.string(),
@@ -15,3 +20,10 @@ export const imageListSchema = z
   .array();
 
 export type ImageList = z.infer<typeof imageListSchema>;
+
+export const loginSchema = z
+  .object({
+    username: z.string(),
+    password: z.string(),
+  })
+  .strict();

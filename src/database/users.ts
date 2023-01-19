@@ -27,6 +27,9 @@ export class UserClass {
   }
 
   public checkPassword(this: DocumentType<UserClass>, checkPassword: string) {
+    if (!this.hashed_password) {
+      return false;
+    }
     return bcrypt.compare(checkPassword, this.hashed_password);
   }
 }
