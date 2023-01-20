@@ -4,6 +4,7 @@ import { injectable } from "tsyringe";
 import { isDocument } from "@typegoose/typegoose";
 import { localMiddleware } from "../../security/authentication";
 import validateAdmin from "../../security/validateAdmin";
+import { logger } from "../../utils";
 
 @injectable()
 class PostRouter {
@@ -14,6 +15,7 @@ class PostRouter {
     .get("/", async (req, res) => {
       res.set("Cache-Control", "max-age=60, s-max-age=3600");
       const posts = await PostHistory.findOrderedPosts();
+      logger.debug({ posts }, "returned posts");
       return res.send(posts.map(mapPost));
     })
 

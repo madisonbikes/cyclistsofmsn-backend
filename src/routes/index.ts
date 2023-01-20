@@ -5,7 +5,7 @@
 import express from "express";
 import PostRouter from "./posts";
 import ImageRouter from "./images";
-import { LoginRoutes } from "./login";
+import { SecurityRoutes } from "./security";
 import { injectable } from "tsyringe";
 
 /** Provide REST API routes for images, posts */
@@ -14,14 +14,14 @@ class MainRouter {
   constructor(
     private imageRouter: ImageRouter,
     private postRouter: PostRouter,
-    private loginRoutes: LoginRoutes
+    private securityRoutes: SecurityRoutes
   ) {}
 
   readonly routes = express
     .Router()
     .use("/posts", this.postRouter.routes)
     .use("/images", this.imageRouter.routes)
-    .use(this.loginRoutes.routes);
+    .use(this.securityRoutes.routes);
 }
 
 export default MainRouter;

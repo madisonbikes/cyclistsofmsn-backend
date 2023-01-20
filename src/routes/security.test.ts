@@ -1,6 +1,7 @@
-import { setupSuite, testContainer, testRequest, TestRequest } from "../test";
+import { setupSuite, testContainer, TestRequest } from "../test";
 import { User } from "../database";
 import { PhotoServer } from "../server";
+import supertest from "supertest";
 
 describe("login route", () => {
   let photoServer: PhotoServer;
@@ -10,7 +11,7 @@ describe("login route", () => {
 
   beforeAll(async () => {
     photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
+    request = supertest.agent(await photoServer.create());
 
     // create a test user for login
     await User.deleteMany({});
@@ -26,6 +27,11 @@ describe("login route", () => {
 
   afterAll(async () => {
     await photoServer.stop();
+  });
+
+  afterEach(() => {
+    // ensure serverside sessions are removed
+    return request.post("/api/v1/logout");
   });
 
   it("responds to login api with good credentials successfully", () => {
@@ -72,5 +78,40 @@ describe("login route", () => {
       .post("/api/v1/login")
       .send({ username: "bad", password: "bad" })
       .expect(401);
+  });
+
+  it("responds to logout api with good session successfully", async () => {
+    await request
+      .post("/api/v1/login")
+      .send({ username: "testuser", password: "password" })
+      .expect(200)
+      .expect(() => {
+        // nothing
+      });
+
+    await request
+      .post("/api/v1/logout")
+      .expect(200)
+      .expect(/logged out/);
+  });
+
+  it("responds to logout api with bad session failure", async () => {
+    await request.post("/api/v1/logout").expect(400);
+  });
+
+  it("responds to session info with good session successfully", async () => {
+    await request
+      .post("/api/v1/login")
+      .send({ username: "testuser", password: "password" })
+      .expect(200);
+
+    await request
+      .get("/api/v1/sessioninfo")
+      .expect(200)
+      .expect(/testuser/);
+  });
+
+  it("responds to session info with no session", async () => {
+    await request.get("/api/v1/sessioninfo").expect(200).expect("");
   });
 });

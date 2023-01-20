@@ -47,7 +47,7 @@ class PostHistoryClass {
     return this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
       .sort({ timestamp: -1 })
-      .populate("image", ["deleted"]);
+      .populate({ path: "image", select: ["deleted"] });
   }
 
   public static async findOrderedPosts(
@@ -55,8 +55,7 @@ class PostHistoryClass {
   ) {
     const posts = await this.find()
       .sort({ timestamp: 1 })
-      .populate("image", ["deleted"])
-      .where({ "image.deleted": false });
+      .populate({ path: "image", select: ["deleted"] });
 
     return posts.filter((post) => {
       if (isDocument(post.image)) {

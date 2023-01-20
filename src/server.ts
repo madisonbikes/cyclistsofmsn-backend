@@ -66,13 +66,14 @@ export class PhotoServer implements Lifecycle {
     passport.use(this.strategies.local);
     passport.serializeUser<string>((user, done) => {
       logger.trace(user, "serialize user");
-      done(null, JSON.stringify(user));
+      const data = JSON.stringify(user);
+      done(null, data);
     });
 
-    passport.deserializeUser<string>((user, done) => {
-      const parsed = JSON.parse(user);
-      logger.trace(parsed, "deserialize user");
-      done(null, parsed);
+    passport.deserializeUser<string>((data, done) => {
+      const user = JSON.parse(data);
+      logger.trace(user, "deserialize user");
+      done(null, user);
     });
 
     const sessionOptions: session.SessionOptions = {

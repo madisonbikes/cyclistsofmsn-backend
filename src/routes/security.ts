@@ -6,7 +6,7 @@ import { validateBodySchema } from "../security/validateSchema";
 import { loginSchema } from "./types";
 
 @injectable()
-export class LoginRoutes {
+export class SecurityRoutes {
   readonly routes = express
     .Router()
     .post(
@@ -17,5 +17,21 @@ export class LoginRoutes {
         const user = request.user as AuthenticatedUser;
         response.status(200).send(user);
       }
-    );
+    )
+    .post("/logout", (request, response, next) => {
+      if (request.user == null) {
+        response.status(400).send("not logged in");
+      } else {
+        request.logout((err) => {
+          if (err) {
+            return next(err);
+          } else {
+            response.status(200).send("logged out");
+          }
+        });
+      }
+    })
+    .get("/sessioninfo", (request, response) => {
+      response.status(200).send(request.user);
+    });
 }
