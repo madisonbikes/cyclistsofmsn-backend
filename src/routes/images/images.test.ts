@@ -1,4 +1,6 @@
 import {
+  createTestUser,
+  loginTestUser,
   setupSuite,
   testContainer,
   testRequest,
@@ -20,6 +22,8 @@ describe("server process", () => {
     photoServer = testContainer().resolve(PhotoServer);
     request = testRequest(await photoServer.create());
     cache = testContainer().resolve(Cache);
+
+    await createTestUser();
   });
 
   afterAll(async () => {
@@ -32,7 +36,8 @@ describe("server process", () => {
     cache.clear();
   });
 
-  it("responds to image list api call", () => {
+  it("responds to image list api call", async () => {
+    await loginTestUser(request);
     return request
       .get("/api/v1/images")
       .expect(200)
@@ -43,6 +48,7 @@ describe("server process", () => {
   });
 
   it("responds to single image api call", async () => {
+    await loginTestUser(request);
     const response = await request.get("/api/v1/images").expect(200);
 
     const imageList = imageListSchema.parse(response.body);
@@ -65,6 +71,7 @@ describe("server process", () => {
   });
 
   it("returns second image request as cached", async () => {
+    await loginTestUser(request);
     const response = await request.get("/api/v1/images").expect(200);
 
     const imageList = imageListSchema.parse(response.body);
@@ -79,6 +86,7 @@ describe("server process", () => {
   });
 
   it("there is an image with an extracted description", async () => {
+    await loginTestUser(request);
     const value = await request.get("/api/v1/images").expect(200);
     const images = imageListSchema.parse(value.body);
     const testImage = images.find(

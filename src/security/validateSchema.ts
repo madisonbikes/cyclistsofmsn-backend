@@ -6,7 +6,7 @@ type Middleware = (
   request: Request,
   response: Response,
   next: NextFunction
-) => Promise<void>;
+) => void;
 
 /** validate the request body against the supplied schema, placing validated object into the request.validated property */
 export const validateBodySchema = <T extends z.ZodTypeAny>(
@@ -23,7 +23,6 @@ export const validateBodySchema = <T extends z.ZodTypeAny>(
       logger.debug(parseResult.error.issues, "invalid body");
       response.status(400).send(parseResult.error.issues);
     }
-    return Promise.resolve();
   };
 };
 
@@ -42,6 +41,5 @@ export const validateQuerySchema = <T extends z.ZodTypeAny>(
       request.validated = undefined;
       response.status(400).send(parseResult.error.issues);
     }
-    return Promise.resolve();
   };
 };

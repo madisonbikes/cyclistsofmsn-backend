@@ -1,7 +1,6 @@
-import { setupSuite, testContainer, TestRequest } from "../test";
+import { setupSuite, testContainer, testRequest, TestRequest } from "../test";
 import { User } from "../database";
 import { PhotoServer } from "../server";
-import supertest from "supertest";
 
 describe("login route", () => {
   let photoServer: PhotoServer;
@@ -11,7 +10,7 @@ describe("login route", () => {
 
   beforeAll(async () => {
     photoServer = testContainer().resolve(PhotoServer);
-    request = supertest.agent(await photoServer.create());
+    request = testRequest(await photoServer.create());
 
     // create a test user for login
     await User.deleteMany({});

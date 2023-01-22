@@ -11,7 +11,7 @@ export type TestRequest = supertest.SuperTest<supertest.Test>;
 
 /** helper function to build a supertest test request from a server object */
 export const testRequest = (server: Server): TestRequest => {
-  return supertest(server);
+  return supertest.agent(server);
 };
 
 /** Generates deterministric values that meet the randomInt() contract */

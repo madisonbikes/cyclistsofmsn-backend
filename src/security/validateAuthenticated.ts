@@ -11,9 +11,9 @@ const validateAuthenticated = (
   const user = request.user as AuthenticatedUser;
   if (user === undefined) {
     response.status(401).send("requires authenticated");
-    return;
+  } else {
+    next();
   }
-  next();
 };
 
 export default validateAuthenticated;

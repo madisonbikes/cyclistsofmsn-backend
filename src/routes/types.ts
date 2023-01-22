@@ -11,15 +11,28 @@ export const putImageQuerySchema = z.object({
 });
 export type PutImageQuery = z.infer<typeof putImageQuerySchema>;
 
-export const imageListSchema = z
-  .object({
-    id: z.string(),
-    filename: z.string(),
-    description: z.string().optional(),
-  })
-  .array();
+export const imageSchema = z.object({
+  id: z.coerce.string(),
+  filename: z.string(),
+  description: z.string().optional(),
+});
+
+export type Image = z.infer<typeof imageSchema>;
+
+export const imageListSchema = imageSchema.array();
 
 export type ImageList = z.infer<typeof imageListSchema>;
+
+export const postSchema = z.object({
+  id: z.coerce.string(),
+  timestamp: z.coerce.date(),
+  imageid: z.coerce.string(),
+  status: z.object({
+    flag: z.string(),
+    error: z.string().optional(),
+    uri: z.string().optional(),
+  }),
+});
 
 export const loginSchema = z
   .object({

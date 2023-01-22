@@ -10,6 +10,8 @@ import {
 import path from "path";
 import { Database } from "../database";
 import assert from "assert";
+import { TestRequest } from ".";
+import mongoose from "mongoose";
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;
@@ -116,4 +118,42 @@ const clearDatabaseConnection = async () => {
 
 const createDatabaseConnection = async () => {
   await testDatabase().start();
+};
+
+export const createTestUser = async () => {
+  await mongoose.connection.collection("users").insertOne({
+    username: "testuser",
+
+    // this is a bcrypt of "password"
+    hashed_password:
+      "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
+
+    admin: false,
+  });
+};
+
+export const createTestAdminUser = async () => {
+  await mongoose.connection.collection("users")?.insertOne({
+    username: "testadmin",
+
+    // this is a bcrypt of "password"
+    hashed_password:
+      "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
+
+    admin: true,
+  });
+};
+
+export const loginTestUser = (request: TestRequest) => {
+  return request
+    .post("/api/v1/login")
+    .send({ username: "testuser", password: "password" })
+    .expect(200);
+};
+
+export const loginTestAdminUser = (request: TestRequest) => {
+  return request
+    .post("/api/v1/login")
+    .send({ username: "testadmin", password: "password" })
+    .expect(200);
 };

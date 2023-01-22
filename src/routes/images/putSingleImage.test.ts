@@ -1,7 +1,15 @@
-import { setupSuite, testContainer, TestRequest } from "../../test";
+import {
+  createTestAdminUser,
+  createTestUser,
+  loginTestAdminUser,
+  loginTestUser,
+  setupSuite,
+  testContainer,
+  testRequest,
+  TestRequest,
+} from "../../test";
 import { PhotoServer } from "../../server";
-import { Image, User } from "../../database";
-import supertest from "supertest";
+import { Image } from "../../database";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
@@ -11,32 +19,9 @@ describe("server process", () => {
 
   beforeAll(async () => {
     photoServer = testContainer().resolve(PhotoServer);
-    request = supertest.agent(await photoServer.create());
+    request = testRequest(await photoServer.create());
 
-    // create a test user for login
-    await User.deleteMany({});
-
-    const testAdmin = new User({
-      username: "testadmin",
-
-      // this is a bcrypt of "password"
-      hashed_password:
-        "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-
-      admin: true,
-    });
-    await testAdmin.save();
-
-    const testUser = new User({
-      username: "testuser",
-
-      // this is a bcrypt of "password"
-      hashed_password:
-        "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-
-      admin: false,
-    });
-    await testUser.save();
+    await Promise.all([createTestUser(), createTestAdminUser()]);
   });
 
   afterAll(async () => {
@@ -48,28 +33,17 @@ describe("server process", () => {
   });
 
   it("responds to non-admin image update api call", async () => {
-    await request
-      .post("/api/v1/login")
-      .send({ username: "testuser", password: "password" })
-      .expect(200);
-
+    await loginTestUser(request);
     return request.put(`/api/v1/images/badid`).expect(401);
   });
 
   it("responds to bad id image update api call", async () => {
-    await request
-      .post("/api/v1/login")
-      .send({ username: "testadmin", password: "password" })
-      .expect(200);
-
+    await loginTestAdminUser(request);
     return request.put(`/api/v1/images/badid`).expect(404);
   });
 
   it("responds to missing id image update api call", async () => {
-    await request
-      .post("/api/v1/login")
-      .send({ username: "testadmin", password: "password" })
-      .expect(200);
+    await loginTestAdminUser(request);
 
     return request
       .put(`/api/v1/images/000000000000000000000000`)
@@ -78,11 +52,7 @@ describe("server process", () => {
   });
 
   it("responds to image update api call", async () => {
-    await request
-      .post("/api/v1/login")
-      .send({ username: "testadmin", password: "password" })
-      .expect(200);
-
+    await loginTestAdminUser(request);
     const goodImageId = await getGoodImageId();
 
     await request

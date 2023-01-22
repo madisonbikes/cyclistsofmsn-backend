@@ -9,6 +9,7 @@ import { GetSingleImageHandler } from "./getSingleImage";
 import imageListHandler from "./imageList";
 import Cache from "../cache";
 import validateAdmin from "../../security/validateAdmin";
+import validateAuthenticated from "../../security/validateAuthenticated";
 import { PutSingleImageHandler } from "./putSingleImage";
 
 @injectable()
@@ -23,7 +24,7 @@ class ImageRouter {
     .Router()
 
     // all images
-    .get("/", asyncWrapper(imageListHandler))
+    .get("/", validateAuthenticated, asyncWrapper(imageListHandler))
 
     .put(
       "/:id",

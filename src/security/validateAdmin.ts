@@ -11,9 +11,9 @@ const validateAdmin = (
   const user = request.user as AuthenticatedUser;
   if (user === undefined || user.admin !== true) {
     response.status(401).send("requires admin");
-    return;
+  } else {
+    next();
   }
-  next();
 };
 
 export default validateAdmin;
