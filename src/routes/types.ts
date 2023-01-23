@@ -34,6 +34,8 @@ export const postSchema = z.object({
   }),
 });
 
+export type Post = z.infer<typeof postSchema>;
+
 export const loginSchema = z
   .object({
     username: z.string(),
