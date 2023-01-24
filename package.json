@@ -79,6 +79,8 @@
     "conventional-changelog-conventionalcommits": "^5.0.0",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-no-autofix": "^1.2.3",
     "eslint-plugin-promise": "^6.1.1",
     "husky": "^8.0.3",

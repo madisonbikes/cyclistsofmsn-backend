@@ -5,13 +5,13 @@ import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
-import MainRouter from "./routes";
+import { MainRouter } from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
 
 import express from "express";
 import session from "express-session";
 import passport from "passport";
-import { Strategies } from "./security/authentication";
+import { Strategies } from "./security";
 import { RedisConnection } from "./redis";
 
 /** expose command-line launcher */

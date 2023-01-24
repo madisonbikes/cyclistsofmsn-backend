@@ -8,7 +8,7 @@ import {
 } from "../../test";
 import { PhotoServer } from "../../server";
 import { Image } from "../../database";
-import Cache from "../cache";
+import { Cache } from "../cache";
 import { imageListSchema } from "../types";
 
 describe("server process", () => {

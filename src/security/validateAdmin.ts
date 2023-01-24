@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthenticatedUser } from ".";
 import { logger } from "../utils";
-import { AuthenticatedUser } from "./authentication";
 
-const validateAdmin = (
+export const validateAdmin = (
   request: Request,
   response: Response,
   next: NextFunction
@@ -15,5 +15,3 @@ const validateAdmin = (
     next();
   }
 };
-
-export default validateAdmin;

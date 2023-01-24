@@ -4,11 +4,10 @@ import { injectable } from "tsyringe";
 import { logger } from "../../utils";
 import { mapPostSchema } from "./types";
 import { asyncWrapper } from "../async";
-import validateAdmin from "../../security/validateAdmin";
-import validateAuthenticated from "../../security/validateAuthenticated";
+import { validateAdmin, validateAuthenticated } from "../../security";
 
 @injectable()
-class PostRouter {
+export class PostRouter {
   readonly routes = express
     .Router()
 
@@ -38,5 +37,3 @@ const loadCurrentPost = async (_req: Request, res: Response) => {
     return res.sendStatus(404);
   }
 };
-
-export default PostRouter;

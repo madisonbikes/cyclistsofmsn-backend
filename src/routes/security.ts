@@ -1,8 +1,7 @@
 import express from "express";
 import passport from "passport";
 import { injectable } from "tsyringe";
-import { AuthenticatedUser } from "../security/authentication";
-import { validateBodySchema } from "../security/validateSchema";
+import { AuthenticatedUser, validateBodySchema } from "../security";
 import { loginSchema } from "./types";
 
 @injectable()

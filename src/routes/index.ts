@@ -3,14 +3,14 @@
  * This has the routes defined.
  */
 import express from "express";
-import PostRouter from "./posts";
-import ImageRouter from "./images";
+import { PostRouter } from "./posts";
+import { ImageRouter } from "./images";
 import { SecurityRoutes } from "./security";
 import { injectable } from "tsyringe";
 
 /** Provide REST API routes for images, posts */
 @injectable()
-class MainRouter {
+export class MainRouter {
   constructor(
     private imageRouter: ImageRouter,
     private postRouter: PostRouter,
@@ -23,5 +23,3 @@ class MainRouter {
     .use("/images", this.imageRouter.routes)
     .use(this.securityRoutes.routes);
 }
-
-export default MainRouter;

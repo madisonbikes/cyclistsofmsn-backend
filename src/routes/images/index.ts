@@ -3,17 +3,17 @@ import { injectable } from "tsyringe";
 import {
   validateBodySchema,
   validateQuerySchema,
-} from "../../security/validateSchema";
+  validateAdmin,
+  validateAuthenticated,
+} from "../../security";
 import { asyncWrapper } from "../async";
 import { GetSingleImageHandler } from "./getSingleImage";
-import imageListHandler from "./imageList";
-import Cache from "../cache";
-import validateAdmin from "../../security/validateAdmin";
-import validateAuthenticated from "../../security/validateAuthenticated";
+import { handler as imageListHandler } from "./imageList";
+import { Cache } from "../cache";
 import { PutSingleImageHandler } from "./putSingleImage";
 
 @injectable()
-class ImageRouter {
+export class ImageRouter {
   constructor(
     private cache: Cache,
     private getSingleImageHandler: GetSingleImageHandler,
@@ -41,5 +41,3 @@ class ImageRouter {
       asyncWrapper(this.getSingleImageHandler.handler)
     );
 }
-
-export default ImageRouter;

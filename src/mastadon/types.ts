@@ -1,9 +1,9 @@
-import { string, z } from "zod";
+import { z } from "zod";
 
 export const mediaUploadResponseSchema = z.object({ id: z.string() });
 export const mediaUploadRequestSchema = z.object({
-  description: string().optional(),
-  focus: string().optional(),
+  description: z.string().optional(),
+  focus: z.string().optional(),
 });
 export type MediaUploadRequest = z.infer<typeof mediaUploadRequestSchema>;
 
