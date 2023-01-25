@@ -3,11 +3,9 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { User, UserDocument } from "../database";
 import { logger } from "../utils";
+import { AuthenticatedUser } from "../routes/types";
 
-export type AuthenticatedUser = Express.User & {
-  username: string;
-  admin: boolean;
-};
+export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 
 export const localMiddleware = passport.authenticate("local", {
   session: true,

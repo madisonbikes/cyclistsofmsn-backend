@@ -1,8 +1,8 @@
 import express from "express";
 import passport from "passport";
 import { injectable } from "tsyringe";
-import { AuthenticatedUser, validateBodySchema } from "../security";
-import { loginSchema } from "./types";
+import { validateBodySchema, validateAuthenticated } from "../security";
+import { loginBodySchema, AuthenticatedUser } from "./types";
 
 @injectable()
 export class SecurityRoutes {
@@ -10,7 +10,7 @@ export class SecurityRoutes {
     .Router()
     .post(
       "/login",
-      validateBodySchema(loginSchema),
+      validateBodySchema(loginBodySchema),
       passport.authenticate("local", { session: true, failWithError: false }),
       (request, response) => {
         const user = request.user as AuthenticatedUser;
@@ -30,7 +30,7 @@ export class SecurityRoutes {
         });
       }
     })
-    .get("/sessioninfo", (request, response) => {
+    .get("/sessioninfo", validateAuthenticated, (request, response) => {
       response.status(200).send(request.user);
     });
 }

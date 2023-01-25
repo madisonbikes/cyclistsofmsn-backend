@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthenticatedUser } from "../routes/types";
 import { logger } from "../utils";
-import { AuthenticatedUser } from ".";
 
 export const validateAuthenticated = (
   request: Request,

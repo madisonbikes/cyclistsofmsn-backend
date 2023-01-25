@@ -36,9 +36,16 @@ export const postSchema = z.object({
 
 export type Post = z.infer<typeof postSchema>;
 
-export const loginSchema = z
+export const loginBodySchema = z
   .object({
     username: z.string(),
     password: z.string(),
   })
   .strict();
+
+export const loginResponseSchema = z.object({
+  username: z.string(),
+  admin: z.boolean(),
+});
+
+export type AuthenticatedUser = z.infer<typeof loginResponseSchema>;
