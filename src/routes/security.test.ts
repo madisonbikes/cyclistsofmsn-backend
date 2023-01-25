@@ -111,6 +111,6 @@ describe("login route", () => {
   });
 
   it("responds to session info with no session", async () => {
-    await request.get("/api/v1/sessioninfo").expect(200).expect("");
+    await request.get("/api/v1/sessioninfo").expect(401);
   });
 });
