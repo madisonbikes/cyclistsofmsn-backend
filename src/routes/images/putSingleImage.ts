@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import { Image, ImageClass } from "../../database";
 import { logger } from "../../utils";
-import { PutImageQuery, putImageQuerySchema } from "../types";
+import { PutImageQuery, putImageQuerySchema } from "../contract";
 
 @injectable()
 export class PutSingleImageHandler {

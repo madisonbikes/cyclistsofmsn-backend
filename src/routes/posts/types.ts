@@ -1,4 +1,4 @@
-import { postSchema } from "../types";
+import { postSchema } from "../contract";
 import { PostHistoryDocument } from "../../database";
 import { isDocument } from "@typegoose/typegoose";
 

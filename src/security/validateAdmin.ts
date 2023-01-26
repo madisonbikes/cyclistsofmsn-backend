@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthenticatedUser } from "../routes/types";
+import { AuthenticatedUser } from "../routes/contract";
 import { logger } from "../utils";
 
 export const validateAdmin = (

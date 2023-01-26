@@ -3,7 +3,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { User, UserDocument } from "../database";
 import { logger } from "../utils";
-import { AuthenticatedUser } from "../routes/types";
+import { AuthenticatedUser } from "../routes/contract";
 
 export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 

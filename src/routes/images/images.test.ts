@@ -9,7 +9,7 @@ import {
 import { PhotoServer } from "../../server";
 import { Image } from "../../database";
 import { Cache } from "../cache";
-import { imageListSchema } from "../types";
+import { imageListSchema } from "../contract";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
@@ -44,6 +44,21 @@ describe("server process", () => {
       .expect(({ text }) => {
         const o = JSON.parse(text);
         expect(o).toHaveLength(6);
+      });
+  });
+
+  it("responds to image list api call with empty timestamp", async () => {
+    const emptyTimestampImage = new Image();
+    emptyTimestampImage.filename = "bad.jpg";
+    await emptyTimestampImage.save();
+
+    await loginTestUser(request);
+    return request
+      .get("/api/v1/images")
+      .expect(200)
+      .expect(({ text }) => {
+        const o = JSON.parse(text);
+        expect(o).toHaveLength(7);
       });
   });
 

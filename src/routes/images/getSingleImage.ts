@@ -7,7 +7,7 @@ import { access } from "fs/promises";
 import { constants } from "fs";
 import sharp from "sharp";
 import { logger } from "../../utils";
-import { getImageQuerySchema, GetImageQuery } from "../types";
+import { getImageQuerySchema, GetImageQuery } from "../contract";
 
 @injectable()
 export class GetSingleImageHandler {

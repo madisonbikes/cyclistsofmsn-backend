@@ -8,7 +8,7 @@ import {
 } from "../../test";
 import { PhotoServer } from "../../server";
 import mongoose from "mongoose";
-import { postSchema } from "../types";
+import { postSchema } from "../contract";
 
 describe("server process", () => {
   let photoServer: PhotoServer;
