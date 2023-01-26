@@ -4,6 +4,7 @@ import { isValidObjectId } from "mongoose";
 import { Image, ImageClass } from "../../database";
 import { logger } from "../../utils";
 import { PutImageQuery, putImageQuerySchema } from "../contract";
+import { lenientImageSchema } from "./localTypes";
 
 @injectable()
 export class PutSingleImageHandler {
@@ -25,9 +26,9 @@ export class PutSingleImageHandler {
       modified.description_from_exif = true;
     }
 
-    const result = await Image.findByIdAndUpdate(id, query);
+    const result = await Image.findByIdAndUpdate(id, query, { new: true });
     if (result != null) {
-      res.sendStatus(200);
+      res.status(200).send(lenientImageSchema.parse(result));
     } else {
       // not found
       res.sendStatus(404);

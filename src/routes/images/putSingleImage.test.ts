@@ -58,7 +58,8 @@ describe("server process", () => {
     await request
       .put(`/api/v1/images/${goodImageId}`)
       .send({ description: "blarg" })
-      .expect(200);
+      .expect(200)
+      .expect(/blarg/);
 
     const checkImage = await Image.findById(goodImageId);
     expect(checkImage).toBeDefined();
