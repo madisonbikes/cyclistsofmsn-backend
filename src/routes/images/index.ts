@@ -33,11 +33,14 @@ export class ImageRouter {
       asyncWrapper(this.putSingleImageHandler.handler)
     )
 
+    // single image metadata
+    .get("/:id", asyncWrapper(this.getSingleImageHandler.metadata))
+
     // single image, cached
     .get(
-      "/:id",
+      "/:id/binary",
       this.cache.middleware({ callNextWhenCacheable: false }),
       validateQuerySchema(this.getSingleImageHandler.schema),
-      asyncWrapper(this.getSingleImageHandler.handler)
+      asyncWrapper(this.getSingleImageHandler.binary)
     );
 }

@@ -77,12 +77,31 @@ describe("server process", () => {
     return request.get("/api/v1/images/badid").expect(404);
   });
 
-  it("failed response to missing image call", async () => {
+  it("failed response to invalid image binary call", () => {
+    return request.get("/api/v1/images/badid/binary").expect(404);
+  });
+
+  it("failed response to missing image file binary call", async () => {
     const badImage = new Image();
     badImage.filename = "bad.jpg";
     await badImage.save();
 
-    return request.get(`/api/v1/images/${badImage.id}`).expect(404);
+    return request.get(`/api/v1/images/${badImage.id}/binary`).expect(404);
+  });
+
+  it("success response to missing image file metadata call", async () => {
+    const badImage = new Image();
+    badImage.filename = "bad.jpg";
+    await badImage.save();
+
+    return request
+      .get(`/api/v1/images/${badImage.id}`)
+      .expect(200)
+      .expect((res) =>
+        expect(res.body).toEqual(
+          expect.objectContaining({ filename: "bad.jpg" })
+        )
+      );
   });
 
   it("returns second image request as cached", async () => {
@@ -112,7 +131,9 @@ describe("server process", () => {
   });
 
   const requestGoodImage = async (id: string) => {
-    const response = await request.get(`/api/v1/images/${id}`).expect(200);
+    const response = await request
+      .get(`/api/v1/images/${id}/binary`)
+      .expect(200);
 
     expect(response.get("content-type")).toEqual("image/jpeg");
     expect(response.body).toBeDefined();

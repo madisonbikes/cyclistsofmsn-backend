@@ -8,6 +8,7 @@ import { constants } from "fs";
 import sharp from "sharp";
 import { logger } from "../../utils";
 import { getImageQuerySchema, GetImageQuery } from "../contract";
+import { lenientImageSchema } from "./localTypes";
 
 @injectable()
 export class GetSingleImageHandler {
@@ -15,7 +16,20 @@ export class GetSingleImageHandler {
 
   readonly schema = getImageQuerySchema;
 
-  handler = async (req: Request, res: Response) => {
+  metadata = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      // bad object id throws exception later, so check early
+      return res.sendStatus(404);
+    }
+    const metadata = await Image.findById(id).and([{ deleted: false }]);
+    if (metadata == null) {
+      return res.sendStatus(404);
+    }
+    res.status(200).send(lenientImageSchema.parse(metadata));
+  };
+
+  binary = async (req: Request, res: Response) => {
     const query = req.validated as GetImageQuery;
 
     const id = req.params.id;
