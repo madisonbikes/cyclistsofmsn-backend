@@ -5,7 +5,7 @@ import { validateBodySchema, validateAuthenticated } from "../security";
 import { loginBodySchema, AuthenticatedUser } from "./contract";
 
 @injectable()
-export class SecurityRoutes {
+export class SessionRouter {
   readonly routes = express
     .Router()
     .post(
@@ -30,7 +30,7 @@ export class SecurityRoutes {
         });
       }
     })
-    .get("/sessioninfo", validateAuthenticated(), (request, response) => {
+    .get("/info", validateAuthenticated(), (request, response) => {
       response.status(200).send(request.user);
     });
 }

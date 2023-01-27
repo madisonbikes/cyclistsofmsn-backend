@@ -27,12 +27,12 @@ describe("login route", () => {
 
   afterEach(() => {
     // ensure serverside sessions are removed
-    return request.post("/api/v1/logout");
+    return request.post("/api/v1/session/logout");
   });
 
   it("responds to login api with good credentials successfully", () => {
     return request
-      .post("/api/v1/login")
+      .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
       .expect(200)
       .expect(() => {
@@ -42,7 +42,7 @@ describe("login route", () => {
 
   it("responds to login api without credentials as bad request", () => {
     return request
-      .post("/api/v1/login")
+      .post("/api/v1/session/login")
       .expect(400)
       .expect((res) => {
         expect(res.body).toEqual(
@@ -62,7 +62,7 @@ describe("login route", () => {
 
   it("responds to login api with extra fields as bad request", () => {
     return request
-      .post("/api/v1/login")
+      .post("/api/v1/session/login")
       .send({ username: "user1", password: "password", extraxyz: "extra" })
       .expect(400)
       .expect(/unrecognized_keys/)
@@ -71,14 +71,14 @@ describe("login route", () => {
 
   it("responds to login api with credentials as success request but unauthorized", () => {
     return request
-      .post("/api/v1/login")
+      .post("/api/v1/session/login")
       .send({ username: "bad", password: "bad" })
       .expect(401);
   });
 
   it("responds to logout api with good session successfully", async () => {
     await request
-      .post("/api/v1/login")
+      .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
       .expect(200)
       .expect(() => {
@@ -86,28 +86,28 @@ describe("login route", () => {
       });
 
     await request
-      .post("/api/v1/logout")
+      .post("/api/v1/session/logout")
       .expect(200)
       .expect(/logged out/);
   });
 
   it("responds to logout api with bad session failure", async () => {
-    await request.post("/api/v1/logout").expect(400);
+    await request.post("/api/v1/session/logout").expect(400);
   });
 
   it("responds to session info with good session successfully", async () => {
     await request
-      .post("/api/v1/login")
+      .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
       .expect(200);
 
     await request
-      .get("/api/v1/sessioninfo")
+      .get("/api/v1/session/info")
       .expect(200)
       .expect(/testuser/);
   });
 
   it("responds to session info with no session", async () => {
-    await request.get("/api/v1/sessioninfo").expect(401);
+    await request.get("/api/v1/session/info").expect(401);
   });
 });
