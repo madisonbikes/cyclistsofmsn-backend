@@ -3,8 +3,9 @@ import { injectable } from "tsyringe";
 import {
   validateBodySchema,
   validateQuerySchema,
-  validateAdmin,
   validateAuthenticated,
+  Roles,
+  validateRole,
 } from "../../security";
 import { asyncWrapper } from "../async";
 import { GetSingleImageHandler } from "./getSingleImage";
@@ -24,12 +25,12 @@ export class ImageRouter {
     .Router()
 
     // all images
-    .get("/", validateAuthenticated, asyncWrapper(imageListHandler))
+    .get("/", validateAuthenticated(), asyncWrapper(imageListHandler))
 
     .put(
       "/:id",
-      validateBodySchema(this.putSingleImageHandler.schema),
-      validateAdmin,
+      validateBodySchema({ schema: this.putSingleImageHandler.schema }),
+      validateRole({ role: Roles.EDITOR }),
       asyncWrapper(this.putSingleImageHandler.handler)
     )
 
@@ -40,7 +41,7 @@ export class ImageRouter {
     .get(
       "/:id/binary",
       this.cache.middleware({ callNextWhenCacheable: false }),
-      validateQuerySchema(this.getSingleImageHandler.schema),
+      validateQuerySchema({ schema: this.getSingleImageHandler.schema }),
       asyncWrapper(this.getSingleImageHandler.binary)
     );
 }

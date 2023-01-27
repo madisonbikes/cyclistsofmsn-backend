@@ -50,9 +50,9 @@ export const loginBodySchema = z
   .strict();
 export type LoginRequest = z.infer<typeof loginBodySchema>;
 
-export const loginResponseSchema = z.object({
+export const authenticatedUserSchema = z.object({
   username: z.string(),
-  admin: z.boolean(),
+  roles: z.string().array(),
 });
 
-export type AuthenticatedUser = z.infer<typeof loginResponseSchema>;
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;

@@ -2,6 +2,7 @@ import {
   DocumentType,
   getModelForClass,
   modelOptions,
+  mongoose,
   prop,
 } from "@typegoose/typegoose";
 import bcrypt from "bcryptjs";
@@ -19,8 +20,8 @@ export class UserClass {
   @prop({ required: true })
   public hashed_password!: string;
 
-  @prop()
-  public admin!: boolean;
+  @prop({ type: String, required: true, default: [] })
+  public roles!: mongoose.Types.Array<string>;
 
   public async setPassword(this: DocumentType<UserClass>, password: string) {
     this.hashed_password = await bcrypt.hash(password, this.BCRYPT_HASH_SIZE);

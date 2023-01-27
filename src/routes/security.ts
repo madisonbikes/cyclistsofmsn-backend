@@ -10,7 +10,7 @@ export class SecurityRoutes {
     .Router()
     .post(
       "/login",
-      validateBodySchema(loginBodySchema),
+      validateBodySchema({ schema: loginBodySchema }),
       passport.authenticate("local", { session: true, failWithError: false }),
       (request, response) => {
         const user = request.user as AuthenticatedUser;
@@ -30,7 +30,7 @@ export class SecurityRoutes {
         });
       }
     })
-    .get("/sessioninfo", validateAuthenticated, (request, response) => {
+    .get("/sessioninfo", validateAuthenticated(), (request, response) => {
       response.status(200).send(request.user);
     });
 }

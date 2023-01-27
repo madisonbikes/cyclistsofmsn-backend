@@ -1,17 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { AuthenticatedUser } from "../routes/contract";
-import { logger } from "../utils";
+import { Roles } from "./authentication";
+import { validateRole } from "./validateRole";
 
-export const validateAdmin = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  logger.trace(request.user, "validating admin");
-  const user = request.user as AuthenticatedUser;
-  if (user === undefined || user.admin !== true) {
-    response.status(401).send("requires admin");
-  } else {
-    next();
-  }
+export const validateAdmin = () => {
+  return validateRole({ role: Roles.ADMIN });
 };

@@ -12,13 +12,13 @@ export class PostRouter {
     .Router()
 
     // all posts
-    .get("/", validateAuthenticated, asyncWrapper(loadPostList))
+    .get("/", validateAuthenticated(), asyncWrapper(loadPostList))
 
     // current post
     .get("/current", asyncWrapper(loadCurrentPost))
 
     // post create operation is secured by admin
-    .post("/create", validateAdmin, (_req, res) => {
+    .post("/create", validateAdmin(), (_req, res) => {
       return res.send("Submitted new post");
     });
 }

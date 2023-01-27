@@ -1,7 +1,9 @@
 import {
   createTestAdminUser,
+  createTestEditorUser,
   createTestUser,
   loginTestAdminUser,
+  loginTestEditorUser,
   loginTestUser,
   setupSuite,
   testContainer,
@@ -21,7 +23,11 @@ describe("server process", () => {
     photoServer = testContainer().resolve(PhotoServer);
     request = testRequest(await photoServer.create());
 
-    await Promise.all([createTestUser(), createTestAdminUser()]);
+    await Promise.all([
+      createTestUser(),
+      createTestAdminUser(),
+      createTestEditorUser(),
+    ]);
   });
 
   afterAll(async () => {
@@ -32,7 +38,7 @@ describe("server process", () => {
     return request.put(`/api/v1/images/badid`).expect(401);
   });
 
-  it("responds to non-admin image update api call", async () => {
+  it("responds to non-editor image update api call", async () => {
     await loginTestUser(request);
     return request.put(`/api/v1/images/badid`).expect(401);
   });
@@ -52,7 +58,7 @@ describe("server process", () => {
   });
 
   it("responds to image update api call", async () => {
-    await loginTestAdminUser(request);
+    await loginTestEditorUser(request);
     const goodImageId = await getGoodImageId();
 
     await request

@@ -1,15 +1,32 @@
+import "reflect-metadata";
 import { injectable } from "tsyringe";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { User, UserDocument } from "../database";
 import { logger } from "../utils";
-import { AuthenticatedUser } from "../routes/contract";
+import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
+import { Request, Response, NextFunction } from "express";
 
 export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
+
+export enum Roles {
+  ADMIN = "admin",
+  EDITOR = "editor",
+}
+
+export const userHasRole = (user: AuthenticatedUser, role: string) => {
+  return user.roles.find((r) => r === role) !== undefined;
+};
 
 export const localMiddleware = passport.authenticate("local", {
   session: true,
 });
+
+export type ExpressMiddleware = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => void;
 
 @injectable()
 export class Strategies {
@@ -35,9 +52,6 @@ export class Strategies {
 
   /** sanitizes user info for export to JWT and into request object */
   private authenticatedUser(user: UserDocument): AuthenticatedUser {
-    return {
-      username: user.username,
-      admin: user.admin ?? false,
-    };
+    return authenticatedUserSchema.parse(user);
   }
 }

@@ -75,15 +75,10 @@ export class Database implements Lifecycle {
 
         while (version < CURRENT_DATABASE_VERSION) {
           switch (version) {
-            /*
-          if (!this._refreshAllMetadata) {
-            logger.info(
-              "Forcing refresh of all metadata due to database upgrade"
-            );
-            this._refreshAllMetadata = true;
-          }
-          break;
-          */
+            case 1: {
+              // TODO migrate users from admin field to role-based
+              break;
+            }
             default:
               break;
           }
@@ -91,6 +86,13 @@ export class Database implements Lifecycle {
         }
         await this.setCurrentVersion();
       }
+    }
+  }
+
+  private triggerMetadataRefresh() {
+    if (!this._refreshAllMetadata) {
+      logger.info("Forcing refresh of all metadata due to database upgrade");
+      this._refreshAllMetadata = true;
     }
   }
 

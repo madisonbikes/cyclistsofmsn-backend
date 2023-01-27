@@ -128,7 +128,7 @@ export const createTestUser = async () => {
     hashed_password:
       "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
 
-    admin: false,
+    roles: [],
   });
 };
 
@@ -140,7 +140,19 @@ export const createTestAdminUser = async () => {
     hashed_password:
       "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
 
-    admin: true,
+    roles: ["admin", "editor"],
+  });
+};
+
+export const createTestEditorUser = async () => {
+  await mongoose.connection.collection("users")?.insertOne({
+    username: "testeditor",
+
+    // this is a bcrypt of "password"
+    hashed_password:
+      "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
+
+    roles: ["editor"],
   });
 };
 
@@ -155,5 +167,12 @@ export const loginTestAdminUser = (request: TestRequest) => {
   return request
     .post("/api/v1/login")
     .send({ username: "testadmin", password: "password" })
+    .expect(200);
+};
+
+export const loginTestEditorUser = (request: TestRequest) => {
+  return request
+    .post("/api/v1/login")
+    .send({ username: "testeditor", password: "password" })
     .expect(200);
 };

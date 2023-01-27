@@ -1,5 +1,10 @@
-import { setupSuite, testContainer, testRequest, TestRequest } from "../test";
-import { User } from "../database";
+import {
+  createTestUser,
+  setupSuite,
+  testContainer,
+  testRequest,
+  TestRequest,
+} from "../test";
 import { PhotoServer } from "../server";
 
 describe("login route", () => {
@@ -13,15 +18,7 @@ describe("login route", () => {
     request = testRequest(await photoServer.create());
 
     // create a test user for login
-    await User.deleteMany({});
-    const testUser = new User({
-      username: "testuser",
-
-      // this is a bcrypt of "password"
-      hashed_password:
-        "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-    });
-    await testUser.save();
+    await createTestUser();
   });
 
   afterAll(async () => {
