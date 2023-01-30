@@ -120,14 +120,13 @@ const createDatabaseConnection = async () => {
   await testDatabase().start();
 };
 
+const PASSWORD_WITH_LOW_WORK_FACTOR =
+  "$2y$04$lQNknVpHEe6ddO3Et1nMGe6q4lNrtNcC3ikrhshs.wT.neD7JwBbm";
+
 export const createTestUser = async () => {
   await mongoose.connection.collection("users").insertOne({
     username: "testuser",
-
-    // this is a bcrypt of "password"
-    hashed_password:
-      "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
     roles: [],
   });
 };
@@ -135,11 +134,7 @@ export const createTestUser = async () => {
 export const createTestAdminUser = async () => {
   await mongoose.connection.collection("users")?.insertOne({
     username: "testadmin",
-
-    // this is a bcrypt of "password"
-    hashed_password:
-      "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
     roles: ["admin", "editor"],
   });
 };
@@ -147,11 +142,7 @@ export const createTestAdminUser = async () => {
 export const createTestEditorUser = async () => {
   await mongoose.connection.collection("users")?.insertOne({
     username: "testeditor",
-
-    // this is a bcrypt of "password"
-    hashed_password:
-      "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
     roles: ["editor"],
   });
 };
