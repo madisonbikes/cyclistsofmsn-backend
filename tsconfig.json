@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "allowJs": false,
     "target": "ES2019",
+    "noImplicitOverride": true,
     "typeRoots": ["@types", "./node_modules/@types"]
   },
   "include": ["src"]

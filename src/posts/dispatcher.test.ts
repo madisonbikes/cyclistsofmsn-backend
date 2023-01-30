@@ -11,7 +11,7 @@ describe("post dispatcher component", () => {
   const now = new MutableNow(5000);
   const mockScheduler = new MockSimpleScheduler(now);
 
-  beforeEach(() => {
+  afterEach(() => {
     mockScheduler.mockReset();
   });
 

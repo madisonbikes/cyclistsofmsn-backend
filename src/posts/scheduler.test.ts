@@ -202,8 +202,8 @@ describe("test schedule component", () => {
       // set current time to 8:15 AM
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       const nowProvider = new MutableNow(now);
-      const scheduler = await buildScheduler(nowProvider);
-      let newPostResult = await scheduler.scheduleNextPost();
+      const scheduler = buildScheduler(nowProvider);
+      let newPostResult = await scheduler.schedulePost({ when: now });
       assertOk(newPostResult);
       let { value: newPost } = newPostResult;
       assertInstanceOf(newPost, PostHistory);
@@ -220,7 +220,9 @@ describe("test schedule component", () => {
         hours: 10,
         minutes: 30,
       }).getTime();
-      newPostResult = await scheduler.scheduleNextPost();
+      newPostResult = await scheduler.schedulePost({
+        when: new Date(nowProvider.when),
+      });
       assertOk(newPostResult);
       newPost = newPostResult.value;
       assertInstanceOf(newPost, PostHistory);
@@ -233,7 +235,7 @@ describe("test schedule component", () => {
   });
 
   const getOkPostResult = async (now: Date): Promise<PostHistoryDocument> => {
-    const result = await buildScheduler(now).scheduleNextPost();
+    const result = await buildScheduler(now).schedulePost({ when: now });
     assertOk(result);
     const newPost = result.value;
     assertInstanceOf(newPost, PostHistory);
@@ -241,7 +243,7 @@ describe("test schedule component", () => {
   };
 
   const _getErrorPostResult = async (now: Date): Promise<PostError> => {
-    const result = await buildScheduler(now).scheduleNextPost();
+    const result = await buildScheduler(now).schedulePost({ when: now });
     assertError(result);
     return result.value;
   };

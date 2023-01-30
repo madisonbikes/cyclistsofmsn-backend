@@ -43,9 +43,11 @@ export class PostDispatcher implements Lifecycle {
   /** async function is fine for setInterval(), but it should never throw an exception */
   private async checkTimeToPost() {
     try {
-      const scheduledResult = await this.scheduler.scheduleNextPost();
+      const scheduledResult = await this.scheduler.schedulePost({
+        when: new Date(),
+      });
       if (scheduledResult.isError()) {
-        logger.error(
+        logger.warn(
           { message: scheduledResult.value.message },
           `Error scheduling post`
         );
@@ -63,19 +65,19 @@ export class PostDispatcher implements Lifecycle {
         } else {
           logger.info("Sending scheduled post on schedule");
         }
-        // execute the post and then if it's sucessful, update the post status
-        const postedImage = await this.executor.post();
-        if (postedImage.isOk()) {
-          nextPost.image = postedImage.value;
-          nextPost.status.flag = PostStatus.COMPLETE;
-        } else {
-          nextPost.status.flag = PostStatus.FAILED;
-          nextPost.status.error = postedImage.value.message;
-        }
-        await nextPost.save();
       }
-    } catch (e) {
-      logger.error(e);
+      // execute the post and then if it's sucessful, update the post status
+      const postedImage = await this.executor.post();
+      if (postedImage.isOk()) {
+        nextPost.image = postedImage.value;
+        nextPost.status.flag = PostStatus.COMPLETE;
+      } else {
+        nextPost.status.flag = PostStatus.FAILED;
+        nextPost.status.error = postedImage.value.message;
+      }
+      await nextPost.save();
+    } catch (err) {
+      logger.error(err, "Error scheduling post");
     }
   }
 }

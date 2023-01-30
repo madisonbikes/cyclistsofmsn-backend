@@ -13,7 +13,7 @@ import {
 import { PhotoServer } from "../../server";
 import { Image } from "../../database";
 
-describe("server process", () => {
+describe("server process - images", () => {
   let photoServer: PhotoServer;
   let request: TestRequest;
 

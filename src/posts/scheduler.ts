@@ -5,6 +5,7 @@ import { differenceInMinutes, startOfDay } from "date-fns";
 import { ServerConfiguration } from "../config";
 import { logger, NowProvider, ok, RandomProvider, Result } from "../utils";
 import { injectable } from "tsyringe";
+import { SchedulePostOptions } from "../routes/contract";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string };
@@ -20,45 +21,50 @@ export class PostScheduler {
   private lastScheduledPostTimestamp: number | undefined;
 
   /** returns the next post after scheduling or if it still needs to be posted */
-  async scheduleNextPost(): Promise<PostResult> {
-    const nextPost = await PostHistory.findNextScheduledPost();
+  async schedulePost({
+    when,
+    overwrite,
+  }: SchedulePostOptions): Promise<PostResult> {
+    const nextPost = await PostHistory.findScheduledPost(when);
     if (nextPost != null) {
-      // to reduce log spam, only output this once even though we are polling every 5 minutes or so
-
-      if (this.lastScheduledPostTimestamp !== nextPost.timestamp.getTime()) {
-        logger.info(
-          { when: nextPost.timestamp },
-          "Using existing scheduled post"
-        );
-        this.lastScheduledPostTimestamp = nextPost.timestamp.getTime();
+      if (!overwrite) {
+        // to reduce log spam, only output this once even though we are polling every 5 minutes or so
+        if (this.lastScheduledPostTimestamp !== nextPost.timestamp.getTime()) {
+          logger.info(
+            { when: nextPost.timestamp },
+            "Using existing scheduled post"
+          );
+          this.lastScheduledPostTimestamp = nextPost.timestamp.getTime();
+        }
+        return ok(nextPost);
       }
-      return ok(nextPost);
+
+      await nextPost.delete();
     }
 
-    const createdPost = await this.createNewScheduledPost();
+    const createdPost = await this.createNewScheduledPost(when);
     return createdPost.alsoOnOk((value) => {
       logger.info({ when: value.timestamp }, `Scheduled new post`);
     });
   }
 
-  private async createNewScheduledPost(): Promise<PostResult> {
-    const lastPost = await PostHistory.findCurrentPost();
+  private async createNewScheduledPost(when: Date): Promise<PostResult> {
+    const lastPost = await PostHistory.findLatestPost();
     const newPost = new PostHistory();
-    newPost.timestamp = this.selectNextTime(lastPost?.timestamp);
+    newPost.timestamp = this.selectNextTime(lastPost?.timestamp, when);
     newPost.status.flag = PostStatus.PENDING;
     return ok(await newPost.save());
   }
 
-  private selectNextTime(lastPostTime: Date | undefined): Date {
-    const now = new Date(this.nowProvider.now());
-    const startOfToday = startOfDay(now);
+  private selectNextTime(lastPostTime: Date | undefined, when: Date): Date {
+    const startOfToday = startOfDay(when);
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
     const lastTimeToday = date_set(startOfToday, {
       hours: this.configuration.lastPostHour,
     });
 
     let startDate: Date;
-    if (now >= lastTimeToday) {
+    if (when >= lastTimeToday) {
       // no more posts today
       startDate = startOfTomorrow;
     } else if (lastPostTime != null) {
@@ -81,6 +87,7 @@ export class PostScheduler {
       hours: this.configuration.lastPostHour,
     });
 
+    const now = new Date(this.nowProvider.now());
     if (firstTime <= now) {
       firstTime = now;
     }

@@ -10,7 +10,7 @@ import { PhotoServer } from "../../server";
 import mongoose from "mongoose";
 import { postSchema } from "../contract";
 
-describe("server process", () => {
+describe("server process - posts", () => {
   let photoServer: PhotoServer;
   let request: TestRequest;
 

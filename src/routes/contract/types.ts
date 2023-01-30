@@ -29,15 +29,19 @@ export const imageListSchema = imageSchema.array();
 
 export type ImageList = z.infer<typeof imageListSchema>;
 
+export const postStatusFlagSchema = z.enum(["pending", "failed", "complete"]);
+
+export const postStatusSchema = z.object({
+  flag: postStatusFlagSchema,
+  error: z.string().optional(),
+  uri: z.string().optional(),
+});
+
 export const postSchema = z.object({
   id: z.coerce.string(),
   timestamp: z.coerce.date(),
-  imageid: z.coerce.string(),
-  status: z.object({
-    flag: z.string(),
-    error: z.string().optional(),
-    uri: z.string().optional(),
-  }),
+  imageid: z.coerce.string().optional(),
+  status: postStatusSchema,
 });
 
 export type Post = z.infer<typeof postSchema>;
@@ -56,3 +60,10 @@ export const authenticatedUserSchema = z.object({
 });
 
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
+export const schedulePostOptionsSchema = z.object({
+  when: z.coerce.date(),
+  overwrite: z.boolean().default(false).optional(),
+});
+
+export type SchedulePostOptions = z.infer<typeof schedulePostOptionsSchema>;

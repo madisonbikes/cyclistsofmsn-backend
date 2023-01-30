@@ -11,7 +11,7 @@ import { Image } from "../../database";
 import { Cache } from "../cache";
 import { imageListSchema } from "../contract";
 
-describe("server process", () => {
+describe("server process - images", () => {
   let photoServer: PhotoServer;
   let request: TestRequest;
   let cache: Cache;

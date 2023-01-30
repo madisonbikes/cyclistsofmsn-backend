@@ -7,6 +7,7 @@ import { ImageDocument } from "../database";
 import { error, logger, Result } from "../utils";
 import { PhotoMastadonClient } from "../mastadon/post";
 
+/** responsible for actually selecting and posting photos */
 @injectable()
 export class PostExecutor {
   constructor(
@@ -23,7 +24,7 @@ export class PostExecutor {
     // select image
     const nextImage = await this.postSelector.nextImage();
     if (nextImage.isError()) {
-      logger.error(
+      logger.warn(
         { error: nextImage.value },
         `Could not find an image to post`
       );

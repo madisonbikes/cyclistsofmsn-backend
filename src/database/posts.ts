@@ -7,6 +7,7 @@ import {
   Ref,
   ReturnModelType,
 } from "@typegoose/typegoose";
+import { endOfDay, startOfDay } from "date-fns";
 import { ImageClass } from "./images";
 
 export enum PostStatus {
@@ -41,9 +42,7 @@ class PostHistoryClass {
   @prop({ default: new PostHistoryStatus(), required: true, _id: false })
   public status!: PostHistoryStatus;
 
-  public static findCurrentPost(
-    this: ReturnModelType<typeof PostHistoryClass>
-  ) {
+  public static findLatestPost(this: ReturnModelType<typeof PostHistoryClass>) {
     return this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
       .sort({ timestamp: -1 })
@@ -66,11 +65,18 @@ class PostHistoryClass {
     });
   }
 
-  public static findNextScheduledPost(
-    this: ReturnModelType<typeof PostHistoryClass>
+  public static findScheduledPost(
+    this: ReturnModelType<typeof PostHistoryClass>,
+    when: Date = new Date()
   ) {
+    const start = startOfDay(when);
+    const end = endOfDay(when);
+
     return this.findOne()
-      .where({ "status.flag": PostStatus.PENDING })
+      .where({
+        "status.flag": PostStatus.PENDING,
+        timestamp: { $gte: start, $lt: end },
+      })
       .sort({ timestamp: -1 });
   }
 }

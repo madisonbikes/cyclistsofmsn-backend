@@ -30,7 +30,7 @@ const loadPostList = async (_req: Request, res: Response) => {
 };
 
 const loadCurrentPost = async (_req: Request, res: Response) => {
-  const post = await PostHistory.findCurrentPost();
+  const post = await PostHistory.findLatestPost();
   if (post) {
     return res.send(mapPostSchema.parse(post));
   } else {

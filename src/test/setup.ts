@@ -100,8 +100,8 @@ const cleanupSuite = async (): Promise<void> => {
 
 @injectable()
 class TestConfiguration extends ServerConfiguration {
-  public photosDir: string;
-  public mongodbUri: string;
+  public override photosDir: string;
+  public override mongodbUri: string;
 
   constructor() {
     super();

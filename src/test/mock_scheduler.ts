@@ -29,7 +29,10 @@ export class MockSimpleScheduler extends SimpleScheduler {
 
   private scheduled: Scheduled[] = [];
 
-  scheduleOnce(run: ScheduledFunction, delayInMillis: number): Cancellable {
+  override scheduleOnce(
+    run: ScheduledFunction,
+    delayInMillis: number
+  ): Cancellable {
     const newItem: Scheduled = {
       nextWhen: this.now.now() + delayInMillis,
       run: run,
@@ -42,7 +45,7 @@ export class MockSimpleScheduler extends SimpleScheduler {
     };
   }
 
-  scheduleRepeat(
+  override scheduleRepeat(
     run: ScheduledFunction,
     intervalInMillis: number,
     delayInMillis = 0

@@ -57,21 +57,21 @@ describe("test executor component", () => {
 
 @injectable()
 class NoopRepositoryScanner extends ImageRepositoryScanner {
-  start(): Promise<void> {
+  override start(): Promise<void> {
     return Promise.resolve();
   }
 }
 
 @injectable()
 class NoopPhotoTweeter extends PhotoTwitterClient {
-  post(_image: string): Promise<number> {
+  override post(_image: string): Promise<number> {
     return Promise.resolve(0);
   }
 }
 
 @injectable()
 class NoopPhotoTooter extends PhotoMastadonClient {
-  post(_image: string): Promise<string> {
+  override post(_image: string): Promise<string> {
     return Promise.resolve("0");
   }
 }

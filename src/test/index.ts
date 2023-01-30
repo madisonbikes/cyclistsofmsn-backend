@@ -20,7 +20,7 @@ export class NotVeryRandom extends RandomProvider {
     super();
   }
 
-  randomInt(min: number, max: number): number {
+  override randomInt(min: number, max: number): number {
     let val = this.specifiedValue;
     if (val < min) {
       val = min;
@@ -45,7 +45,7 @@ export class MutableNow extends NowProvider {
     }
   }
 
-  now(): number {
+  override now(): number {
     return this.when;
   }
 }
