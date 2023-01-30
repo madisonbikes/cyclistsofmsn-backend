@@ -8,7 +8,7 @@ import { Database } from "./database";
 import { MainRouter } from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
 
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import session from "express-session";
 import passport from "passport";
 import { Strategies } from "./security";
@@ -89,6 +89,12 @@ export class PhotoServer implements Lifecycle {
     app.use(passport.session());
 
     app.use("/api/v1", this.apiRouter.routes);
+
+    app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+      logger.error(err, "Unhandled server error");
+      res.status(500);
+    });
+
     app.on("error", (err) => {
       logger.error(err);
     });
