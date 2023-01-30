@@ -6,6 +6,7 @@ import { User, UserDocument } from "../database";
 import { logger } from "../utils";
 import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
 import { Request, Response, NextFunction } from "express";
+import bcrypt from "bcryptjs";
 
 export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 
@@ -13,6 +14,9 @@ export enum Roles {
   ADMIN = "admin",
   EDITOR = "editor",
 }
+
+/** check this level every few years, eventually bump to higher hash size to improve security */
+const BCRYPT_HASH_SIZE = 10;
 
 export const userHasRole = (user: AuthenticatedUser, role: string) => {
   return user.roles.find((r) => r === role) !== undefined;
@@ -38,10 +42,12 @@ export class Strategies {
       done("null username", false);
       return;
     }
-
     const user = await User.findOne({ username });
     if (user) {
-      success = await user.checkPassword(password);
+      success = await this.checkPassword(user.hashed_password, password);
+    } else {
+      // even with missing user, waste cpu cycles "checking" password to hide this API consumers
+      await generateHashedPassword("no_password");
     }
     if (!success || !user) {
       done(null, false);
@@ -50,8 +56,16 @@ export class Strategies {
     }
   });
 
+  checkPassword(hashedPassword: string, checkPassword: string) {
+    return bcrypt.compare(checkPassword, hashedPassword);
+  }
+
   /** sanitizes user info for export to JWT and into request object */
   private authenticatedUser(user: UserDocument): AuthenticatedUser {
     return authenticatedUserSchema.parse(user);
   }
 }
+
+export const generateHashedPassword = (password: string) => {
+  return bcrypt.hash(password, BCRYPT_HASH_SIZE);
+};
