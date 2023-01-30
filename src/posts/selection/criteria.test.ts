@@ -10,12 +10,7 @@ import {
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
 
 describe("test criteria components", () => {
-  setupSuite({ withDatabase: true });
-
-  beforeEach(async () => {
-    // clear posts and images
-    await Promise.all([PostHistory.deleteMany(), Image.deleteMany()]);
-  });
+  setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
 
   describe("seasonality criteria", () => {
     it("before window", async () => {

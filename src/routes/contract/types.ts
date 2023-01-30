@@ -64,6 +64,7 @@ export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
 export const schedulePostOptionsSchema = z.object({
   when: z.coerce.date(),
   overwrite: z.boolean().default(false).optional(),
+  selectImage: z.boolean().default(true).optional(),
 });
 
 export type SchedulePostOptions = z.infer<typeof schedulePostOptionsSchema>;

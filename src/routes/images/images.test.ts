@@ -7,9 +7,9 @@ import {
   TestRequest,
 } from "../../test";
 import { PhotoServer } from "../../server";
-import { Image } from "../../database";
 import { Cache } from "../cache";
 import { imageListSchema } from "../contract";
+import mongoose from "mongoose";
 
 describe("server process - images", () => {
   let photoServer: PhotoServer;
@@ -32,7 +32,9 @@ describe("server process - images", () => {
 
   afterEach(async () => {
     // reset database
-    await Image.deleteMany({ filename: "bad.jpg" });
+    await mongoose.connection
+      .collection("images")
+      .deleteMany({ filename: "missing.jpg" });
     cache.clear();
   });
 
@@ -48,9 +50,7 @@ describe("server process - images", () => {
   });
 
   it("responds to image list api call with empty timestamp", async () => {
-    const emptyTimestampImage = new Image();
-    emptyTimestampImage.filename = "bad.jpg";
-    await emptyTimestampImage.save();
+    await createMissingImage();
 
     await loginTestUser(request);
     return request
@@ -82,24 +82,22 @@ describe("server process - images", () => {
   });
 
   it("failed response to missing image file binary call", async () => {
-    const badImage = new Image();
-    badImage.filename = "bad.jpg";
-    await badImage.save();
+    const missingImage = await createMissingImage();
 
-    return request.get(`/api/v1/images/${badImage.id}/binary`).expect(404);
+    return request
+      .get(`/api/v1/images/${missingImage.insertedId}/binary`)
+      .expect(404);
   });
 
   it("success response to missing image file metadata call", async () => {
-    const badImage = new Image();
-    badImage.filename = "bad.jpg";
-    await badImage.save();
+    const missingImage = await createMissingImage();
 
     return request
-      .get(`/api/v1/images/${badImage.id}`)
+      .get(`/api/v1/images/${missingImage.insertedId}`)
       .expect(200)
       .expect((res) =>
         expect(res.body).toEqual(
-          expect.objectContaining({ filename: "bad.jpg" })
+          expect.objectContaining({ filename: "missing.jpg" })
         )
       );
   });
@@ -138,5 +136,14 @@ describe("server process - images", () => {
     expect(response.get("content-type")).toEqual("image/jpeg");
     expect(response.body).toBeDefined();
     return response;
+  };
+
+  const createMissingImage = async () => {
+    const retval = await mongoose.connection.collection("images").insertOne({
+      filename: "missing.jpg",
+      deleted: false,
+      description_from_exif: false,
+    });
+    return retval;
   };
 });

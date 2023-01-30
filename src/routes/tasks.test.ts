@@ -34,12 +34,16 @@ describe("server process - tasks", () => {
   it("scheduleTask for tomorrow succeeds", async () => {
     await loginTestAdminUser(request);
 
-    const options: SchedulePostOptions = { when: startOfTomorrow() };
+    const options: SchedulePostOptions = {
+      when: startOfTomorrow(),
+      selectImage: true,
+    };
     const response = await request
       .post("/api/v1/tasks/schedulePost")
       .send(options)
       .expect(200);
     const parsed = postSchema.parse(response.body);
     expect(parsed.status.flag).toEqual(postStatusFlagSchema.Enum.pending);
+    expect(parsed.imageid).toBeDefined();
   });
 });

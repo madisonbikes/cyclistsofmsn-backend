@@ -22,6 +22,12 @@ let tc: DependencyContainer | undefined;
 export type SuiteOptions = {
   // spin up a memory mongodb instance for testing purposes
   withDatabase: boolean;
+
+  // clear images after each test
+  clearImages: boolean;
+
+  // clear post history after each test
+  clearPostHistory: boolean;
 };
 
 /** entry point that should be included first in each describe block */
@@ -31,6 +37,17 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
     tc = await initializeSuite(options);
 
     await createDatabaseConnection();
+  });
+
+  afterEach(async () => {
+    const queries: Array<Promise<unknown>> = [];
+    if (options.clearPostHistory) {
+      queries.push(mongoose.connection.collection("posts")?.deleteMany({}));
+    }
+    if (options.clearImages) {
+      queries.push(mongoose.connection.collection("images")?.deleteMany({}));
+    }
+    await Promise.all(queries);
   });
 
   afterAll(async () => {

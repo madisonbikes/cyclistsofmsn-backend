@@ -49,6 +49,10 @@ export class Error<K, E> {
     return true;
   }
 
+  alsoOnOkAsync(_func: (k: K) => Promise<void>): Promise<Result<K, E>> {
+    return Promise.resolve(this);
+  }
+
   alsoOnOk(_func: (k: K) => void): Result<K, E> {
     return this;
   }

@@ -3,9 +3,17 @@ import date_set from "date-fns/set";
 import date_add from "date-fns/add";
 import { differenceInMinutes, startOfDay } from "date-fns";
 import { ServerConfiguration } from "../config";
-import { logger, NowProvider, ok, RandomProvider, Result } from "../utils";
+import {
+  error,
+  logger,
+  NowProvider,
+  ok,
+  RandomProvider,
+  Result,
+} from "../utils";
 import { injectable } from "tsyringe";
 import { SchedulePostOptions } from "../routes/contract";
+import { ImageSelector } from "./selection/selector";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string };
@@ -15,7 +23,8 @@ export class PostScheduler {
   constructor(
     private randomProvider: RandomProvider,
     private nowProvider: NowProvider,
-    private configuration: ServerConfiguration
+    private configuration: ServerConfiguration,
+    private imageSelector: ImageSelector
   ) {}
 
   private lastScheduledPostTimestamp: number | undefined;
@@ -23,6 +32,7 @@ export class PostScheduler {
   /** returns the next post after scheduling or if it still needs to be posted */
   async schedulePost({
     when,
+    selectImage,
     overwrite,
   }: SchedulePostOptions): Promise<PostResult> {
     const nextPost = await PostHistory.findScheduledPost(when);
@@ -42,17 +52,28 @@ export class PostScheduler {
       await nextPost.delete();
     }
 
-    const createdPost = await this.createNewScheduledPost(when);
+    const createdPost = await this.createNewScheduledPost(when, selectImage);
     return createdPost.alsoOnOk((value) => {
       logger.info({ when: value.timestamp }, `Scheduled new post`);
     });
   }
 
-  private async createNewScheduledPost(when: Date): Promise<PostResult> {
+  private async createNewScheduledPost(
+    when: Date,
+    selectImage = false
+  ): Promise<PostResult> {
     const lastPost = await PostHistory.findLatestPost();
     const newPost = new PostHistory();
     newPost.timestamp = this.selectNextTime(lastPost?.timestamp, when);
     newPost.status.flag = PostStatus.PENDING;
+    if (selectImage) {
+      const newImage = await this.imageSelector.nextImage();
+      if (newImage.isOk()) {
+        newPost.image = newImage.value;
+      } else {
+        return error(newImage.value);
+      }
+    }
     return ok(await newPost.save());
   }
 

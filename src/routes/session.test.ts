@@ -69,7 +69,14 @@ describe("login route", () => {
       .expect(/extraxyz/);
   });
 
-  it("responds to login api with credentials as success request but unauthorized", () => {
+  it("responds to login api with good username, bad credentials as unauthorized", () => {
+    return request
+      .post("/api/v1/session/login")
+      .send({ username: "testuser", password: "wrong_password" })
+      .expect(401);
+  });
+
+  it("responds to login api with bad username (and bad password) as unauthorized", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "bad", password: "bad" })

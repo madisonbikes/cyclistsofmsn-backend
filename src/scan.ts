@@ -122,7 +122,7 @@ export class ImageRepositoryScanner implements Lifecycle {
     return tag?.value[0];
   }
 
-  private getFileMetadata = async (filename: string) => {
+  private async getFileMetadata(filename: string) {
     const [
       fs_timestamp,
       { DateTimeOriginal: rawCreatedOn, ImageDescription: rawDescription },
@@ -141,5 +141,5 @@ export class ImageRepositoryScanner implements Lifecycle {
       description_from_exif,
     };
     return retval;
-  };
+  }
 }

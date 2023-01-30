@@ -27,13 +27,7 @@ import { ServerConfiguration } from "../config";
 const RANDOM_VALUE = 50;
 
 describe("test schedule component", () => {
-  setupSuite({ withDatabase: true });
-
-  beforeEach(async () => {
-    // clear posts and images
-    await PostHistory.deleteMany();
-    await Image.deleteMany();
-  });
+  setupSuite({ withDatabase: true, clearImages: true, clearPostHistory: true });
 
   describe("with no images", () => {
     it("should succeed, will fail at actual posting time", async function () {
