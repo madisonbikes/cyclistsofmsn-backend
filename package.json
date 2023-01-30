@@ -29,7 +29,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^10.0.0",
+    "@typegoose/typegoose": "^10.1.0",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^6.1.3",
     "date-fns": "^2.29.3",
