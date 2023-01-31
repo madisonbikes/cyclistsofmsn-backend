@@ -6,6 +6,7 @@ import {
   NowProvider,
   ok,
   Result,
+  safeAsyncWrapper,
   SimpleScheduler,
 } from "../utils";
 import { PostError, PostScheduler } from "./scheduler";
@@ -20,16 +21,16 @@ import {
 import { ImageSelector } from "./selection/selector";
 import { ImageRepositoryScanner } from "../scan";
 
-/** check every five minutes */
-const CHECK_INTERVAL = 5 * 60 * 1000;
-const DELAY = 5 * 1000;
+/** dispatch posts every five minutes */
+const DISPATCH_INTERVAL = 5 * 60 * 1000;
+const DISPATCH_DELAY = 5 * 1000;
 
 /**
  * The post dispatcher is responsible for orchestrating posting photos.
  */
 @injectable()
 export class PostDispatcher implements Lifecycle {
-  private scheduled: Cancellable | undefined;
+  private scheduled: Array<Cancellable | undefined> = [];
 
   constructor(
     private scheduler: PostScheduler,
@@ -41,32 +42,26 @@ export class PostDispatcher implements Lifecycle {
   ) {}
 
   start(): void {
-    this.scheduled = this.simpleScheduler.scheduleRepeat(
-      () => {
-        return this.syncDispatch();
-      },
-      CHECK_INTERVAL,
-      DELAY
+    this.scheduled.push(
+      this.simpleScheduler.scheduleRepeat(
+        safeAsyncWrapper("dispatch", this.asyncDispatch),
+        DISPATCH_INTERVAL,
+        DISPATCH_DELAY
+      )
     );
   }
 
   stop(): void {
-    this.scheduled?.cancel();
-    this.scheduled = undefined;
+    this.scheduled.forEach((v, ndx, array) => {
+      v?.cancel();
+      array[ndx] = undefined;
+    });
   }
 
-  /** async function is fine for setInterval(), but it should NEVER throw an exception */
-  private async syncDispatch() {
-    try {
-      await this.asyncDispatch();
-    } catch (err) {
-      logger.error(err, "Error scheduling post");
-    }
-  }
-
-  private async asyncDispatch() {
+  asyncDispatch = async () => {
     const scheduledResult = await this.scheduler.schedulePost({
       when: new Date(this.nowProvider.now()),
+      selectImage: true,
     });
     if (scheduledResult.isError()) {
       logger.warn(
@@ -105,7 +100,7 @@ export class PostDispatcher implements Lifecycle {
       nextPost.status.flag = PostStatus.COMPLETE;
     }
     await nextPost.save();
-  }
+  };
 
   /** returns true if it's time to execute this post, false if it's in the future */
   private isTimeToPost(post: PostHistoryDocument) {
@@ -120,7 +115,7 @@ export class PostDispatcher implements Lifecycle {
       return false;
     }
 
-    if (when > CHECK_INTERVAL) {
+    if (when > DISPATCH_INTERVAL) {
       logger.info(
         `Missed scheduled post ${Math.abs(
           Math.round(when / 1000 / 60)

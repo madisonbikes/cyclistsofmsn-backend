@@ -72,10 +72,10 @@ class PostHistoryClass {
     const start = startOfDay(when);
     const end = endOfDay(when);
 
-    return this.findOne()
+    return this.find()
       .where({
         "status.flag": PostStatus.PENDING,
-        timestamp: { $gte: start, $lt: end },
+        timestamp: { $gte: start, $lte: end },
       })
       .sort({ timestamp: -1 });
   }

@@ -7,6 +7,7 @@ import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
 import { MainRouter } from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
+import { PostPopulate } from "./posts/populate";
 
 import express, { NextFunction, Request, Response } from "express";
 import session from "express-session";
@@ -36,12 +37,14 @@ export class PhotoServer implements Lifecycle {
     private redis: RedisConnection,
     private apiRouter: MainRouter,
     postDispatcher: PostDispatcher,
+    postPopulate: PostPopulate,
     private strategies: Strategies
   ) {
     this.components.push(database);
     this.components.push(redis);
     this.components.push(scanner);
     this.components.push(postDispatcher);
+    this.components.push(postPopulate);
   }
 
   components: Lifecycle[] = [];

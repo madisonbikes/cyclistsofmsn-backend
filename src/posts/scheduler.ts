@@ -1,7 +1,10 @@
 import { PostHistory, PostHistoryDocument, PostStatus } from "../database";
-import date_set from "date-fns/set";
-import date_add from "date-fns/add";
-import { differenceInMinutes, startOfDay } from "date-fns";
+import {
+  differenceInMinutes,
+  startOfDay,
+  set as date_set,
+  add as date_add,
+} from "date-fns";
 import { ServerConfiguration } from "../config";
 import {
   error,
@@ -35,21 +38,29 @@ export class PostScheduler {
     selectImage,
     overwrite,
   }: SchedulePostOptions): Promise<PostResult> {
-    const nextPost = await PostHistory.findScheduledPost(when);
-    if (nextPost != null) {
+    const matchingPosts = await PostHistory.findScheduledPost(when);
+    if (matchingPosts.length > 0) {
       if (!overwrite) {
+        if (matchingPosts.length > 1) {
+          logger.warn(
+            {
+              matchingPosts,
+            },
+            `More than one post scheduled for timestamp ${when}`
+          );
+        }
+        const firstPost = matchingPosts[0];
         // to reduce log spam, only output this once even though we are polling every 5 minutes or so
-        if (this.lastScheduledPostTimestamp !== nextPost.timestamp.getTime()) {
+        if (this.lastScheduledPostTimestamp !== firstPost.timestamp.getTime()) {
           logger.info(
-            { when: nextPost.timestamp },
+            { when: firstPost.timestamp },
             "Using existing scheduled post"
           );
-          this.lastScheduledPostTimestamp = nextPost.timestamp.getTime();
+          this.lastScheduledPostTimestamp = firstPost.timestamp.getTime();
         }
-        return ok(nextPost);
+        return ok(firstPost);
       }
-
-      await nextPost.delete();
+      await Promise.all(matchingPosts.map((p) => p.delete()));
     }
 
     const createdPost = await this.createNewScheduledPost(when, selectImage);
@@ -64,7 +75,13 @@ export class PostScheduler {
   ): Promise<PostResult> {
     const lastPost = await PostHistory.findLatestPost();
     const newPost = new PostHistory();
-    newPost.timestamp = this.selectNextTime(lastPost?.timestamp, when);
+
+    const selectedTime = this.selectNextTime(lastPost?.timestamp, when);
+    if (selectedTime.isError()) {
+      // sometimes we can't schedule a new post today
+      return error(selectedTime.value);
+    }
+    newPost.timestamp = selectedTime.value;
     newPost.status.flag = PostStatus.PENDING;
     if (selectImage) {
       const newImage = await this.imageSelector.nextImage();
@@ -77,29 +94,39 @@ export class PostScheduler {
     return ok(await newPost.save());
   }
 
-  private selectNextTime(lastPostTime: Date | undefined, when: Date): Date {
-    const startOfToday = startOfDay(when);
+  private selectNextTime(
+    lastPostTime: Date | undefined,
+    when: Date
+  ): Result<Date, PostError> {
+    const startOfToday = startOfDay(this.nowProvider.now());
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
+    const startOfPostDay = startOfDay(when);
     const lastTimeToday = date_set(startOfToday, {
       hours: this.configuration.lastPostHour,
     });
 
     let startDate: Date;
-    if (when >= lastTimeToday) {
-      // no more posts today
-      startDate = startOfTomorrow;
-    } else if (lastPostTime != null) {
-      // there are previous posts
-      if (lastPostTime > startOfToday) {
-        // we already posted today
-        startDate = startOfTomorrow;
+    if (startOfPostDay >= startOfTomorrow) {
+      // scheduling for future date
+      startDate = startOfPostDay;
+    } else {
+      // rest of logic deals with scheduling posts on same day
+      if (when >= lastTimeToday) {
+        // no more posts today
+        return error({ message: "Posting closed for today" });
+      } else if (lastPostTime != null) {
+        // there are previous posts
+        if (lastPostTime > startOfToday) {
+          // we already posted today
+          return error({ message: "Already posted today" });
+        } else {
+          // still need to post today
+          startDate = startOfToday;
+        }
       } else {
-        // still need to post today
+        // no posts at all, post today
         startDate = startOfToday;
       }
-    } else {
-      // no posts at all, post today
-      startDate = startOfToday;
     }
     let firstTime = date_set(startDate, {
       hours: this.configuration.firstPostHour,
@@ -116,6 +143,6 @@ export class PostScheduler {
     const random_min = this.randomProvider.randomInt(0, diff);
 
     // return
-    return date_add(firstTime, { minutes: random_min });
+    return ok(date_add(firstTime, { minutes: random_min }));
   }
 }
