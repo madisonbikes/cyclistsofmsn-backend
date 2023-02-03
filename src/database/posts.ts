@@ -56,18 +56,18 @@ export class PostHistoryClass {
       .sort({ timestamp: 1 })
       .populate({ path: "image", select: ["deleted"] });
 
-    return posts.filter((post) => {
-      if (isDocument(post.image)) {
-        return !post.image.deleted;
-      } else {
-        return false;
+    return posts.flatMap((post) => {
+      const retval = post;
+      if (isDocument(post.image) && post.image.deleted) {
+        retval.image = undefined;
       }
+      return retval;
     });
   }
 
   public static findScheduledPost(
     this: ReturnModelType<typeof PostHistoryClass>,
-    when: Date = new Date()
+    when: Date
   ) {
     const start = startOfDay(when);
     const end = endOfDay(when);

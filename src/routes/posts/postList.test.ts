@@ -36,10 +36,15 @@ describe("server process - posts", () => {
     await loginTestUser(request);
     const postRequest = await request.get("/api/v1/posts").expect(200);
     const posts = postSchema.array().parse(postRequest.body);
-    expect(posts.length).toEqual(3);
+    expect(posts.length).toEqual(4);
     expect(posts[0].status.flag).toEqual("complete");
+    expect(posts[0].imageid).toBeDefined();
     expect(posts[1].status.flag).toEqual("pending");
+    expect(posts[1].imageid).toBeDefined();
     expect(posts[2].status.flag).toEqual("failed");
+    expect(posts[2].imageid).toBeDefined();
+    expect(posts[3].status.flag).toEqual("pending");
+    expect(posts[3].imageid).not.toBeDefined();
   });
 
   const createTestPosts = async () => {
@@ -64,6 +69,11 @@ describe("server process - posts", () => {
       {
         image: insertedId,
         timestamp: new Date(Date.now() + 1000),
+        status: { flag: "pending" },
+      },
+      // add post missing image id to test filtering
+      {
+        timestamp: new Date(Date.now() + 3000),
         status: { flag: "pending" },
       },
     ]);
