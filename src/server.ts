@@ -95,7 +95,7 @@ export class PhotoServer implements Lifecycle {
 
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
-      res.status(500);
+      res.sendStatus(500);
     });
 
     app.on("error", (err) => {

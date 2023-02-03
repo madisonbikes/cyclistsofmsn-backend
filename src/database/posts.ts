@@ -32,7 +32,7 @@ export class PostHistoryStatus {
 }
 
 @modelOptions({ schemaOptions: { collection: "posts" } })
-class PostHistoryClass {
+export class PostHistoryClass {
   @prop({ ref: () => ImageClass })
   public image?: Ref<ImageClass>;
 

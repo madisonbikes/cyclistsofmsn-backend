@@ -1,10 +1,20 @@
-import express, { Request, Response } from "express";
-import { PostHistory } from "../../database";
+import express from "express";
 import { injectable } from "tsyringe";
-import { logger } from "../../utils";
-import { mapPostSchema } from "./types";
 import { asyncWrapper } from "../async";
-import { validateAdmin, validateAuthenticated } from "../../security";
+import {
+  Roles,
+  validateAdmin,
+  validateAuthenticated,
+  validateBodySchema,
+  validateId,
+  validateRole,
+} from "../../security";
+import {
+  bodySchema as singlePostPutSchema,
+  handler as singlePostPutHandler,
+} from "./put";
+import { handler as singlePostDeleteHandler } from "./delete";
+import { currentPostHandler, getPostHandler, getPostListHandler } from "./get";
 
 @injectable()
 export class PostRouter {
@@ -12,28 +22,35 @@ export class PostRouter {
     .Router()
 
     // all posts
-    .get("/", validateAuthenticated(), asyncWrapper(loadPostList))
+    .get("/", validateAuthenticated(), asyncWrapper(getPostListHandler))
 
     // current post
-    .get("/current", asyncWrapper(loadCurrentPost))
+    .get("/current", asyncWrapper(currentPostHandler))
 
-    // post create operation is secured by admin
-    .post("/create", validateAdmin(), (_req, res) => {
+    // current post
+    .get("/:id", validateEditor(), validateId(), asyncWrapper(getPostHandler))
+
+    .put(
+      "/:id",
+      validateBodySchema({ schema: singlePostPutSchema }),
+      validateEditor(),
+      validateId(),
+      asyncWrapper(singlePostPutHandler)
+    )
+
+    .delete(
+      "/:id",
+      validateAdmin(),
+      validateId(),
+      asyncWrapper(singlePostDeleteHandler)
+    )
+
+    // post create operation is secured by editor role
+    .post("/create", validateEditor(), (_req, res) => {
       return res.send("Submitted new post");
     });
 }
 
-const loadPostList = async (_req: Request, res: Response) => {
-  const posts = await PostHistory.findOrderedPosts();
-  logger.debug({ posts }, "returned posts");
-  return res.send(mapPostSchema.array().parse(posts));
-};
-
-const loadCurrentPost = async (_req: Request, res: Response) => {
-  const post = await PostHistory.findLatestPost();
-  if (post) {
-    return res.send(mapPostSchema.parse(post));
-  } else {
-    return res.sendStatus(404);
-  }
+const validateEditor = () => {
+  return validateRole({ role: Roles.EDITOR });
 };

@@ -6,19 +6,25 @@ import {
   validateAuthenticated,
   Roles,
   validateRole,
+  validateId,
+  validateAdmin,
 } from "../../security";
 import { asyncWrapper } from "../async";
-import { GetSingleImageHandler } from "./getSingleImage";
+import { SingleImageGet } from "./get";
+import { SingleImageDelete } from "./delete";
 import { handler as imageListHandler } from "./imageList";
 import { Cache } from "../cache";
-import { PutSingleImageHandler } from "./putSingleImage";
+import {
+  handler as singleImagePutHandler,
+  bodySchema as singleImagePutSchema,
+} from "./put";
 
 @injectable()
 export class ImageRouter {
   constructor(
     private cache: Cache,
-    private getSingleImageHandler: GetSingleImageHandler,
-    private putSingleImageHandler: PutSingleImageHandler
+    private singleGet: SingleImageGet,
+    private singleDelete: SingleImageDelete
   ) {}
 
   readonly routes = express
@@ -29,19 +35,28 @@ export class ImageRouter {
 
     .put(
       "/:id",
-      validateBodySchema({ schema: this.putSingleImageHandler.schema }),
+      validateBodySchema({ schema: singleImagePutSchema }),
       validateRole({ role: Roles.EDITOR }),
-      asyncWrapper(this.putSingleImageHandler.handler)
+      validateId(),
+      asyncWrapper(singleImagePutHandler)
     )
 
     // single image metadata
-    .get("/:id", asyncWrapper(this.getSingleImageHandler.metadata))
+    .get("/:id", validateId(), asyncWrapper(this.singleGet.metadata))
+
+    .delete(
+      "/:id",
+      validateAdmin(),
+      validateId(),
+      asyncWrapper(this.singleDelete.handler)
+    )
 
     // single image, cached
     .get(
       "/:id/binary",
       this.cache.middleware({ callNextWhenCacheable: false }),
-      validateQuerySchema({ schema: this.getSingleImageHandler.schema }),
-      asyncWrapper(this.getSingleImageHandler.binary)
+      validateId(),
+      validateQuerySchema({ schema: this.singleGet.querySchema }),
+      asyncWrapper(this.singleGet.binary)
     );
 }

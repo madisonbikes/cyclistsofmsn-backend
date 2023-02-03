@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { isValidObjectId } from "mongoose";
 import { Image } from "../../database";
 import { FilesystemRepository } from "../../fs_repository";
 import { injectable } from "tsyringe";
@@ -11,17 +10,13 @@ import { getImageQuerySchema, GetImageQuery } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 
 @injectable()
-export class GetSingleImageHandler {
+export class SingleImageGet {
   constructor(private fsRepository: FilesystemRepository) {}
 
-  readonly schema = getImageQuerySchema;
+  readonly querySchema = getImageQuerySchema;
 
   metadata = async (req: Request, res: Response) => {
     const id = req.params.id;
-    if (!isValidObjectId(id)) {
-      // bad object id throws exception later, so check early
-      return res.sendStatus(404);
-    }
     const metadata = await Image.findById(id).and([{ deleted: false }]);
     if (metadata == null) {
       return res.sendStatus(404);
@@ -33,11 +28,6 @@ export class GetSingleImageHandler {
     const query = req.validated as GetImageQuery;
 
     const id = req.params.id;
-    if (!isValidObjectId(id)) {
-      // bad object id throws exception later, so check early
-      return res.sendStatus(404);
-    }
-
     logger.debug(`loading image ${id}`);
     const filename = (await Image.findById(id).and([{ deleted: false }]))
       ?.filename;

@@ -6,11 +6,6 @@ export const getImageQuerySchema = z.object({
 });
 export type GetImageQuery = z.infer<typeof getImageQuerySchema>;
 
-export const putImageQuerySchema = z.object({
-  description: z.string().optional(),
-});
-export type PutImageQuery = z.infer<typeof putImageQuerySchema>;
-
 export const mutableImageSchema = z.object({
   description: z.string().optional(),
 });
@@ -21,15 +16,15 @@ export const imageSchema = mutableImageSchema.extend({
   filename: z.string(),
   fs_timestamp: z.coerce.date(),
   exif_createdon: z.coerce.date().optional(),
+  description_from_exif: z.boolean(),
 });
-
 export type Image = z.infer<typeof imageSchema>;
 
 export const imageListSchema = imageSchema.array();
-
 export type ImageList = z.infer<typeof imageListSchema>;
 
 export const postStatusFlagSchema = z.enum(["pending", "failed", "complete"]);
+export type PostStatusFlag = z.infer<typeof postStatusFlagSchema>;
 
 export const postStatusSchema = z.object({
   flag: postStatusFlagSchema,
@@ -37,13 +32,16 @@ export const postStatusSchema = z.object({
   uri: z.string().optional(),
 });
 
-export const postSchema = z.object({
-  id: z.coerce.string(),
+export const mutablePostSchema = z.object({
   timestamp: z.coerce.date(),
   imageid: z.coerce.string().optional(),
   status: postStatusSchema,
 });
+export type MutablePost = z.infer<typeof mutablePostSchema>;
 
+export const postSchema = mutablePostSchema.extend({
+  id: z.coerce.string(),
+});
 export type Post = z.infer<typeof postSchema>;
 
 export const loginBodySchema = z
@@ -58,7 +56,6 @@ export const authenticatedUserSchema = z.object({
   username: z.string(),
   roles: z.string().array(),
 });
-
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
 
 export const schedulePostOptionsSchema = z.object({
@@ -66,5 +63,4 @@ export const schedulePostOptionsSchema = z.object({
   overwrite: z.boolean().default(false).optional(),
   selectImage: z.boolean().default(true).optional(),
 });
-
 export type SchedulePostOptions = z.infer<typeof schedulePostOptionsSchema>;
