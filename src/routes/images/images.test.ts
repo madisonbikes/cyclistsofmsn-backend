@@ -81,6 +81,32 @@ describe("server process - images", () => {
     return request.get("/api/v1/images/badid/binary").expect(404);
   });
 
+  it("failed response to image binary call with bad query params", async () => {
+    await loginTestUser(request);
+    const response = await request.get("/api/v1/images").expect(200);
+
+    const imageList = imageListSchema.parse(response.body);
+    expect(imageList.length).toBeGreaterThan(0);
+    const imageId = imageList[0].id;
+
+    return request
+      .get(`/api/v1/images/${imageId}/binary?width=bad`)
+      .expect(400);
+  });
+
+  it("successful response to image binary call with extra query params", async () => {
+    await loginTestUser(request);
+    const response = await request.get("/api/v1/images").expect(200);
+
+    const imageList = imageListSchema.parse(response.body);
+    expect(imageList.length).toBeGreaterThan(0);
+    const imageId = imageList[0].id;
+
+    return request
+      .get(`/api/v1/images/${imageId}/binary?extra=argument`)
+      .expect(200);
+  });
+
   it("failed response to missing image file binary call", async () => {
     const missingImage = await createMissingImage();
 
