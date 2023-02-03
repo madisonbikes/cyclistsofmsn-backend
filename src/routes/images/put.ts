@@ -19,7 +19,7 @@ export const handler = async (req: Request, res: Response) => {
 
   const result = await Image.findByIdAndUpdate(id, modified, { new: true });
   if (result != null) {
-    res.status(200).send(lenientImageSchema.parse(result));
+    res.send(lenientImageSchema.parse(result));
   } else {
     // not found
     res.sendStatus(404);

@@ -14,7 +14,7 @@ export class SessionRouter {
       passport.authenticate("local", { session: true, failWithError: false }),
       (request, response) => {
         const user = request.user as AuthenticatedUser;
-        response.status(200).send(user);
+        response.send(user);
       }
     )
     .post("/logout", (request, response, next) => {
@@ -25,12 +25,12 @@ export class SessionRouter {
           if (err) {
             return next(err);
           } else {
-            response.status(200).send("logged out");
+            response.send("logged out");
           }
         });
       }
     })
     .get("/info", validateAuthenticated(), (request, response) => {
-      response.status(200).send(request.user);
+      response.send(request.user);
     });
 }

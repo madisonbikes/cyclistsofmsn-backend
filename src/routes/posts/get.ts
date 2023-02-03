@@ -17,7 +17,9 @@ export const getPostHandler = async (req: Request, res: Response) => {
   logger.debug(`loading post ${id}`);
   const post = await PostHistory.findById(id);
   if (post != null) {
-    return res.send(mapPostSchema.parse(post));
+    const retval = mapPostSchema.parse(post);
+    logger.debug({ post: retval }, "returned post data");
+    return res.send(retval);
   } else {
     return res.sendStatus(404);
   }

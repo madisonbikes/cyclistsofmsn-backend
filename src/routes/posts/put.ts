@@ -14,7 +14,7 @@ export const handler = async (req: Request, res: Response) => {
 
   const result = await PostHistory.findByIdAndUpdate(id, body, { new: true });
   if (result != null) {
-    res.status(200).send(mapPostSchema.parse(result));
+    res.send(mapPostSchema.parse(result));
   } else {
     // not found
     res.sendStatus(404);

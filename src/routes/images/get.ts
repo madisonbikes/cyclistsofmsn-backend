@@ -21,7 +21,7 @@ export class SingleImageGet {
     if (metadata == null) {
       return res.sendStatus(404);
     }
-    res.status(200).send(lenientImageSchema.parse(metadata));
+    res.send(lenientImageSchema.parse(metadata));
   };
 
   binary = async (req: Request, res: Response) => {

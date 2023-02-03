@@ -19,7 +19,7 @@ export class TasksRouter {
       const result = await this.scheduler.schedulePost(postOptions);
       if (result.isOk()) {
         const mapped = mapPostSchema.parse(result.value);
-        response.status(200).send(mapped);
+        response.send(mapped);
       } else {
         response.status(400).send(result.value);
       }
