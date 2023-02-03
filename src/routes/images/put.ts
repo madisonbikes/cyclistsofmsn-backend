@@ -9,7 +9,7 @@ export const bodySchema = mutableImageSchema;
 export const handler = async (req: Request, res: Response) => {
   const body = req.validated as MutableImage;
 
-  const id = req.params.id;
+  const { id } = req.params;
   logger.trace({ id, body }, "put single image");
 
   const modified: Partial<ImageDocument> = { ...body };

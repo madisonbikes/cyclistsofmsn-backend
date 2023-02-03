@@ -16,7 +16,7 @@ export class SingleImageGet {
   readonly querySchema = getImageQuerySchema;
 
   metadata = async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const { id } = req.params;
     const metadata = await Image.findById(id).and([{ deleted: false }]);
     if (metadata == null) {
       return res.sendStatus(404);
@@ -27,7 +27,7 @@ export class SingleImageGet {
   binary = async (req: Request, res: Response) => {
     const query = req.validated as GetImageQuery;
 
-    const id = req.params.id;
+    const { id } = req.params;
     logger.debug(`loading image ${id}`);
     const filename = (await Image.findById(id).and([{ deleted: false }]))
       ?.filename;
@@ -37,7 +37,7 @@ export class SingleImageGet {
 
     const imageFile = this.fsRepository.photoPath(filename);
 
-    let width = query.width;
+    let { width } = query;
     if (!width && !query.height) {
       width = 1024;
     }

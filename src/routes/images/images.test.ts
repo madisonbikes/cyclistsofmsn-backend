@@ -115,7 +115,7 @@ describe("server process - images", () => {
       .expect(404);
   });
 
-  it("success response to missing image file metadata call", async () => {
+  it("successful response to missing image file metadata call", async () => {
     const missingImage = await createMissingImage();
 
     return request
@@ -126,6 +126,14 @@ describe("server process - images", () => {
           expect.objectContaining({ filename: "missing.jpg" })
         )
       );
+  });
+
+  it("failed response to image file metadata call with missing id", () => {
+    return request.get(`/api/v1/images/000000000000`).expect(404);
+  });
+
+  it("failed response to image file binary call with missing id", () => {
+    return request.get(`/api/v1/images/000000000000/binary`).expect(404);
   });
 
   it("returns second image request as cached", async () => {

@@ -10,14 +10,14 @@ export class SingleImageDelete {
 
   handler = async (req: Request, res: Response) => {
     const id = req.params.id;
-    logger.trace({ id }, "delete single post");
+    logger.trace({ id }, "delete single image");
 
     const result = await Image.findOneAndDelete({ _id: id });
     if (result != null) {
-      const shortName = result?.filename;
-      if (shortName != null) {
-        const filename = this.repository.photoPath(shortName);
-        await this.repository.delete(filename);
+      const { filename } = result;
+      if (filename != null) {
+        const fullPath = this.repository.photoPath(filename);
+        await this.repository.delete(fullPath);
       }
       res.sendStatus(200);
     } else {

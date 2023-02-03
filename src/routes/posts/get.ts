@@ -13,7 +13,7 @@ export const currentPostHandler = async (_req: Request, res: Response) => {
 };
 
 export const getPostHandler = async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const { id } = req.params;
   logger.debug(`loading post ${id}`);
   const post = await PostHistory.findById(id);
   if (post != null) {

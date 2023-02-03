@@ -9,7 +9,7 @@ export const bodySchema = mutablePostSchema;
 export const handler = async (req: Request, res: Response) => {
   const body = req.validated as MutablePost;
 
-  const id = req.params.id;
+  const { id } = req.params;
   logger.trace({ id, body }, "put single post");
 
   const result = await PostHistory.findByIdAndUpdate(id, body, { new: true });

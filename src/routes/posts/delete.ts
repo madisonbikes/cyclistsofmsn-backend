@@ -3,7 +3,7 @@ import { PostHistory } from "../../database";
 import { logger } from "../../utils";
 
 export const handler = async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const { id } = req.params;
   logger.trace({ id }, "delete single post");
 
   const result = await PostHistory.deleteOne({ _id: id });
