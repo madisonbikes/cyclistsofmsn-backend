@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import "reflect-metadata";
 import { NowProvider, RandomProvider } from "../utils";
 import supertest from "supertest";

@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import pino, { Logger, stdSerializers, TransportTargetOptions } from "pino";
 import { initEnv } from "./env";
 
