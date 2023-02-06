@@ -44,6 +44,9 @@ export const postSchema = mutablePostSchema.extend({
 });
 export type Post = z.infer<typeof postSchema>;
 
+export const postListSchema = postSchema.array();
+export type PostList = z.infer<typeof postListSchema>;
+
 export const loginBodySchema = z
   .object({
     username: z.string(),

@@ -1,31 +1,27 @@
 import {
-  createTestAdminUser,
-  createTestEditorUser,
-  createTestUser,
   loginTestAdminUser,
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
-  testContainer,
   testRequest,
   TestRequest,
 } from "../../test";
-import { PhotoServer } from "../../server";
 import { PostHistory } from "../../database";
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
+import {
+  createTestAdminUser,
+  createTestEditorUser,
+  createTestUser,
+} from "../../test/data";
 
 describe("server process - posts", () => {
-  let photoServer: PhotoServer;
   let request: TestRequest;
-  let testPostId: string;
+  let testPostId: ObjectId;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
-
     await Promise.all([
       createTestUser(),
       createTestAdminUser(),
@@ -35,14 +31,11 @@ describe("server process - posts", () => {
 
   beforeEach(async () => {
     testPostId = await createTestPost();
+    request = testRequest();
   });
 
   afterEach(async () => {
     await deletePost(testPostId);
-  });
-
-  afterAll(async () => {
-    await photoServer.stop();
   });
 
   it("responds to unauthenticated post delete api call", () => {
@@ -84,12 +77,10 @@ describe("server process - posts", () => {
 
   const createTestPost = async () => {
     const retval = await mongoose.connection.collection("posts").insertOne({});
-    return retval.insertedId.toString();
+    return retval.insertedId;
   };
 
-  const deletePost = (id: string) => {
-    return mongoose.connection
-      .collection("posts")
-      .deleteOne({ _id: new ObjectId(id) });
+  const deletePost = (_id: ObjectId) => {
+    return mongoose.connection.collection("posts").deleteOne({ _id });
   };
 });

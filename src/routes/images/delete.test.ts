@@ -1,31 +1,27 @@
 import {
-  createTestAdminUser,
-  createTestEditorUser,
-  createTestUser,
   loginTestAdminUser,
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
-  testContainer,
   testRequest,
   TestRequest,
 } from "../../test";
-import { PhotoServer } from "../../server";
 import { Image } from "../../database";
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
+import {
+  createTestAdminUser,
+  createTestEditorUser,
+  createTestUser,
+} from "../../test/data";
 
 describe("server process - images", () => {
-  let photoServer: PhotoServer;
   let request: TestRequest;
-  let testImageId: string;
+  let testImageId: ObjectId;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
-
     await Promise.all([
       createTestUser(),
       createTestAdminUser(),
@@ -35,14 +31,11 @@ describe("server process - images", () => {
 
   beforeEach(async () => {
     testImageId = await createTestImage();
+    request = testRequest();
   });
 
   afterEach(async () => {
     await deleteImage(testImageId);
-  });
-
-  afterAll(async () => {
-    await photoServer.stop();
   });
 
   it("responds to unauthenticated image delete api call", () => {
@@ -94,12 +87,10 @@ describe("server process - images", () => {
       deleted: false,
       description_from_exif: false,
     });
-    return retval.insertedId.toString();
+    return retval.insertedId;
   };
 
-  const deleteImage = (id: string) => {
-    return mongoose.connection
-      .collection("images")
-      .deleteOne({ _id: new ObjectId(id) });
+  const deleteImage = (_id: ObjectId) => {
+    return mongoose.connection.collection("images").deleteOne({ _id });
   };
 });

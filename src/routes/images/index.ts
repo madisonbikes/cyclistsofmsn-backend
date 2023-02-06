@@ -10,9 +10,8 @@ import {
   validateAdmin,
 } from "../../security";
 import { asyncWrapper } from "../async";
-import { SingleImageGet } from "./get";
+import { ImageGet } from "./get";
 import { SingleImageDelete } from "./delete";
-import { handler as imageListHandler } from "./imageList";
 import { Cache } from "../cache";
 import {
   handler as singleImagePutHandler,
@@ -23,7 +22,7 @@ import {
 export class ImageRouter {
   constructor(
     private cache: Cache,
-    private singleGet: SingleImageGet,
+    private imageGet: ImageGet,
     private singleDelete: SingleImageDelete
   ) {}
 
@@ -31,7 +30,7 @@ export class ImageRouter {
     .Router()
 
     // all images
-    .get("/", validateAuthenticated(), asyncWrapper(imageListHandler))
+    .get("/", validateAuthenticated(), asyncWrapper(this.imageGet.listHandler))
 
     .put(
       "/:id",
@@ -42,7 +41,7 @@ export class ImageRouter {
     )
 
     // single image metadata
-    .get("/:id", validateId(), asyncWrapper(this.singleGet.metadata))
+    .get("/:id", validateId(), asyncWrapper(this.imageGet.metadata))
 
     .delete(
       "/:id",
@@ -56,7 +55,7 @@ export class ImageRouter {
       "/:id/binary",
       this.cache.middleware({ callNextWhenCacheable: false }),
       validateId(),
-      validateQuerySchema({ schema: this.singleGet.querySchema }),
-      asyncWrapper(this.singleGet.binary)
+      validateQuerySchema({ schema: this.imageGet.querySchema }),
+      asyncWrapper(this.imageGet.binary)
     );
 }

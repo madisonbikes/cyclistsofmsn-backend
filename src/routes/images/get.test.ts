@@ -1,33 +1,29 @@
 import {
-  createTestUser,
   loginTestUser,
   setupSuite,
   testContainer,
   testRequest,
   TestRequest,
 } from "../../test";
-import { PhotoServer } from "../../server";
 import { Cache } from "../cache";
 import { imageListSchema } from "../contract";
 import mongoose from "mongoose";
+import { createTestUser } from "../../test/data";
 
 describe("server process - images", () => {
-  let photoServer: PhotoServer;
   let request: TestRequest;
   let cache: Cache;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
     cache = testContainer().resolve(Cache);
 
     await createTestUser();
   });
 
-  afterAll(async () => {
-    await photoServer.stop();
+  beforeEach(() => {
+    request = testRequest();
   });
 
   afterEach(async () => {
@@ -40,26 +36,19 @@ describe("server process - images", () => {
 
   it("responds to image list api call", async () => {
     await loginTestUser(request);
-    return request
-      .get("/api/v1/images")
-      .expect(200)
-      .expect(({ text }) => {
-        const o = JSON.parse(text);
-        expect(o).toHaveLength(6);
-      });
+    const images = await request.get("/api/v1/images").expect(200);
+    const parsed = imageListSchema.parse(images.body);
+    expect(parsed).toHaveLength(6);
   });
 
   it("responds to image list api call with empty timestamp", async () => {
     await createMissingImage();
 
     await loginTestUser(request);
-    return request
-      .get("/api/v1/images")
-      .expect(200)
-      .expect(({ text }) => {
-        const o = JSON.parse(text);
-        expect(o).toHaveLength(7);
-      });
+    const images = await request.get("/api/v1/images").expect(200);
+
+    const parsed = imageListSchema.parse(images.body);
+    expect(parsed).toHaveLength(7);
   });
 
   it("responds to single image api call", async () => {

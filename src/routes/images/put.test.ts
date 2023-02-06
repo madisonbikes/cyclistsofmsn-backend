@@ -1,28 +1,24 @@
 import {
-  createTestAdminUser,
-  createTestEditorUser,
-  createTestUser,
   loginTestAdminUser,
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
-  testContainer,
   testRequest,
   TestRequest,
 } from "../../test";
-import { PhotoServer } from "../../server";
 import { Image } from "../../database";
+import {
+  createTestAdminUser,
+  createTestEditorUser,
+  createTestUser,
+} from "../../test/data";
 
 describe("server process - images", () => {
-  let photoServer: PhotoServer;
   let request: TestRequest;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
-
     await Promise.all([
       createTestUser(),
       createTestAdminUser(),
@@ -30,8 +26,8 @@ describe("server process - images", () => {
     ]);
   });
 
-  afterAll(async () => {
-    await photoServer.stop();
+  beforeEach(() => {
+    request = testRequest();
   });
 
   it("responds to unauthenticated image update api call", () => {

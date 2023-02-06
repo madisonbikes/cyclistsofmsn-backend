@@ -1,34 +1,28 @@
 import {
-  createTestAdminUser,
   loginTestAdminUser,
   setupSuite,
-  testContainer,
   testRequest,
   TestRequest,
 } from "../test";
-import { PhotoServer } from "../server";
 import {
   postSchema,
   postStatusFlagSchema,
   SchedulePostOptions,
 } from "./contract";
 import { startOfTomorrow } from "date-fns";
+import { createTestAdminUser } from "../test/data";
 
 describe("server process - tasks", () => {
-  let photoServer: PhotoServer;
   let request: TestRequest;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
-
     await createTestAdminUser();
   });
 
-  afterAll(async () => {
-    await photoServer.stop();
+  beforeEach(() => {
+    request = testRequest();
   });
 
   it("scheduleTask for tomorrow succeeds", async () => {

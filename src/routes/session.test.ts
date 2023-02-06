@@ -1,33 +1,18 @@
-import {
-  createTestUser,
-  setupSuite,
-  testContainer,
-  testRequest,
-  TestRequest,
-} from "../test";
-import { PhotoServer } from "../server";
+import { setupSuite, testRequest, TestRequest } from "../test";
+import { createTestUser } from "../test/data";
 
 describe("login route", () => {
-  let photoServer: PhotoServer;
   let request: TestRequest;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    photoServer = testContainer().resolve(PhotoServer);
-    request = testRequest(await photoServer.create());
-
     // create a test user for login
     await createTestUser();
   });
 
-  afterAll(async () => {
-    await photoServer.stop();
-  });
-
-  afterEach(() => {
-    // ensure serverside sessions are removed
-    return request.post("/api/v1/session/logout");
+  beforeEach(() => {
+    request = testRequest();
   });
 
   it("responds to login api with good credentials successfully", () => {

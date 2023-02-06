@@ -10,7 +10,7 @@ import { getImageQuerySchema, GetImageQuery } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 
 @injectable()
-export class SingleImageGet {
+export class ImageGet {
   constructor(private fsRepository: FilesystemRepository) {}
 
   readonly querySchema = getImageQuerySchema;
@@ -63,5 +63,11 @@ export class SingleImageGet {
       .type("jpeg")
       .set("Cache-Control", "max-age=3600, s-max-age=36000")
       .send(buffer);
+  };
+
+  listHandler = async (_req: Request, res: Response) => {
+    const images = await Image.find({ deleted: false });
+    const retval = lenientImageSchema.array().parse(images);
+    res.send(retval);
   };
 }

@@ -1,0 +1,69 @@
+import { connection } from "mongoose";
+
+/** returns array of inserted post id's */
+export const createTestPosts = async () => {
+  const { insertedId: image } = await connection
+    .collection("images")
+    .insertOne({
+      filename: "blarg.jpg",
+      deleted: false,
+      description_from_exif: false,
+    });
+  const { insertedIds, insertedCount } = await connection
+    .collection("posts")
+    .insertMany([
+      {
+        image,
+        timestamp: new Date(Date.now() + 2000),
+        status: { flag: "failed" },
+      },
+      {
+        image,
+        timestamp: new Date(Date.now()),
+        status: { flag: "complete" },
+      },
+      {
+        image,
+        timestamp: new Date(Date.now() + 1000),
+        status: { flag: "pending" },
+      },
+      // add post missing image id to test filtering
+      {
+        timestamp: new Date(Date.now() + 3000),
+        status: { flag: "pending" },
+      },
+    ]);
+
+  const retval: string[] = [];
+  for (let i = 0; i < insertedCount; i++) {
+    retval.push(insertedIds[i].toString());
+  }
+  return retval;
+};
+
+const PASSWORD_WITH_LOW_WORK_FACTOR =
+  "$2y$04$lQNknVpHEe6ddO3Et1nMGe6q4lNrtNcC3ikrhshs.wT.neD7JwBbm";
+
+export const createTestUser = async () => {
+  await connection.collection("users").insertOne({
+    username: "testuser",
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    roles: [],
+  });
+};
+
+export const createTestAdminUser = async () => {
+  await connection.collection("users")?.insertOne({
+    username: "testadmin",
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    roles: ["admin", "editor"],
+  });
+};
+
+export const createTestEditorUser = async () => {
+  await connection.collection("users")?.insertOne({
+    username: "testeditor",
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    roles: ["editor"],
+  });
+};

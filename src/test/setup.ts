@@ -10,8 +10,9 @@ import {
 import path from "path";
 import { Database } from "../database";
 import assert from "assert";
-import { TestRequest } from ".";
 import mongoose from "mongoose";
+import { PhotoServer } from "../server";
+import { Server, TestRequest } from "./request";
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;
@@ -19,9 +20,15 @@ let mongoServer: MongoMemoryServer | undefined;
 // the test container is initialized once for the suite
 let tc: DependencyContainer | undefined;
 
+export let photoServer: PhotoServer | undefined;
+export let runningPhotoServer: Server | undefined;
+
 export type SuiteOptions = {
   // spin up a memory mongodb instance for testing purposes
   withDatabase: boolean;
+
+  // start up a photoserver instance
+  withPhotoServer: boolean;
 
   // clear images after each test
   clearImages: boolean;
@@ -37,6 +44,11 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
     tc = await initializeSuite(options);
 
     await createDatabaseConnection();
+
+    if (options.withPhotoServer) {
+      photoServer = tc.resolve(PhotoServer);
+      runningPhotoServer = await photoServer.create();
+    }
   });
 
   afterEach(async () => {
@@ -53,6 +65,9 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterAll(async () => {
     assert(tc);
 
+    await photoServer?.stop();
+    photoServer = undefined;
+
     await clearDatabaseConnection();
     await cleanupSuite();
     tc = undefined;
@@ -63,20 +78,17 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
  * Callers that make modifications to the container should do so in a CHILD container because the container is not reset
  * between test
  */
-export const testContainer = (): DependencyContainer => {
+export const testContainer = () => {
   assert(tc);
   return tc;
 };
 
 /** return the object managing the connection to the mongodb instance */
-export const testDatabase = (): Database => {
+export const testDatabase = () => {
   return testContainer().resolve(Database);
 };
 
-const initializeSuite = async (
-  options: Partial<SuiteOptions>
-): Promise<DependencyContainer> => {
-  const withDatabase = options.withDatabase;
+const initializeSuite = async ({ withDatabase }: Partial<SuiteOptions>) => {
   if (withDatabase) {
     // start the mongo in-memory server on an ephemeral port
     mongoServer = await MongoMemoryServer.create();
@@ -110,7 +122,7 @@ const initializeSuite = async (
   return testContainer;
 };
 
-const cleanupSuite = async (): Promise<void> => {
+const cleanupSuite = async () => {
   await mongoServer?.stop();
   mongoServer = undefined;
 };
@@ -135,33 +147,6 @@ const clearDatabaseConnection = async () => {
 
 const createDatabaseConnection = async () => {
   await testDatabase().start();
-};
-
-const PASSWORD_WITH_LOW_WORK_FACTOR =
-  "$2y$04$lQNknVpHEe6ddO3Et1nMGe6q4lNrtNcC3ikrhshs.wT.neD7JwBbm";
-
-export const createTestUser = async () => {
-  await mongoose.connection.collection("users").insertOne({
-    username: "testuser",
-    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-    roles: [],
-  });
-};
-
-export const createTestAdminUser = async () => {
-  await mongoose.connection.collection("users")?.insertOne({
-    username: "testadmin",
-    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-    roles: ["admin", "editor"],
-  });
-};
-
-export const createTestEditorUser = async () => {
-  await mongoose.connection.collection("users")?.insertOne({
-    username: "testeditor",
-    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-    roles: ["editor"],
-  });
 };
 
 export const loginTestUser = (request: TestRequest) => {

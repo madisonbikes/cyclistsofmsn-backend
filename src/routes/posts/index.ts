@@ -28,7 +28,12 @@ export class PostRouter {
     .get("/current", asyncWrapper(currentPostHandler))
 
     // current post
-    .get("/:id", validateEditor(), validateId(), asyncWrapper(getPostHandler))
+    .get(
+      "/:id",
+      validateAuthenticated(),
+      validateId(),
+      asyncWrapper(getPostHandler)
+    )
 
     .put(
       "/:id",
