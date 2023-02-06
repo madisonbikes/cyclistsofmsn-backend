@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { PostHistory } from "../../database";
 import { logger } from "../../utils";
-import { MutablePost, mutablePostSchema } from "../contract";
+import { PutPostBody, putPostBodySchema } from "../contract";
 import { mapPostSchema } from "./types";
 
-export const bodySchema = mutablePostSchema;
+export const bodySchema = putPostBodySchema;
 
 export const handler = async (req: Request, res: Response) => {
-  const body = req.validated as MutablePost;
+  const body = req.validated as PutPostBody;
 
   const { id } = req.params;
   logger.trace({ id, body }, "put single post");

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { Image, ImageDocument } from "../../database";
 import { logger } from "../../utils";
-import { MutableImage, mutableImageSchema } from "../contract";
+import { PutImageBody, putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 
-export const bodySchema = mutableImageSchema;
+export const bodySchema = putImageBodySchema;
 
 export const handler = async (req: Request, res: Response) => {
-  const body = req.validated as MutableImage;
+  const body = req.validated as PutImageBody;
 
   const { id } = req.params;
   logger.trace({ id, body }, "put single image");

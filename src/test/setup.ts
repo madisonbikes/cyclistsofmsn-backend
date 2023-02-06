@@ -41,7 +41,27 @@ export type SuiteOptions = {
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   beforeAll(async () => {
     assert(tc === undefined);
-    tc = await initializeSuite(options);
+    tc = await initializeSuite();
+
+    if (options.withDatabase) {
+      // start the mongo in-memory server on an ephemeral port
+      mongoServer = await MongoMemoryServer.create();
+      mongoUri = mongoServer.getUri();
+
+      // provide a Database object scoped to the container rather, overriding singleton normally
+      tc.register<Database>(
+        Database,
+        { useClass: Database },
+        { lifecycle: Lifecycle.ContainerScoped }
+      );
+    } else {
+      // if database not enabled, trigger an error if we try to inject a database object
+      tc.register<Database>(Database, {
+        useFactory: () => {
+          throw new Error("No database allowed for this test suite");
+        },
+      });
+    }
 
     await createDatabaseConnection();
 
@@ -65,8 +85,12 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterAll(async () => {
     assert(tc);
 
+    runningPhotoServer = undefined;
     await photoServer?.stop();
     photoServer = undefined;
+
+    await mongoServer?.stop();
+    mongoServer = undefined;
 
     await clearDatabaseConnection();
     await cleanupSuite();
@@ -88,13 +112,7 @@ export const testDatabase = () => {
   return testContainer().resolve(Database);
 };
 
-const initializeSuite = async ({ withDatabase }: Partial<SuiteOptions>) => {
-  if (withDatabase) {
-    // start the mongo in-memory server on an ephemeral port
-    mongoServer = await MongoMemoryServer.create();
-    mongoUri = mongoServer.getUri();
-  }
-
+const initializeSuite = () => {
   // don't use value registrations because they will be cleared in the beforeEach() handler
   const testContainer = rootContainer.createChildContainer();
 
@@ -104,27 +122,11 @@ const initializeSuite = async ({ withDatabase }: Partial<SuiteOptions>) => {
     { useClass: TestConfiguration },
     { lifecycle: Lifecycle.ContainerScoped }
   );
-  if (withDatabase) {
-    // provide a Database object scoped to the container rather, overriding singleton normally
-    testContainer.register<Database>(
-      Database,
-      { useClass: Database },
-      { lifecycle: Lifecycle.ContainerScoped }
-    );
-  } else {
-    // if database not enabled, trigger an error if we try to inject a database object
-    testContainer.register<Database>(Database, {
-      useFactory: () => {
-        throw new Error("No database allowed for this test suite");
-      },
-    });
-  }
-  return testContainer;
+  return Promise.resolve(testContainer);
 };
 
 const cleanupSuite = async () => {
-  await mongoServer?.stop();
-  mongoServer = undefined;
+  // empty
 };
 
 @injectable()
