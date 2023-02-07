@@ -79,7 +79,8 @@ export class PostDispatcher implements Lifecycle {
     let postImage: ImageDocument | null = null;
     if (nextPost.image != null) {
       // use existing selected image, if it exists
-      postImage = await Image.findById(nextPost.image.id);
+      const { id } = nextPost.image;
+      postImage = await Image.findById(id);
     }
     if (postImage == null) {
       // or generate a new image

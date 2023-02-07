@@ -78,6 +78,7 @@ export class PostHistoryClass {
         "status.flag": PostStatus.PENDING,
         timestamp: { $gte: start, $lte: end },
       })
+      .populate("image")
       .sort({ timestamp: -1 });
   }
 }
