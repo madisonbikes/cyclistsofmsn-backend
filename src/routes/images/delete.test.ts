@@ -6,7 +6,7 @@ import {
   testRequest,
   TestRequest,
 } from "../../test";
-import { Image } from "../../database";
+import { Image, PostHistory } from "../../database";
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import {
@@ -19,7 +19,12 @@ describe("server process - images", () => {
   let request: TestRequest;
   let testImageId: ObjectId;
 
-  setupSuite({ withDatabase: true, withPhotoServer: true });
+  setupSuite({
+    withDatabase: true,
+    withPhotoServer: true,
+    clearImages: true,
+    clearPostHistory: true,
+  });
 
   beforeAll(async () => {
     await Promise.all([
@@ -81,11 +86,46 @@ describe("server process - images", () => {
     // TODO implement this test, problems due to static test_resources at the moment
   });
 
+  it("responds to image delete api call, clearing posts that reference this image", async () => {
+    await loginTestAdminUser(request);
+
+    // make sure image exists
+    let checkImage = await Image.findById(testImageId);
+    expect(checkImage).toBeDefined();
+
+    const createdPostId = await createTestPost(testImageId);
+
+    // ensure post exists and is assigned to the image
+    let checkPost = await PostHistory.findById(createdPostId);
+    expect(checkPost?.image).toBeDefined();
+
+    // delete the image
+    await request.delete(`/api/v1/images/${testImageId}`).expect(200);
+
+    // image should not exist
+    checkImage = await Image.findById(testImageId);
+    expect(checkImage).toBeNull();
+
+    checkPost = await PostHistory.findById(createdPostId);
+    expect(checkPost).toBeDefined();
+    expect(checkPost?.image).not.toBeDefined();
+  });
+
   const createTestImage = async () => {
     const retval = await mongoose.connection.collection("images").insertOne({
       filename: "created.jpg",
       deleted: false,
       description_from_exif: false,
+    });
+    return retval.insertedId;
+  };
+
+  /** create a test post with the supplied image id */
+  const createTestPost = async (image: ObjectId) => {
+    const retval = await mongoose.connection.collection("posts").insertOne({
+      image,
+      timestamp: new Date(),
+      status: { flag: "pending" },
     });
     return retval.insertedId;
   };

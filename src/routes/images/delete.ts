@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { injectable } from "tsyringe";
-import { Image } from "../../database";
+import { Image, PostHistory } from "../../database";
 import { FilesystemRepository } from "../../fs_repository";
 import { logger } from "../../utils";
 
@@ -19,6 +19,11 @@ export class SingleImageDelete {
         const fullPath = this.repository.photoPath(filename);
         await this.repository.delete(fullPath);
       }
+      const postList = await PostHistory.find({ image: id });
+      for (const post of postList) {
+        post.image = undefined;
+      }
+      await Promise.all(postList.map((p) => p.save()));
       res.sendStatus(200);
     } else {
       // not found
