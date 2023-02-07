@@ -3,7 +3,7 @@ import { Image } from "../database";
 import { PostExecutor } from "./postExecutor";
 import { injectable } from "tsyringe";
 import { PhotoTwitterClient } from "../twitter/post";
-import { PhotoMastadonClient } from "../mastadon/post";
+import { PhotoMastodonClient } from "../mastodon/post";
 
 describe("test executor component", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
@@ -27,7 +27,7 @@ describe("test executor component", () => {
 
     return testContainer()
       .register(PhotoTwitterClient, { useValue: noopTweeter })
-      .register(PhotoMastadonClient, { useValue: noopTooter })
+      .register(PhotoMastodonClient, { useValue: noopTooter })
       .resolve(PostExecutor);
   };
 });
@@ -40,7 +40,7 @@ class NoopPhotoTweeter extends PhotoTwitterClient {
 }
 
 @injectable()
-class NoopPhotoTooter extends PhotoMastadonClient {
+class NoopPhotoTooter extends PhotoMastodonClient {
   override post(_image: string): Promise<string> {
     return Promise.resolve("0");
   }

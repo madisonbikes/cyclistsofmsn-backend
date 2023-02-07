@@ -22,10 +22,10 @@ export class ServerConfiguration {
   public readonly twitterAccessTokenSecret =
     process.env.TWITTER_ACCESS_TOKEN_SECRET || "";
 
-  public readonly mastadonUri = process.env.MASTADON_URI || "";
-  public readonly mastadonAccessToken = process.env.MASTADON_ACCESS_TOKEN || "";
-  public readonly mastadonStatusVisibility =
-    process.env.MASTADON_STATUS_VISIBILITY;
+  public readonly mastodonUri = process.env.MASTODON_URI || "";
+  public readonly mastodonAccessToken = process.env.MASTODON_ACCESS_TOKEN || "";
+  public readonly mastodonStatusVisibility =
+    process.env.MASTODON_STATUS_VISIBILITY;
 
   public readonly redisUri = process.env.REDIS_URI || "";
 
