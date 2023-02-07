@@ -1,4 +1,4 @@
-import { postSchema } from "../contract";
+import { Post, postSchema, postStatusSchema } from "../contract";
 import { PostHistoryDocument } from "../../database";
 import { isDocument } from "@typegoose/typegoose";
 
@@ -11,19 +11,22 @@ export const mapPostSchema = z.preprocess((p) => {
     throw new Error(`unexpected post document: ${JSON.stringify(post)}`);
   }
 
+  const status = postStatusSchema.parse(post.status);
+  let retval: Post;
   if (isDocument(post.image)) {
-    return {
+    retval = {
       id: post.id,
       timestamp: post.timestamp,
-      imageid: post.image._id,
-      status: post.status,
+      imageid: post.image._id ?? undefined,
+      status,
     };
   } else {
-    return {
+    retval = {
       id: post.id,
       timestamp: post.timestamp,
-      imageid: post.image,
-      status: post.status,
+      imageid: post.image?.toString() ?? undefined,
+      status,
     };
   }
+  return retval;
 }, postSchema);

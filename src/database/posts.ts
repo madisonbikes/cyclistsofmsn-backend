@@ -49,6 +49,7 @@ export class PostHistoryClass {
       .populate({ path: "image", select: ["deleted"] });
   }
 
+  /** returns sorted by timestamp ascending */
   public static async findOrderedPosts(
     this: ReturnModelType<typeof PostHistoryClass>
   ) {

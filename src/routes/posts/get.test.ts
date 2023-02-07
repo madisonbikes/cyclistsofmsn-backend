@@ -26,18 +26,18 @@ describe("server process - posts", () => {
   });
 
   it("responds to single post api call", async () => {
-    const insertedIds = await createTestPosts();
+    const { insertedPostIds } = await createTestPosts();
     await loginTestUser(request);
 
-    const id = insertedIds[0];
+    const id = insertedPostIds[0];
     const postResponse = await request.get(`/api/v1/posts/${id}`).expect(200);
     const parsed = postSchema.parse(postResponse.body);
     expect(parsed).toBeDefined();
   });
 
   it("failed response to to single unauthenticated post api call", async () => {
-    const insertedIds = await createTestPosts();
-    const id = insertedIds[0];
+    const { insertedPostIds } = await createTestPosts();
+    const id = insertedPostIds[0];
     return request.get(`/api/v1/posts/${id}`).expect(401);
   });
 

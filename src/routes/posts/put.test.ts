@@ -55,12 +55,12 @@ describe("server process - posts", () => {
   });
 
   it("responds to post update api call", async () => {
-    const insertedIds = await createTestPosts();
+    const { insertedPostIds } = await createTestPosts();
 
     await loginTestEditorUser(request);
 
-    expect(insertedIds).not.toHaveLength(0);
-    const goodId = insertedIds[0];
+    expect(insertedPostIds).not.toHaveLength(0);
+    const goodId = insertedPostIds[0];
     await request
       .put(`/api/v1/posts/${goodId}`)
       .send({ status: { flag: "pending" } })

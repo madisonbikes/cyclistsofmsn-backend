@@ -18,7 +18,7 @@ export const getPostHandler = async (req: Request, res: Response) => {
   const post = await PostHistory.findById(id);
   if (post != null) {
     const retval = mapPostSchema.parse(post);
-    logger.debug({ post: retval }, "returned post data");
+    logger.trace({ post: retval }, "returned post data");
     return res.send(retval);
   } else {
     return res.sendStatus(404);
@@ -27,6 +27,7 @@ export const getPostHandler = async (req: Request, res: Response) => {
 
 export const getPostListHandler = async (_req: Request, res: Response) => {
   const posts = await PostHistory.findOrderedPosts();
-  logger.trace({ posts }, "returned posts");
-  return res.send(mapPostSchema.array().parse(posts));
+  const parsed = mapPostSchema.array().parse(posts);
+  logger.trace({ posts: parsed }, "returned posts");
+  return res.send(parsed);
 };

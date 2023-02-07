@@ -34,11 +34,11 @@ export const createTestPosts = async () => {
       },
     ]);
 
-  const retval: string[] = [];
+  const mappedPostIds: string[] = [];
   for (let i = 0; i < insertedCount; i++) {
-    retval.push(insertedIds[i].toString());
+    mappedPostIds.push(insertedIds[i].toString());
   }
-  return retval;
+  return { insertedImageId: image.toString(), insertedPostIds: mappedPostIds };
 };
 
 const PASSWORD_WITH_LOW_WORK_FACTOR =
