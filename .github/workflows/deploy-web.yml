@@ -24,7 +24,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npm run test
+      - run: npm run test --maxWorkers=50%
       - run: npm run lint
 
       - name: Deploy on Server
