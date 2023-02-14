@@ -34,4 +34,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          script: /home/cyclists_of_msn/apps/cyclists_of_msn_web/redeploy_backend
+          script: ${{ secrets.DEPLOY_SCRIPT }}

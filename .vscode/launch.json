@@ -24,13 +24,7 @@
     {
       "name": "Selective tests via NPM",
       "request": "launch",
-      "runtimeArgs": [
-        "run",
-        "test",
-        "--",
-        "-t filter",
-        "src/posts/scheduler.test.ts"
-      ],
+      "runtimeArgs": ["run", "test", "--", "-i", "get"],
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",

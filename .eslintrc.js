@@ -18,7 +18,7 @@ module.exports = {
     ecmaVersion: 6,
     project: "./tsconfig.json",
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "promise"],
   reportUnusedDisableDirectives: true,
   rules: {
     "no-unused-vars": "off",
