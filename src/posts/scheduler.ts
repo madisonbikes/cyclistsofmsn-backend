@@ -40,7 +40,7 @@ export class PostScheduler {
   }: SchedulePostOptions): Promise<PostResult> {
     const matchingPosts = await PostHistory.findScheduledPost(when);
     if (matchingPosts.length > 0) {
-      if (!overwrite) {
+      if (overwrite ?? false) {
         if (matchingPosts.length > 1) {
           logger.warn(
             {

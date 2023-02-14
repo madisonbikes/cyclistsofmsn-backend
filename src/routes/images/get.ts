@@ -38,7 +38,7 @@ export class ImageGet {
     const imageFile = this.fsRepository.photoPath(filename);
 
     let { width } = query;
-    if (!width && !query.height) {
+    if (width === undefined && query.height === undefined) {
       width = 1024;
     }
 

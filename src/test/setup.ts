@@ -38,11 +38,13 @@ export type SuiteOptions = {
 
 /** entry point that should be included first in each describe block */
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
+  const withDatabase = options.withDatabase ?? false;
+  const withPhotoServer = options.withPhotoServer ?? false;
   beforeAll(async () => {
     assert(tc === undefined);
     tc = await initializeSuite();
 
-    if (options.withDatabase) {
+    if (withDatabase) {
       // start the mongo in-memory server on an ephemeral port
       mongoServer = await MongoMemoryServer.create();
       mongoUri = mongoServer.getUri();
@@ -64,7 +66,7 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
       });
     }
 
-    if (options.withPhotoServer) {
+    if (withPhotoServer) {
       photoServer = tc.resolve(PhotoServer);
       runningPhotoServer = await photoServer.create();
     }
@@ -72,10 +74,10 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
 
   afterEach(async () => {
     const queries: Array<Promise<unknown>> = [];
-    if (options.clearPostHistory) {
+    if (options.clearPostHistory ?? false) {
       queries.push(testDatabase().collection("posts")?.deleteMany({}));
     }
-    if (options.clearImages) {
+    if (options.clearImages ?? false) {
       queries.push(testDatabase().collection("images")?.deleteMany({}));
     }
     await Promise.all(queries);
@@ -84,13 +86,13 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterAll(async () => {
     assert(tc);
 
-    if (options.withPhotoServer) {
+    if (withPhotoServer) {
       runningPhotoServer = undefined;
       await photoServer?.stop();
       photoServer = undefined;
     }
 
-    if (options.withDatabase) {
+    if (withDatabase) {
       await mongoServer?.stop();
       mongoServer = undefined;
 

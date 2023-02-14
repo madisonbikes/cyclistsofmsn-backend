@@ -22,7 +22,7 @@ export class SessionRouter {
         response.status(400).send("not logged in");
       } else {
         request.logout((err) => {
-          if (err) {
+          if (err !== undefined) {
             return next(err);
           } else {
             response.send("logged out");

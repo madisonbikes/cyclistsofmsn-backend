@@ -4,10 +4,10 @@ import { initEnv } from "./env";
 
 initEnv();
 
-const logFile = process.env.LOG_FILE || "backend.log";
-const logLevel = process.env.LOG_LEVEL || "info";
-const consoleLogLevel = process.env.CONSOLE_LOG_LEVEL || "info";
-const testLogLevel = process.env.TEST_LOG_LEVEL || "silent";
+const logFile = process.env.LOG_FILE ?? "backend.log";
+const logLevel = process.env.LOG_LEVEL ?? "info";
+const consoleLogLevel = process.env.CONSOLE_LOG_LEVEL ?? "info";
+const testLogLevel = process.env.TEST_LOG_LEVEL ?? "silent";
 
 const serializers = {
   err: stdSerializers.err,

@@ -76,7 +76,9 @@ export class MockSimpleScheduler extends SimpleScheduler {
 
     const filtered = this.scheduled.filter((item) => {
       return (
-        !item.cancelled && item.nextWhen >= this.lastRun && item.nextWhen < now
+        item.cancelled === undefined &&
+        item.nextWhen >= this.lastRun &&
+        item.nextWhen < now
       );
     });
 
