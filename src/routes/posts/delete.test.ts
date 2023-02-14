@@ -3,11 +3,11 @@ import {
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
+  testDatabase,
   testRequest,
   TestRequest,
 } from "../../test";
 import { PostHistory } from "../../database";
-import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import {
   createTestAdminUser,
@@ -76,11 +76,11 @@ describe("server process - posts", () => {
   });
 
   const createTestPost = async () => {
-    const retval = await mongoose.connection.collection("posts").insertOne({});
+    const retval = await testDatabase().collection("posts").insertOne({});
     return retval.insertedId;
   };
 
   const deletePost = (_id: ObjectId) => {
-    return mongoose.connection.collection("posts").deleteOne({ _id });
+    return testDatabase().collection("posts").deleteOne({ _id });
   };
 });

@@ -10,9 +10,8 @@ import {
 import path from "path";
 import { Database } from "../database";
 import assert from "assert";
-import mongoose from "mongoose";
 import { PhotoServer } from "../server";
-import { Server, TestRequest } from "./request";
+import { Server } from "./request";
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;
@@ -54,6 +53,8 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
         { useClass: Database },
         { lifecycle: Lifecycle.ContainerScoped }
       );
+
+      await testDatabase().start();
     } else {
       // if database not enabled, trigger an error if we try to inject a database object
       tc.register<Database>(Database, {
@@ -62,8 +63,6 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
         },
       });
     }
-
-    await createDatabaseConnection();
 
     if (options.withPhotoServer) {
       photoServer = tc.resolve(PhotoServer);
@@ -74,10 +73,10 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterEach(async () => {
     const queries: Array<Promise<unknown>> = [];
     if (options.clearPostHistory) {
-      queries.push(mongoose.connection.collection("posts")?.deleteMany({}));
+      queries.push(testDatabase().collection("posts")?.deleteMany({}));
     }
     if (options.clearImages) {
-      queries.push(mongoose.connection.collection("images")?.deleteMany({}));
+      queries.push(testDatabase().collection("images")?.deleteMany({}));
     }
     await Promise.all(queries);
   });
@@ -85,14 +84,19 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterAll(async () => {
     assert(tc);
 
-    runningPhotoServer = undefined;
-    await photoServer?.stop();
-    photoServer = undefined;
+    if (options.withPhotoServer) {
+      runningPhotoServer = undefined;
+      await photoServer?.stop();
+      photoServer = undefined;
+    }
 
-    await mongoServer?.stop();
-    mongoServer = undefined;
+    if (options.withDatabase) {
+      await mongoServer?.stop();
+      mongoServer = undefined;
 
-    await clearDatabaseConnection();
+      await testDatabase().stop();
+    }
+
     await cleanupSuite();
     tc = undefined;
   });
@@ -147,11 +151,3 @@ class TestConfiguration extends ServerConfiguration {
     this.redisUri = "";
   }
 }
-
-const clearDatabaseConnection = async () => {
-  await testDatabase().stop();
-};
-
-const createDatabaseConnection = async () => {
-  await testDatabase().start();
-};

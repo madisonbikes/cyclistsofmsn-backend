@@ -21,6 +21,13 @@ export class Database implements Lifecycle {
     return this._refreshAllMetadata;
   }
 
+  collection(name: string) {
+    if (this.connection === undefined) {
+      throw new Error("not connected to mongodb");
+    }
+    return this.connection.connection.collection(name);
+  }
+
   async start(): Promise<boolean> {
     if (this.connection) {
       logger.debug(

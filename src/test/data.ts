@@ -1,15 +1,15 @@
-import { connection } from "mongoose";
+import { testDatabase } from "./setup";
 
 /** returns array of inserted post id's */
 export const createTestPosts = async () => {
-  const { insertedId: image } = await connection
+  const { insertedId: image } = await testDatabase()
     .collection("images")
     .insertOne({
       filename: "blarg.jpg",
       deleted: false,
       description_from_exif: false,
     });
-  const { insertedIds, insertedCount } = await connection
+  const { insertedIds, insertedCount } = await testDatabase()
     .collection("posts")
     .insertMany([
       {
@@ -45,7 +45,7 @@ const PASSWORD_WITH_LOW_WORK_FACTOR =
   "$2y$04$lQNknVpHEe6ddO3Et1nMGe6q4lNrtNcC3ikrhshs.wT.neD7JwBbm";
 
 export const createTestUser = async () => {
-  await connection.collection("users").insertOne({
+  await testDatabase().collection("users").insertOne({
     username: "testuser",
     hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
     roles: [],
@@ -53,17 +53,21 @@ export const createTestUser = async () => {
 };
 
 export const createTestAdminUser = async () => {
-  await connection.collection("users")?.insertOne({
-    username: "testadmin",
-    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-    roles: ["admin", "editor"],
-  });
+  await testDatabase()
+    .collection("users")
+    .insertOne({
+      username: "testadmin",
+      hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+      roles: ["admin", "editor"],
+    });
 };
 
 export const createTestEditorUser = async () => {
-  await connection.collection("users")?.insertOne({
-    username: "testeditor",
-    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-    roles: ["editor"],
-  });
+  await testDatabase()
+    .collection("users")
+    .insertOne({
+      username: "testeditor",
+      hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+      roles: ["editor"],
+    });
 };

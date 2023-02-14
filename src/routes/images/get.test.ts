@@ -2,12 +2,12 @@ import {
   loginTestUser,
   setupSuite,
   testContainer,
+  testDatabase,
   testRequest,
   TestRequest,
 } from "../../test";
 import { Cache } from "../cache";
 import { imageListSchema } from "../contract";
-import mongoose from "mongoose";
 import { createTestUser } from "../../test/data";
 
 describe("server process - images", () => {
@@ -28,7 +28,7 @@ describe("server process - images", () => {
 
   afterEach(async () => {
     // reset database
-    await mongoose.connection
+    await testDatabase()
       .collection("images")
       .deleteMany({ filename: "missing.jpg" });
     cache.clear();
@@ -162,7 +162,7 @@ describe("server process - images", () => {
   };
 
   const createMissingImage = async () => {
-    const retval = await mongoose.connection.collection("images").insertOne({
+    const retval = await testDatabase().collection("images").insertOne({
       filename: "missing.jpg",
       deleted: false,
       description_from_exif: false,

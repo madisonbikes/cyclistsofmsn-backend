@@ -3,11 +3,11 @@ import {
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
+  testDatabase,
   testRequest,
   TestRequest,
 } from "../../test";
 import { Image, PostHistory } from "../../database";
-import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import {
   createTestAdminUser,
@@ -112,7 +112,7 @@ describe("server process - images", () => {
   });
 
   const createTestImage = async () => {
-    const retval = await mongoose.connection.collection("images").insertOne({
+    const retval = await testDatabase().collection("images").insertOne({
       filename: "created.jpg",
       deleted: false,
       description_from_exif: false,
@@ -122,15 +122,17 @@ describe("server process - images", () => {
 
   /** create a test post with the supplied image id */
   const createTestPost = async (image: ObjectId) => {
-    const retval = await mongoose.connection.collection("posts").insertOne({
-      image,
-      timestamp: new Date(),
-      status: { flag: "pending" },
-    });
+    const retval = await testDatabase()
+      .collection("posts")
+      .insertOne({
+        image,
+        timestamp: new Date(),
+        status: { flag: "pending" },
+      });
     return retval.insertedId;
   };
 
   const deleteImage = (_id: ObjectId) => {
-    return mongoose.connection.collection("images").deleteOne({ _id });
+    return testDatabase().collection("images").deleteOne({ _id });
   };
 });
