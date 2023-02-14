@@ -4,6 +4,7 @@ import { NowProvider, RandomProvider } from "../utils";
 export * from "./assertions";
 export * from "./setup";
 export * from "./request";
+export * from "./login";
 
 /** Generates deterministric values that meet the randomInt() contract */
 export class NotVeryRandom extends RandomProvider {

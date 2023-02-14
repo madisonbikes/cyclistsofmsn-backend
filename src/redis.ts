@@ -23,13 +23,13 @@ export class RedisConnection implements Lifecycle {
   }
 
   async start() {
-    if (this.client) {
+    if (this.client !== undefined) {
       await this.client.connect();
     }
   }
 
   async stop() {
-    if (this.client) {
+    if (this.client !== undefined) {
       await this.client.disconnect();
       this.client = undefined;
     }

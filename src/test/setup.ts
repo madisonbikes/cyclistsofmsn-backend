@@ -131,15 +131,20 @@ const cleanupSuite = async () => {
 
 @injectable()
 class TestConfiguration extends ServerConfiguration {
-  public override photosDir: string;
-  public override mongodbUri: string;
+  public override photosDir;
+  public override mongodbUri;
+  public override redisUri;
 
   constructor() {
     super();
 
     this.photosDir = path.resolve(__dirname, "../../test_resources");
+
     // use static mongo URI set in suite initialization
     this.mongodbUri = mongoUri;
+
+    // don't enable redis for testing
+    this.redisUri = "";
   }
 }
 
@@ -149,25 +154,4 @@ const clearDatabaseConnection = async () => {
 
 const createDatabaseConnection = async () => {
   await testDatabase().start();
-};
-
-export const loginTestUser = (request: TestRequest) => {
-  return request
-    .post("/api/v1/session/login")
-    .send({ username: "testuser", password: "password" })
-    .expect(200);
-};
-
-export const loginTestAdminUser = (request: TestRequest) => {
-  return request
-    .post("/api/v1/session/login")
-    .send({ username: "testadmin", password: "password" })
-    .expect(200);
-};
-
-export const loginTestEditorUser = (request: TestRequest) => {
-  return request
-    .post("/api/v1/session/login")
-    .send({ username: "testeditor", password: "password" })
-    .expect(200);
 };
