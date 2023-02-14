@@ -51,7 +51,7 @@
     "redis": "^4.5.1",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.31.3",
-    "superagent": "^8.0.6",
+    "superagent": "^8.0.9",
     "ts-node": "^10.9.1",
     "tsyringe": "^4.7.0",
     "twitter-api-client": "^1.6.1",
