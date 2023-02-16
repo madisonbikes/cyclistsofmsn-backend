@@ -42,17 +42,21 @@ export class Strategies {
       done("null username", false);
       return;
     }
-    const user = await User.findOne({ username });
-    if (user) {
-      success = await this.checkPassword(user.hashed_password, password);
-    } else {
-      // even with missing user, waste cpu cycles "checking" password to hide this API consumers
-      await generateHashedPassword("no_password");
-    }
-    if (!success || !user) {
-      done(null, false);
-    } else {
-      done(null, this.authenticatedUser(user));
+    try {
+      const user = await User.findOne({ username });
+      if (user) {
+        success = await this.checkPassword(user.hashed_password, password);
+      } else {
+        // even with missing user, waste cpu cycles "checking" password to hide this API consumers
+        await generateHashedPassword("no_password");
+      }
+      if (!success || !user) {
+        done(null, false);
+      } else {
+        done(null, this.authenticatedUser(user));
+      }
+    } catch (err) {
+      done(err, false);
     }
   });
 
