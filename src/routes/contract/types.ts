@@ -57,7 +57,7 @@ export const loginBodySchema = z
     password: z.string(),
   })
   .strict();
-export type LoginRequest = z.infer<typeof loginBodySchema>;
+export type LoginBody = z.infer<typeof loginBodySchema>;
 
 export const authenticatedUserSchema = z.object({
   username: z.string(),
