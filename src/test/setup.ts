@@ -140,6 +140,7 @@ class TestConfiguration extends ServerConfiguration {
   public override photosDir;
   public override mongodbUri;
   public override redisUri;
+  public override secureCookie;
 
   constructor() {
     super();
@@ -151,5 +152,8 @@ class TestConfiguration extends ServerConfiguration {
 
     // don't enable redis for testing
     this.redisUri = "";
+
+    // tests don't use SSL
+    this.secureCookie = false;
   }
 }

@@ -24,6 +24,7 @@ export class RedisConnection implements Lifecycle {
 
   async start() {
     if (this.client !== undefined) {
+      logger.info(`Connecting to redis on ${this.config.redisUri}`);
       await this.client.connect();
     }
   }

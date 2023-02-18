@@ -14,6 +14,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategies } from "./security";
 import { RedisConnection } from "./redis";
+import { SessionMiddlewareConfigurator } from "./session";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -38,7 +39,8 @@ export class PhotoServer implements Lifecycle {
     private apiRouter: MainRouter,
     postDispatcher: PostDispatcher,
     postPopulate: PostPopulate,
-    private strategies: Strategies
+    private strategies: Strategies,
+    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator
   ) {
     this.components.push(database);
     this.components.push(redis);
@@ -79,15 +81,7 @@ export class PhotoServer implements Lifecycle {
       done(null, user);
     });
 
-    const sessionOptions: session.SessionOptions = {
-      secret: this.configuration.sessionStoreSecret,
-      resave: false,
-      saveUninitialized: false,
-    };
-    if (this.redis.isEnabled()) {
-      sessionOptions.store = this.redis.createStore();
-    }
-    app.use(session(sessionOptions));
+    app.use(this.sessionMiddlewareConfigurator.build());
     app.use(passport.initialize());
     app.use(passport.session());
 

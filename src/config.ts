@@ -5,6 +5,8 @@ initEnv();
 
 const DEFAULT_SERVER_PORT = 3001;
 
+const isDev = process.env.NODE_ENV === "development";
+
 @injectable()
 @singleton()
 export class ServerConfiguration {
@@ -32,6 +34,11 @@ export class ServerConfiguration {
   public readonly sessionStoreSecret =
     process.env.SESSION_STORE_SECRET ?? "notverysecret";
 
+  public readonly secureCookie = parseBooleanWithDefault(
+    process.env.SECURE_COOKIE,
+    !isDev
+  );
+
   // note that logging configuration is handled in util/logger.ts
   constructor() {
     const port = process.env.PORT;
@@ -43,3 +50,14 @@ export class ServerConfiguration {
     }
   }
 }
+
+const parseBooleanWithDefault = (
+  value: string | undefined,
+  defaultValue: boolean
+): boolean => {
+  let retval = defaultValue;
+  if (value !== undefined) {
+    retval = value.toLowerCase() === "true";
+  }
+  return retval;
+};
