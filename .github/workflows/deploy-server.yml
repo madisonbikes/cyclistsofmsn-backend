@@ -2,7 +2,7 @@
 
 # Then, if tests pass, it runs a remote setup script on the configured server over SSH
 
-name: Deploy to web server
+name: Deploy to server
 on:
   workflow_dispatch:
 
