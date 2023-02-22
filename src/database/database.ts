@@ -36,10 +36,7 @@ export class Database implements Lifecycle {
       );
       return false;
     }
-    logger.debug(
-      { url: this.configuration.mongodbUri },
-      `Connecting to MongoDB`
-    );
+    logger.info(`Connecting to MongoDB on ${this.configuration.mongodbUri}`);
 
     // this is the default value from mongoose 7 forward, be explicit to avoid deprecation notice
     mongoose.set("strictQuery", false);

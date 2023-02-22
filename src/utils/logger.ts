@@ -1,4 +1,5 @@
 /* istanbul ignore file */
+import { ConnectionString } from "connection-string";
 import pino, { Logger, stdSerializers, TransportTargetOptions } from "pino";
 import { initEnv } from "./env";
 
@@ -57,3 +58,13 @@ if (process.env.NODE_ENV === "test") {
   newLogger = pino({ level, serializers }, transport);
 }
 export const logger = newLogger;
+
+export const maskUriPassword = (uri: string) => {
+  try {
+    const logUri = new ConnectionString(uri);
+    return logUri.toString({ passwordHash: true });
+  } catch (err) {
+    logger.warn({ err, uri }, "unparseable/unmaskable URI");
+    return uri;
+  }
+};
