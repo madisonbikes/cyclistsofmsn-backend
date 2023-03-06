@@ -42,7 +42,7 @@
     "lru-cache": "^7.14.1",
     "mongoose": "^6.8.4",
     "oauth-1.0a": "^2.2.6",
-    "p-limit": "3.1.0",
+    "p-limit": "4.0.0",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pino": "^8.8.0",
