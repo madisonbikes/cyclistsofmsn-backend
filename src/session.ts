@@ -4,6 +4,7 @@ import { RedisConnection } from "./redis";
 import session from "express-session";
 
 const COOKIE_MAX_AGE_DAYS = 7;
+
 @injectable()
 export class SessionMiddlewareConfigurator {
   constructor(

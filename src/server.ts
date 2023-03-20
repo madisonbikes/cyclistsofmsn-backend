@@ -10,7 +10,6 @@ import { PostDispatcher } from "./posts/dispatcher";
 import { PostPopulate } from "./posts/populate";
 
 import express, { NextFunction, Request, Response } from "express";
-import session from "express-session";
 import passport from "passport";
 import { Strategies } from "./security";
 import { RedisConnection } from "./redis";
@@ -33,14 +32,15 @@ if (require.main === module) {
 export class PhotoServer implements Lifecycle {
   constructor(
     private configuration: ServerConfiguration,
-    scanner: ImageRepositoryScanner,
-    database: Database,
-    private redis: RedisConnection,
-    private apiRouter: MainRouter,
-    postDispatcher: PostDispatcher,
-    postPopulate: PostPopulate,
     private strategies: Strategies,
-    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator
+    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator,
+    private apiRouter: MainRouter,
+
+    database: Database,
+    redis: RedisConnection,
+    scanner: ImageRepositoryScanner,
+    postDispatcher: PostDispatcher,
+    postPopulate: PostPopulate
   ) {
     this.components.push(database);
     this.components.push(redis);
