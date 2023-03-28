@@ -1,5 +1,5 @@
 import express, { RequestHandler } from "express";
-import LRUCache from "lru-cache";
+import lru_cache from "lru-cache";
 import { injectable, singleton } from "tsyringe";
 import { logger } from "../utils";
 
@@ -18,7 +18,7 @@ type MiddlewareOptions = {
 @injectable()
 @singleton()
 export class Cache {
-  private memoryCache = new LRUCache<string, Holder>({
+  private memoryCache = new lru_cache<string, Holder>({
     maxSize: CACHE_SIZE,
     sizeCalculation: (holder: Holder): number => {
       const v = holder.value as { length: number };
