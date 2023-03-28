@@ -21,6 +21,13 @@ export class Database implements Lifecycle {
     return this._refreshAllMetadata;
   }
 
+  collection(name: string) {
+    if (this.connection === undefined) {
+      throw new Error("not connected to mongodb");
+    }
+    return this.connection.connection.collection(name);
+  }
+
   async start(): Promise<boolean> {
     if (this.connection) {
       logger.debug(
@@ -29,10 +36,7 @@ export class Database implements Lifecycle {
       );
       return false;
     }
-    logger.debug(
-      { url: this.configuration.mongodbUri },
-      `Connecting to MongoDB`
-    );
+    logger.info(`Connecting to MongoDB on ${this.configuration.mongodbUri}`);
 
     // this is the default value from mongoose 7 forward, be explicit to avoid deprecation notice
     mongoose.set("strictQuery", false);
@@ -75,15 +79,10 @@ export class Database implements Lifecycle {
 
         while (version < CURRENT_DATABASE_VERSION) {
           switch (version) {
-            /*
-          if (!this._refreshAllMetadata) {
-            logger.info(
-              "Forcing refresh of all metadata due to database upgrade"
-            );
-            this._refreshAllMetadata = true;
-          }
-          break;
-          */
+            case 1: {
+              // TODO migrate users from admin field to role-based
+              break;
+            }
             default:
               break;
           }
@@ -91,6 +90,13 @@ export class Database implements Lifecycle {
         }
         await this.setCurrentVersion();
       }
+    }
+  }
+
+  private triggerMetadataRefresh() {
+    if (!this._refreshAllMetadata) {
+      logger.info("Forcing refresh of all metadata due to database upgrade");
+      this._refreshAllMetadata = true;
     }
   }
 

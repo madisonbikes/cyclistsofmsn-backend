@@ -1,4 +1,9 @@
-import { NotVeryRandom, setupSuite, testContainer } from "../../test";
+import {
+  assertError,
+  NotVeryRandom,
+  setupSuite,
+  testContainer,
+} from "../../test";
 import { Image, ImageDocument, PostHistory } from "../../database";
 import { ImageSelector } from "./selector";
 import assert from "assert";
@@ -6,18 +11,14 @@ import { startOfToday, subDays } from "date-fns";
 import { RandomProvider } from "../../utils";
 
 describe("test post image selector components", () => {
-  setupSuite({ withDatabase: true });
-
-  beforeEach(async () => {
-    // clear posts and images
-    await Promise.all([PostHistory.deleteMany(), Image.deleteMany()]);
-  });
+  setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
 
   describe("selector", () => {
     it("fail with no image", async () => {
       const selector = buildSelector();
-      const post = await selector.nextImage();
-      expect(post.isError()).toBeTruthy();
+      const image = await selector.nextImage();
+      assertError(image);
+      expect(image.value.message).toEqual("no images");
     });
 
     it("succeed with one image", async () => {

@@ -1,18 +1,10 @@
+/* istanbul ignore file */
 import "reflect-metadata";
 import { NowProvider, RandomProvider } from "../utils";
-import supertest from "supertest";
-import { Server } from "http";
-
 export * from "./assertions";
 export * from "./setup";
-
-/** helper type alias for supertest request object */
-export type TestRequest = supertest.SuperTest<supertest.Test>;
-
-/** helper function to build a supertest test request from a server object */
-export const testRequest = (server: Server): TestRequest => {
-  return supertest(server);
-};
+export * from "./request";
+export * from "./login";
 
 /** Generates deterministric values that meet the randomInt() contract */
 export class NotVeryRandom extends RandomProvider {
@@ -20,7 +12,7 @@ export class NotVeryRandom extends RandomProvider {
     super();
   }
 
-  randomInt(min: number, max: number): number {
+  override randomInt(min: number, max: number): number {
     let val = this.specifiedValue;
     if (val < min) {
       val = min;
@@ -45,7 +37,7 @@ export class MutableNow extends NowProvider {
     }
   }
 
-  now(): number {
+  override now(): number {
     return this.when;
   }
 }

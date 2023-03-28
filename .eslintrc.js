@@ -9,6 +9,8 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:promise/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
     "prettier",
   ],
   parser: "@typescript-eslint/parser",
@@ -16,7 +18,7 @@ module.exports = {
     ecmaVersion: 6,
     project: "./tsconfig.json",
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "promise"],
   reportUnusedDisableDirectives: true,
   rules: {
     "no-unused-vars": "off",
@@ -32,5 +34,7 @@ module.exports = {
     "func-style": ["warn"],
     "require-await": ["error"],
     "@typescript-eslint/no-floating-promises": "error",
+    "import/no-default-export": 2,
+    "@typescript-eslint/strict-boolean-expressions": "warn",
   },
 };

@@ -10,7 +10,8 @@
       "runtimeArgs": ["run", "test"],
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
-      "type": "node"
+      "type": "node",
+      "console": "integratedTerminal"
     },
     {
       "name": "Launch dev server (hot reload)",
@@ -19,6 +20,15 @@
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "type": "node"
+    },
+    {
+      "name": "Selective tests via NPM",
+      "request": "launch",
+      "runtimeArgs": ["run", "test", "--", "-i", "get"],
+      "runtimeExecutable": "npm",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "console": "integratedTerminal"
     }
   ]
 }

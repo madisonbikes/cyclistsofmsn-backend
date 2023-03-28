@@ -7,7 +7,7 @@ import {
 
 @modelOptions({ schemaOptions: { collection: "images" } })
 export class ImageClass {
-  @prop({ required: true, unique: true })
+  @prop({ required: true, unique: true, index: true })
   public filename!: string;
 
   @prop()

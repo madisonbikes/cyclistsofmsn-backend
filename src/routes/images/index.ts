@@ -1,30 +1,61 @@
 import express from "express";
 import { injectable } from "tsyringe";
-import { validateQuerySchema } from "../../security/validateSchema";
+import {
+  validateBodySchema,
+  validateQuerySchema,
+  validateAuthenticated,
+  Roles,
+  validateRole,
+  validateId,
+  validateAdmin,
+} from "../../security";
 import { asyncWrapper } from "../async";
-import { SingleImageHandler } from "./singleImage";
-import { handler } from "./imageList";
-import Cache from "../cache";
+import { ImageGet } from "./get";
+import { SingleImageDelete } from "./delete";
+import { Cache } from "../cache";
+import {
+  handler as singleImagePutHandler,
+  bodySchema as singleImagePutSchema,
+} from "./put";
 
 @injectable()
-class ImageRouter {
+export class ImageRouter {
   constructor(
     private cache: Cache,
-    private singleImageHandler: SingleImageHandler
+    private imageGet: ImageGet,
+    private singleDelete: SingleImageDelete
   ) {}
 
   readonly routes = express
     .Router()
+
     // all images
-    .get("/", asyncWrapper(handler))
+    .get("/", validateAuthenticated(), asyncWrapper(this.imageGet.listHandler))
+
+    .put(
+      "/:id",
+      validateBodySchema({ schema: singleImagePutSchema }),
+      validateRole({ role: Roles.EDITOR }),
+      validateId(),
+      asyncWrapper(singleImagePutHandler)
+    )
+
+    // single image metadata
+    .get("/:id", validateId(), asyncWrapper(this.imageGet.metadata))
+
+    .delete(
+      "/:id",
+      validateAdmin(),
+      validateId(),
+      asyncWrapper(this.singleDelete.handler)
+    )
 
     // single image, cached
     .get(
-      "/:id",
+      "/:id/binary",
       this.cache.middleware({ callNextWhenCacheable: false }),
-      validateQuerySchema(this.singleImageHandler.schema),
-      asyncWrapper(this.singleImageHandler.handler)
+      validateId(),
+      validateQuerySchema({ schema: this.imageGet.querySchema }),
+      asyncWrapper(this.imageGet.binary)
     );
 }
-
-export default ImageRouter;

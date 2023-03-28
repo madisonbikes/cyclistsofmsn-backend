@@ -1,12 +1,13 @@
 import { injectable } from "tsyringe";
+import { error } from "../../utils";
 import { PostResult, PostScheduler } from "../scheduler";
 
 @injectable()
 export class MockPostScheduler extends PostScheduler {
   scheduledCount = 0;
 
-  scheduleNextPost(): Promise<PostResult> {
+  override schedulePost(): Promise<PostResult> {
     this.scheduledCount++;
-    return Promise.reject();
+    return Promise.resolve(error({ message: "mock" }));
   }
 }

@@ -1,29 +1,12 @@
-import { assertError, assertOk, setupSuite, testContainer } from "../test";
-import { Image, PostHistory } from "../database";
+import { setupSuite, testContainer } from "../test";
+import { Image } from "../database";
 import { PostExecutor } from "./postExecutor";
-import { ImageRepositoryScanner } from "../scan";
 import { injectable } from "tsyringe";
 import { PhotoTwitterClient } from "../twitter/post";
-import { PhotoMastadonClient } from "../mastadon/post";
+import { PhotoMastodonClient } from "../mastodon/post";
 
 describe("test executor component", () => {
-  setupSuite({ withDatabase: true });
-
-  beforeEach(async () => {
-    // clear posts and images
-    await PostHistory.deleteMany();
-    await Image.deleteMany();
-  });
-
-  describe("with no images", () => {
-    it("should fail if no images in repository", async function () {
-      const executor = buildExecutor();
-
-      const postedImage = await executor.post();
-      assertError(postedImage);
-      expect(postedImage.value.message).toEqual("no images");
-    });
-  });
+  setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
 
   describe("with images", () => {
     it("should succeed if an image in the repository", async function () {
@@ -34,44 +17,31 @@ describe("test executor component", () => {
 
       const executor = buildExecutor();
 
-      const postedImage = await executor.post();
-      assertOk(postedImage);
-      expect(postedImage.value.filename).toEqual("blarg");
+      await executor.post(newImage);
     });
   });
 
   const buildExecutor = () => {
-    const noopScanner = testContainer().resolve(NoopRepositoryScanner);
     const noopTweeter = testContainer().resolve(NoopPhotoTweeter);
     const noopTooter = testContainer().resolve(NoopPhotoTooter);
 
     return testContainer()
-      .register<ImageRepositoryScanner>(ImageRepositoryScanner, {
-        useValue: noopScanner,
-      })
       .register(PhotoTwitterClient, { useValue: noopTweeter })
-      .register(PhotoMastadonClient, { useValue: noopTooter })
+      .register(PhotoMastodonClient, { useValue: noopTooter })
       .resolve(PostExecutor);
   };
 });
 
 @injectable()
-class NoopRepositoryScanner extends ImageRepositoryScanner {
-  start(): Promise<void> {
-    return Promise.resolve();
-  }
-}
-
-@injectable()
 class NoopPhotoTweeter extends PhotoTwitterClient {
-  post(_image: string): Promise<number> {
+  override post(_image: string): Promise<number> {
     return Promise.resolve(0);
   }
 }
 
 @injectable()
-class NoopPhotoTooter extends PhotoMastadonClient {
-  post(_image: string): Promise<string> {
+class NoopPhotoTooter extends PhotoMastodonClient {
+  override post(_image: string): Promise<string> {
     return Promise.resolve("0");
   }
 }

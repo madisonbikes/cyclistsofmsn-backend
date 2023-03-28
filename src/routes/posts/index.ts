@@ -1,43 +1,61 @@
 import express from "express";
-import { PostHistory, PostHistoryDocument } from "../../database";
 import { injectable } from "tsyringe";
-import { isDocument } from "@typegoose/typegoose";
-import { jwtMiddleware } from "../../security/authentication";
+import { asyncWrapper } from "../async";
+import {
+  Roles,
+  validateAdmin,
+  validateAuthenticated,
+  validateBodySchema,
+  validateId,
+  validateRole,
+} from "../../security";
+import {
+  bodySchema as singlePostPutSchema,
+  handler as singlePostPutHandler,
+} from "./put";
+import { handler as singlePostDeleteHandler } from "./delete";
+import { currentPostHandler, getPostHandler, getPostListHandler } from "./get";
 
 @injectable()
-class PostRouter {
+export class PostRouter {
   readonly routes = express
     .Router()
 
     // all posts
-    .get("/", async (req, res) => {
-      res.set("Cache-Control", "max-age=60, s-max-age=3600");
-      const posts = await PostHistory.findOrderedPosts();
-      return res.send(posts.map(mapPost));
-    })
+    .get("/", validateAuthenticated(), asyncWrapper(getPostListHandler))
 
     // current post
-    .get("/current", async (req, res) => {
-      const post = await PostHistory.findCurrentPost();
-      if (post) {
-        return res.send(mapPost(post));
-      } else {
-        return res.sendStatus(404);
-      }
-    })
+    .get("/current", asyncWrapper(currentPostHandler))
 
-    // post create operation is secured by jwt token
-    .post("/create", jwtMiddleware, (_req, res) => {
+    // current post
+    .get(
+      "/:id",
+      validateAuthenticated(),
+      validateId(),
+      asyncWrapper(getPostHandler)
+    )
+
+    .put(
+      "/:id",
+      validateBodySchema({ schema: singlePostPutSchema }),
+      validateEditor(),
+      validateId(),
+      asyncWrapper(singlePostPutHandler)
+    )
+
+    .delete(
+      "/:id",
+      validateAdmin(),
+      validateId(),
+      asyncWrapper(singlePostDeleteHandler)
+    )
+
+    // post create operation is secured by editor role
+    .post("/create", validateEditor(), (_req, res) => {
       return res.send("Submitted new post");
     });
 }
 
-const mapPost = (post: PostHistoryDocument) => {
-  if (isDocument(post.image)) {
-    return { id: post.id, timestamp: post.timestamp, image: post.image._id };
-  } else {
-    return { id: post.id, timestamp: post.timestamp, image: post.image };
-  }
+const validateEditor = () => {
+  return validateRole({ role: Roles.EDITOR });
 };
-
-export default PostRouter;

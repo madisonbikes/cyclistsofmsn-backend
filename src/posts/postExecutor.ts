@@ -1,38 +1,22 @@
 import { injectable } from "tsyringe";
-import { PostError } from "./scheduler";
 import { PhotoTwitterClient } from "../twitter/post";
-import { ImageSelector } from "./selection/selector";
-import { ImageRepositoryScanner } from "../scan";
 import { ImageDocument } from "../database";
-import { error, logger, Result } from "../utils";
-import { PhotoMastadonClient } from "../mastadon/post";
+import { logger } from "../utils";
+import { PhotoMastodonClient } from "../mastodon/post";
 
+/** responsible for actually posting photos */
 @injectable()
 export class PostExecutor {
   constructor(
     private photoTweeter: PhotoTwitterClient,
-    private photoTooter: PhotoMastadonClient,
-    private postSelector: ImageSelector,
-    private repositoryScanner: ImageRepositoryScanner
+    private photoTooter: PhotoMastodonClient
   ) {}
 
-  async post(): Promise<Result<ImageDocument, PostError>> {
-    // first, scan repository for new images
-    await this.repositoryScanner.start();
-
-    // select image
-    const nextImage = await this.postSelector.nextImage();
-    if (nextImage.isError()) {
-      logger.error(
-        { error: nextImage.value },
-        `Could not find an image to post`
-      );
-      return error(nextImage.value);
-    }
+  async post(image: ImageDocument) {
     if (this.photoTweeter.isEnabled()) {
       try {
         logger.debug("Twitter enabled");
-        const result = await this.photoTweeter.post(nextImage.value.filename);
+        const result = await this.photoTweeter.post(image.filename);
         logger.info({ id: result }, `Posted new Twitter post`);
       } catch (e) {
         logger.error(e, "Error posting tweet");
@@ -40,16 +24,15 @@ export class PostExecutor {
     }
     if (this.photoTooter.isEnabled()) {
       try {
-        logger.debug("Mastadon enabled");
+        logger.debug("Mastodon enabled");
         const result = await this.photoTooter.post(
-          nextImage.value.filename,
-          nextImage.value.description
+          image.filename,
+          image.description
         );
-        logger.info({ id: result }, `Posted new Mastadon post`);
+        logger.info({ id: result }, `Posted new Mastodon post`);
       } catch (e) {
-        logger.error(e, "Error posting to Mastadon");
+        logger.error(e, "Error posting to Mastodon");
       }
     }
-    return nextImage;
   }
 }

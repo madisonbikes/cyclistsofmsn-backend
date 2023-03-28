@@ -2,7 +2,7 @@
 
 # Then, if tests pass, it runs a remote setup script on the configured server over SSH
 
-name: Deploy to web server
+name: Deploy to server
 on:
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npm run test
+      - run: npm run test --maxWorkers=50%
       - run: npm run lint
 
       - name: Deploy on Server
@@ -34,4 +34,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          script: /home/cyclists_of_msn/apps/cyclists_of_msn_web/redeploy_backend
+          script: ${{ secrets.DEPLOY_SCRIPT }}

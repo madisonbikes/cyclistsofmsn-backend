@@ -17,7 +17,7 @@ type MiddlewareOptions = {
 
 @injectable()
 @singleton()
-class Cache {
+export class Cache {
   private memoryCache = new LRUCache<string, Holder>({
     maxSize: CACHE_SIZE,
     sizeCalculation: (holder: Holder): number => {
@@ -98,5 +98,3 @@ class Cache {
     this.memoryCache.clear();
   };
 }
-
-export default Cache;

@@ -30,7 +30,7 @@ type TootPostOptions = {
 };
 
 @injectable()
-export class PhotoMastadonClient {
+export class PhotoMastodonClient {
   constructor(
     private configuration: ServerConfiguration,
     private repository: FilesystemRepository
@@ -38,8 +38,8 @@ export class PhotoMastadonClient {
 
   isEnabled() {
     return (
-      this.configuration.mastadonUri !== "" &&
-      this.configuration.mastadonAccessToken !== ""
+      this.configuration.mastodonUri !== "" &&
+      this.configuration.mastodonAccessToken !== ""
     );
   }
 
@@ -52,7 +52,7 @@ export class PhotoMastadonClient {
 
     const visibility = statusUpdateVisibilitySchema
       .optional()
-      .parse(this.configuration.mastadonStatusVisibility);
+      .parse(this.configuration.mastodonStatusVisibility);
     return this.postToot({
       status: "#cyclistsofmadison",
       visibility,
@@ -67,7 +67,7 @@ export class PhotoMastadonClient {
         focus: options.image.focus,
         description: options.image.description,
       };
-      const mediaRequest = this.buildAuthorizedMastadonPostRequest(
+      const mediaRequest = this.buildAuthorizedMastodonPostRequest(
         "/api/v2/media"
       ).attach("file", options.image.buffer, options.image.filename);
 
@@ -98,7 +98,7 @@ export class PhotoMastadonClient {
 
     // FIXME when we introduce message queue/etc use same UUID for retries
     const uuid = crypto.randomUUID();
-    const tootResponse = await this.buildAuthorizedMastadonPostRequest(
+    const tootResponse = await this.buildAuthorizedMastodonPostRequest(
       "/api/v1/statuses"
     )
       .set("Idempotency-Key", uuid)
@@ -114,16 +114,16 @@ export class PhotoMastadonClient {
     return statusUpdateResponseSchema.parse(tootResponse.body).id;
   }
 
-  private buildAuthorizedMastadonPostRequest(api: string) {
+  private buildAuthorizedMastodonPostRequest(api: string) {
     return request
-      .post(`${this.configuration.mastadonUri}/${api}`)
-      .set("Authorization", `Bearer ${this.configuration.mastadonAccessToken}`);
+      .post(`${this.configuration.mastodonUri}/${api}`)
+      .set("Authorization", `Bearer ${this.configuration.mastodonAccessToken}`);
   }
 }
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {
-  const client = container.resolve(PhotoMastadonClient);
+  const client = container.resolve(PhotoMastodonClient);
   const fileBuffer = await readFile(args[1]);
 
   console.log("loaded file");

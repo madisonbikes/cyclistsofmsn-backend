@@ -1,4 +1,4 @@
-import { Database, Image, ImageClass, ImageDocument } from "./database";
+import { Database, Image, ImageDocument } from "./database";
 import { FilesystemRepository } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
 import parseDate from "date-fns/parse";
@@ -122,7 +122,7 @@ export class ImageRepositoryScanner implements Lifecycle {
     return tag?.value[0];
   }
 
-  private getFileMetadata = async (filename: string) => {
+  private async getFileMetadata(filename: string) {
     const [
       fs_timestamp,
       { DateTimeOriginal: rawCreatedOn, ImageDescription: rawDescription },
@@ -134,12 +134,12 @@ export class ImageRepositoryScanner implements Lifecycle {
     const exif_createdon = this.parseImageDateTimeTag(rawCreatedOn);
     const description_from_exif = description !== undefined;
 
-    const retval: Partial<ImageClass> = {
+    const retval: Partial<ImageDocument> = {
       fs_timestamp,
       exif_createdon,
       description,
       description_from_exif,
     };
     return retval;
-  };
+  }
 }

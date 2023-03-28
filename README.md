@@ -4,7 +4,7 @@ This is the Cyclists of Madison photo bot backend.
 
 ## Features
 
-- (New!) Mastadon posting support
+- (New!) Mastodon posting support
 - Twitter (boo!) posting support
 
 ## Goals

@@ -7,6 +7,7 @@ import {
   Ref,
   ReturnModelType,
 } from "@typegoose/typegoose";
+import { endOfDay, startOfDay } from "date-fns";
 import { ImageClass } from "./images";
 
 export enum PostStatus {
@@ -31,7 +32,7 @@ export class PostHistoryStatus {
 }
 
 @modelOptions({ schemaOptions: { collection: "posts" } })
-class PostHistoryClass {
+export class PostHistoryClass {
   @prop({ ref: () => ImageClass })
   public image?: Ref<ImageClass>;
 
@@ -41,37 +42,43 @@ class PostHistoryClass {
   @prop({ default: new PostHistoryStatus(), required: true, _id: false })
   public status!: PostHistoryStatus;
 
-  public static findCurrentPost(
-    this: ReturnModelType<typeof PostHistoryClass>
-  ) {
+  public static findLatestPost(this: ReturnModelType<typeof PostHistoryClass>) {
     return this.findOne()
       .where({ "status.flag": PostStatus.COMPLETE })
       .sort({ timestamp: -1 })
-      .populate("image", ["deleted"]);
+      .populate({ path: "image", select: ["deleted"] });
   }
 
+  /** returns sorted by timestamp ascending */
   public static async findOrderedPosts(
     this: ReturnModelType<typeof PostHistoryClass>
   ) {
     const posts = await this.find()
       .sort({ timestamp: 1 })
-      .populate("image", ["deleted"])
-      .where({ "image.deleted": false });
+      .populate({ path: "image", select: ["deleted"] });
 
-    return posts.filter((post) => {
-      if (isDocument(post.image)) {
-        return !post.image.deleted;
-      } else {
-        return false;
+    return posts.flatMap((post) => {
+      const retval = post;
+      if (isDocument(post.image) && post.image.deleted) {
+        retval.image = undefined;
       }
+      return retval;
     });
   }
 
-  public static findNextScheduledPost(
-    this: ReturnModelType<typeof PostHistoryClass>
+  public static findScheduledPost(
+    this: ReturnModelType<typeof PostHistoryClass>,
+    when: Date
   ) {
-    return this.findOne()
-      .where({ "status.flag": PostStatus.PENDING })
+    const start = startOfDay(when);
+    const end = endOfDay(when);
+
+    return this.find()
+      .where({
+        "status.flag": PostStatus.PENDING,
+        timestamp: { $gte: start, $lte: end },
+      })
+      .populate("image")
       .sort({ timestamp: -1 });
   }
 }

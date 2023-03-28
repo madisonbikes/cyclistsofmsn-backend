@@ -13,8 +13,8 @@ import { injectable } from "tsyringe";
 type Scheduled = {
   nextWhen: number;
   run: ScheduledFunction;
-  repeatInterval?: number;
-  cancelled?: boolean;
+  repeatInterval: number;
+  cancelled: boolean;
 };
 
 @injectable()
@@ -29,10 +29,15 @@ export class MockSimpleScheduler extends SimpleScheduler {
 
   private scheduled: Scheduled[] = [];
 
-  scheduleOnce(run: ScheduledFunction, delayInMillis: number): Cancellable {
+  override scheduleOnce(
+    run: ScheduledFunction,
+    delayInMillis: number
+  ): Cancellable {
     const newItem: Scheduled = {
       nextWhen: this.now.now() + delayInMillis,
       run: run,
+      repeatInterval: 0,
+      cancelled: false,
     };
     this.scheduled.push(newItem);
     return {
@@ -42,7 +47,7 @@ export class MockSimpleScheduler extends SimpleScheduler {
     };
   }
 
-  scheduleRepeat(
+  override scheduleRepeat(
     run: ScheduledFunction,
     intervalInMillis: number,
     delayInMillis = 0
@@ -54,6 +59,7 @@ export class MockSimpleScheduler extends SimpleScheduler {
       nextWhen: this.now.now() + delayInMillis,
       run: run,
       repeatInterval: intervalInMillis,
+      cancelled: false,
     };
     this.scheduled.push(newItem);
     return {
@@ -78,13 +84,12 @@ export class MockSimpleScheduler extends SimpleScheduler {
     });
 
     for await (const item of filtered) {
-      const interval = item.repeatInterval ?? 0;
-      if (interval > 0) {
+      if (item.repeatInterval > 0) {
         let current = this.lastRun;
         while (current < now) {
           if (item.nextWhen === current) {
             await item.run();
-            item.nextWhen += interval;
+            item.nextWhen += item.repeatInterval;
           }
           current++;
         }

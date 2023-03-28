@@ -28,5 +28,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npm test
+      - run: npm run test --maxWorkers=50%
       - run: npm run lint

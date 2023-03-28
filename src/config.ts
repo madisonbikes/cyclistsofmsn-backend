@@ -5,45 +5,59 @@ initEnv();
 
 const DEFAULT_SERVER_PORT = 3001;
 
-export type JwtConfiguration = {
-  secret: string;
-  issuer: string;
-  audience: string;
-  expiresIn: string;
-};
+const isDev = process.env.NODE_ENV === "development";
 
 @injectable()
 @singleton()
 export class ServerConfiguration {
-  public readonly serverPort = process.env.PORT || `${DEFAULT_SERVER_PORT}`;
-  public readonly photosDir = process.env.PHOTOS_DIR || "photos";
-  public readonly reactStaticRootDir?: string = process.env.STATIC_ROOT_DIR;
+  public readonly serverPort;
+  public readonly photosDir = process.env.PHOTOS_DIR ?? "photos";
+  public readonly reactStaticRootDir = process.env.STATIC_ROOT_DIR ?? "";
   public readonly mongodbUri =
-    process.env.MONGODB_URI || "mongodb://localhost:27017/cyclists_of_msn";
+    process.env.MONGODB_URI ?? "mongodb://localhost:27017/cyclists_of_msn";
   public readonly firstPostHour = 8;
   public readonly lastPostHour = 16;
 
-  public readonly twitterApiKey = process.env.TWITTER_API_KEY || "";
-  public readonly twitterApiSecret = process.env.TWITTER_API_SECRET || "";
-  public readonly twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN || "";
+  public readonly twitterApiKey = process.env.TWITTER_API_KEY ?? "";
+  public readonly twitterApiSecret = process.env.TWITTER_API_SECRET ?? "";
+  public readonly twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN ?? "";
   public readonly twitterAccessTokenSecret =
-    process.env.TWITTER_ACCESS_TOKEN_SECRET || "";
+    process.env.TWITTER_ACCESS_TOKEN_SECRET ?? "";
 
-  public readonly mastadonUri = process.env.MASTADON_URI || "";
-  public readonly mastadonAccessToken = process.env.MASTADON_ACCESS_TOKEN || "";
-  public readonly mastadonStatusVisibility =
-    process.env.MASTADON_STATUS_VISIBILITY;
+  public readonly mastodonUri = process.env.MASTODON_URI ?? "";
+  public readonly mastodonAccessToken = process.env.MASTODON_ACCESS_TOKEN ?? "";
+  public readonly mastodonStatusVisibility =
+    process.env.MASTODON_STATUS_VISIBILITY;
 
-  public readonly jwt: JwtConfiguration;
+  public readonly redisUri = process.env.REDIS_URI ?? "";
+
+  public readonly sessionStoreSecret =
+    process.env.SESSION_STORE_SECRET ?? "notverysecret";
+
+  public readonly secureCookie = parseBooleanWithDefault(
+    process.env.SECURE_COOKIE,
+    !isDev
+  );
 
   // note that logging configuration is handled in util/logger.ts
-
   constructor() {
-    this.jwt = {
-      secret: process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure",
-      audience: "cyclistsofmsn",
-      issuer: "cyclistsofmsn",
-      expiresIn: "14d",
-    };
+    const port = process.env.PORT;
+    if (port === undefined || !port) {
+      // blank or undefined
+      this.serverPort = `${DEFAULT_SERVER_PORT}`;
+    } else {
+      this.serverPort = port;
+    }
   }
 }
+
+const parseBooleanWithDefault = (
+  value: string | undefined,
+  defaultValue: boolean
+): boolean => {
+  let retval = defaultValue;
+  if (value !== undefined) {
+    retval = value.toLowerCase() === "true";
+  }
+  return retval;
+};

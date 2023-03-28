@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { isValidObjectId } from "mongoose";
 import { Image } from "../../database";
 import { FilesystemRepository } from "../../fs_repository";
 import { injectable } from "tsyringe";
@@ -7,23 +6,28 @@ import { access } from "fs/promises";
 import { constants } from "fs";
 import sharp from "sharp";
 import { logger } from "../../utils";
-import { getImageQuerySchema, GetImageQuery } from "../types";
+import { getImageQuerySchema, GetImageQuery } from "../contract";
+import { lenientImageSchema } from "./localTypes";
 
 @injectable()
-export class SingleImageHandler {
+export class ImageGet {
   constructor(private fsRepository: FilesystemRepository) {}
 
-  readonly schema = getImageQuerySchema;
+  readonly querySchema = getImageQuerySchema;
 
-  handler = async (req: Request, res: Response) => {
-    const query = req.validated as GetImageQuery;
-
-    const id = req.params.id;
-    if (!isValidObjectId(id)) {
-      // bad object id throws exception later, so check early
+  metadata = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const metadata = await Image.findById(id).and([{ deleted: false }]);
+    if (metadata == null) {
       return res.sendStatus(404);
     }
+    res.send(lenientImageSchema.parse(metadata));
+  };
 
+  binary = async (req: Request, res: Response) => {
+    const query = req.validated as GetImageQuery;
+
+    const { id } = req.params;
     logger.debug(`loading image ${id}`);
     const filename = (await Image.findById(id).and([{ deleted: false }]))
       ?.filename;
@@ -33,8 +37,8 @@ export class SingleImageHandler {
 
     const imageFile = this.fsRepository.photoPath(filename);
 
-    let width = query.width;
-    if (!width && !query.height) {
+    let { width } = query;
+    if (width === undefined && query.height === undefined) {
       width = 1024;
     }
 
@@ -59,5 +63,11 @@ export class SingleImageHandler {
       .type("jpeg")
       .set("Cache-Control", "max-age=3600, s-max-age=36000")
       .send(buffer);
+  };
+
+  listHandler = async (_req: Request, res: Response) => {
+    const images = await Image.find({ deleted: false });
+    const retval = lenientImageSchema.array().parse(images);
+    res.send(retval);
   };
 }

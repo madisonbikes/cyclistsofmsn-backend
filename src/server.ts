@@ -5,12 +5,15 @@ import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
 import { ImageRepositoryScanner } from "./scan";
 import { Database } from "./database";
-import MainRouter from "./routes";
+import { MainRouter } from "./routes";
 import { PostDispatcher } from "./posts/dispatcher";
+import { PostPopulate } from "./posts/populate";
 
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
-import { Strategies } from "./security/authentication";
+import { Strategies } from "./security";
+import { RedisConnection } from "./redis";
+import { SessionMiddlewareConfigurator } from "./session";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -29,15 +32,21 @@ if (require.main === module) {
 export class PhotoServer implements Lifecycle {
   constructor(
     private configuration: ServerConfiguration,
-    scanner: ImageRepositoryScanner,
-    database: Database,
+    private strategies: Strategies,
+    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator,
     private apiRouter: MainRouter,
+
+    database: Database,
+    redis: RedisConnection,
+    scanner: ImageRepositoryScanner,
     postDispatcher: PostDispatcher,
-    private strategies: Strategies
+    postPopulate: PostPopulate
   ) {
     this.components.push(database);
+    this.components.push(redis);
     this.components.push(scanner);
     this.components.push(postDispatcher);
+    this.components.push(postPopulate);
   }
 
   components: Lifecycle[] = [];
@@ -58,12 +67,31 @@ export class PhotoServer implements Lifecycle {
       app.use("/", express.static(this.configuration.reactStaticRootDir));
     }
 
-    // used for securing most api endpoints
-    passport.use(this.strategies.jwt);
+    // init passport
+    passport.use(this.strategies.local);
+    passport.serializeUser<string>((user, done) => {
+      logger.trace(user, "serialize user");
+      const data = JSON.stringify(user);
+      done(null, data);
+    });
 
+    passport.deserializeUser<string>((data, done) => {
+      const user = JSON.parse(data);
+      logger.trace(user, "deserialize user");
+      done(null, user);
+    });
+
+    app.use(this.sessionMiddlewareConfigurator.build());
     app.use(passport.initialize());
+    app.use(passport.session());
 
-    app.use(this.apiRouter.routes);
+    app.use("/api/v1", this.apiRouter.routes);
+
+    app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+      logger.error(err, "Unhandled server error");
+      res.sendStatus(500);
+    });
+
     app.on("error", (err) => {
       logger.error(err);
     });
