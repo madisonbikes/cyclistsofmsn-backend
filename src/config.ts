@@ -3,14 +3,12 @@ import { initEnv } from "./utils/env";
 
 initEnv();
 
-const DEFAULT_SERVER_PORT = 3001;
-
 const isDev = process.env.NODE_ENV === "development";
 
 @injectable()
 @singleton()
 export class ServerConfiguration {
-  public readonly serverPort;
+  public readonly serverPort = parseIntWithDefault(process.env.PORT, 3001);
   public readonly photosDir = process.env.PHOTOS_DIR ?? "photos";
   public readonly reactStaticRootDir = process.env.STATIC_ROOT_DIR ?? "";
   public readonly mongodbUri =
@@ -39,17 +37,35 @@ export class ServerConfiguration {
     !isDev
   );
 
+  public readonly trustProxy = parseBooleanWithDefault(
+    process.env.TRUST_PROXY,
+    false
+  );
+
+  public readonly enableCors = parseBooleanWithDefault(
+    process.env.ENABLE_CORS,
+    false
+  );
+
   // note that logging configuration is handled in util/logger.ts
   constructor() {
-    const port = process.env.PORT;
-    if (port === undefined || !port) {
-      // blank or undefined
-      this.serverPort = `${DEFAULT_SERVER_PORT}`;
-    } else {
-      this.serverPort = port;
-    }
+    // empty
   }
 }
+
+const parseIntWithDefault = (
+  value: string | undefined,
+  defaultValue: number
+): number => {
+  let retval = defaultValue;
+  if (value !== undefined) {
+    retval = Number(value);
+    if (isNaN(retval)) {
+      retval = defaultValue;
+    }
+  }
+  return retval;
+};
 
 const parseBooleanWithDefault = (
   value: string | undefined,

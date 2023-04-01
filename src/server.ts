@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import http, { Server } from "http";
+import cors from "cors";
 import { Lifecycle, logger } from "./utils";
 import { container, injectable } from "tsyringe";
 import { ServerConfiguration } from "./config";
@@ -61,6 +62,11 @@ export class PhotoServer implements Lifecycle {
     const app = express();
 
     app.use(express.json());
+
+    if (this.configuration.enableCors) {
+      // cors should only be used for development -- production serves from same server/port
+      app.use(cors());
+    }
 
     // in production mode, serve the production React app from here
     if (this.configuration.reactStaticRootDir) {
