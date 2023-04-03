@@ -1,5 +1,5 @@
 import { ServerConfiguration } from "../config";
-import { IccTags, Tags, XmpTags, load } from "exifreader";
+import { load } from "exifreader";
 import fs from "fs/promises";
 import path from "path";
 import { injectable } from "tsyringe";
@@ -22,10 +22,11 @@ export class FilesystemRepository {
     return filteredFiles;
   }
 
-  async exif(baseFilename: string): Promise<Tags & IccTags & XmpTags> {
+  async tags(baseFilename: string) {
     const path = this.photoPath(baseFilename);
     const fileData = await fs.readFile(path);
-    return load(fileData);
+    const tags = load(fileData, { expanded: true });
+    return tags;
   }
 
   async timestamp(baseFilename: string) {

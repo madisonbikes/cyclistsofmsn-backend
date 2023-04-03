@@ -112,26 +112,23 @@ export class ImageRepositoryScanner implements Lifecycle {
     if (!tag || tag.value.length === 0) {
       return undefined;
     }
-    return parseDate(tag?.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
+    return parseDate(tag.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
   }
 
   private parseStringTag(tag: StringArrayTag | undefined): string | undefined {
     if (!tag || tag.value.length === 0) {
       return undefined;
     }
-    return tag?.value[0];
+    return tag.value[0];
   }
 
   private async getFileMetadata(filename: string) {
-    const [
-      fs_timestamp,
-      { DateTimeOriginal: rawCreatedOn, ImageDescription: rawDescription },
-    ] = await Promise.all([
+    const [fs_timestamp, tags] = await Promise.all([
       this.fsRepository.timestamp(filename),
-      this.fsRepository.exif(filename),
+      this.fsRepository.tags(filename),
     ]);
-    const description = this.parseStringTag(rawDescription);
-    const exif_createdon = this.parseImageDateTimeTag(rawCreatedOn);
+    const description = this.parseStringTag(tags?.exif?.ImageDescription);
+    const exif_createdon = this.parseImageDateTimeTag(tags?.exif?.DateTime);
     const description_from_exif = description !== undefined;
 
     const retval: Partial<ImageDocument> = {
@@ -140,6 +137,7 @@ export class ImageRepositoryScanner implements Lifecycle {
       description,
       description_from_exif,
     };
+    console.log(JSON.stringify(retval));
     return retval;
   }
 }
