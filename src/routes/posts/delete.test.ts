@@ -34,10 +34,6 @@ describe("server process - posts", () => {
     request = testRequest();
   });
 
-  afterEach(async () => {
-    await deletePost(testPostId);
-  });
-
   it("responds to unauthenticated post delete api call", () => {
     return request.delete(`/api/v1/posts/badid`).expect(401);
   });
@@ -78,9 +74,5 @@ describe("server process - posts", () => {
   const createTestPost = async () => {
     const retval = await testDatabase().collection("posts").insertOne({});
     return retval.insertedId;
-  };
-
-  const deletePost = (_id: ObjectId) => {
-    return testDatabase().collection("posts").deleteOne({ _id });
   };
 });

@@ -54,10 +54,36 @@ describe("test post image selector components", () => {
       await createPost(seasonalImage, subDays(startOfToday(), 190));
 
       const selector = buildSelector();
-      const post = await selector.nextImage();
-      expect(post.isOk()).toBeTruthy();
-      assert(post.isOk());
-      expect(post.value.id).toEqual(seasonalImage.id);
+      const image = await selector.nextImage();
+      expect(image.isOk()).toBeTruthy();
+      assert(image.isOk());
+      expect(image.value.id).toEqual(seasonalImage.id);
+    });
+
+    it("fail with only hidden image", async () => {
+      const hidden = await createImage("hiddenImage");
+      hidden.hidden = true;
+      await hidden.save();
+
+      const selector = buildSelector();
+      const image = await selector.nextImage();
+      assertError(image);
+      expect(image.value.message).toEqual("no images");
+    });
+
+    it("succeed with a hidden and non-hidden image", async () => {
+      const hidden = await createImage("hiddenImage");
+      hidden.hidden = true;
+      await hidden.save();
+
+      const normalImage = await createImage("normal");
+
+      const selector = buildSelector();
+      const image = await selector.nextImage();
+
+      expect(image.isOk()).toBeTruthy();
+      assert(image.isOk());
+      expect(image.value.id).toEqual(normalImage.id);
     });
   });
 

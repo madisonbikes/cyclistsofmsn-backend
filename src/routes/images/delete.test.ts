@@ -39,10 +39,6 @@ describe("server process - images", () => {
     request = testRequest();
   });
 
-  afterEach(async () => {
-    await deleteImage(testImageId);
-  });
-
   it("responds to unauthenticated image delete api call", () => {
     return request.delete(`/api/v1/images/badid`).expect(401);
   });
@@ -130,9 +126,5 @@ describe("server process - images", () => {
         status: { flag: "pending" },
       });
     return retval.insertedId;
-  };
-
-  const deleteImage = (_id: ObjectId) => {
-    return testDatabase().collection("images").deleteOne({ _id });
   };
 });

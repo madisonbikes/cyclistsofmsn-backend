@@ -8,6 +8,7 @@ export type GetImageQuery = z.infer<typeof getImageQuerySchema>;
 
 const mutableImageSchema = z.object({
   description: z.string().optional(),
+  hidden: z.boolean(),
 });
 
 export const putImageBodySchema = mutableImageSchema.deepPartial();

@@ -12,6 +12,7 @@ import { Database } from "../database";
 import assert from "assert";
 import { PhotoServer } from "../server";
 import { Server } from "./request";
+import { ImageRepositoryScanner } from "../scan";
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;
@@ -26,7 +27,8 @@ export type SuiteOptions = {
   // spin up a memory mongodb instance for testing purposes
   withDatabase: boolean;
 
-  // start up a photoserver instance
+  // start up a photoserver instance, which also resets image/post history database
+  // after each test
   withPhotoServer: boolean;
 
   // clear images after each test
@@ -40,6 +42,9 @@ export type SuiteOptions = {
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   const withDatabase = options.withDatabase ?? false;
   const withPhotoServer = options.withPhotoServer ?? false;
+  const clearPostHistory = options.clearPostHistory ?? false;
+  const clearImages = options.clearImages ?? false;
+
   beforeAll(async () => {
     assert(tc === undefined);
     tc = await initializeSuite();
@@ -73,14 +78,24 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   });
 
   afterEach(async () => {
+    assert(tc !== undefined);
     const queries: Array<Promise<unknown>> = [];
-    if (options.clearPostHistory ?? false) {
+    if (clearPostHistory || withPhotoServer) {
       queries.push(testDatabase().collection("posts")?.deleteMany({}));
     }
-    if (options.clearImages ?? false) {
+    if (clearImages || withPhotoServer) {
       queries.push(testDatabase().collection("images")?.deleteMany({}));
     }
-    await Promise.all(queries);
+
+    if (queries.length > 0) {
+      await Promise.all(queries);
+    }
+
+    // this has to run after we've wiped the database
+    if (withPhotoServer) {
+      const scanner = tc.resolve(ImageRepositoryScanner);
+      await scanner.start();
+    }
   });
 
   afterAll(async () => {

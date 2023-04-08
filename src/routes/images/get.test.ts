@@ -26,11 +26,7 @@ describe("server process - images", () => {
     request = testRequest();
   });
 
-  afterEach(async () => {
-    // reset database
-    await testDatabase()
-      .collection("images")
-      .deleteMany({ filename: "missing.jpg" });
+  afterEach(() => {
     cache.clear();
   });
 
@@ -151,6 +147,19 @@ describe("server process - images", () => {
     expect(testImage?.description).toContain("riding a bike");
   });
 
+  it("a marked hidden image returns as hidden", async () => {
+    await loginTestUser(request);
+
+    const hiddenFilename = "test_DSC_7020.jpg";
+    await markImageHidden(hiddenFilename);
+
+    const value = await request.get("/api/v1/images").expect(200);
+    const images = imageListSchema.parse(value.body);
+    const testImage = images.find((v) => v.filename === hiddenFilename);
+    expect(testImage).toBeDefined();
+    expect(testImage?.hidden).toBe(true);
+  });
+
   const requestGoodImage = async (id: string) => {
     const response = await request
       .get(`/api/v1/images/${id}/binary`)
@@ -167,6 +176,14 @@ describe("server process - images", () => {
       deleted: false,
       description_from_exif: false,
     });
+    return retval;
+  };
+
+  const markImageHidden = async (filename: string) => {
+    const retval = await testDatabase()
+      .collection("images")
+      .updateOne({ filename }, { $set: { hidden: true } });
+    expect(retval.modifiedCount).toBe(1);
     return retval;
   };
 });

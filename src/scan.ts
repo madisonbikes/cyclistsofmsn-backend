@@ -137,7 +137,6 @@ export class ImageRepositoryScanner implements Lifecycle {
       description,
       description_from_exif,
     };
-    console.log(JSON.stringify(retval));
     return retval;
   }
 }

@@ -32,6 +32,12 @@ export class ImageClass {
    */
   @prop({ default: false, required: true })
   public deleted!: boolean;
+
+  /**
+   * If a file is hidden, it will not be used for future posts.
+   */
+  @prop({ default: false, required: true })
+  public hidden!: boolean;
 }
 
 export type ImageDocument = DocumentType<ImageClass>;

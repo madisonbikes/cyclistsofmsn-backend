@@ -13,8 +13,6 @@ describe("server process - posts", () => {
   setupSuite({
     withDatabase: true,
     withPhotoServer: true,
-    clearPostHistory: true,
-    clearImages: true,
   });
 
   beforeAll(async () => {

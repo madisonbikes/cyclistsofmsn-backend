@@ -69,6 +69,20 @@ describe("server process - images", () => {
     expect(checkImage?.description_from_exif).toEqual(false);
   });
 
+  it("responds to image update api call setting hidden", async () => {
+    await loginTestEditorUser(request);
+    const goodImageId = await getGoodImageId();
+
+    await request
+      .put(`/api/v1/images/${goodImageId}`)
+      .send({ hidden: true })
+      .expect(200);
+
+    const checkImage = await Image.findById(goodImageId);
+    expect(checkImage).toBeDefined();
+    expect(checkImage?.hidden).toBe(true);
+  });
+
   const getGoodImageId = async () => {
     const retval = (
       await Image.findOne({
