@@ -76,7 +76,7 @@
     "@types/readline-sync": "^1.4.4",
     "@types/sharp": "^0.31.1",
     "@types/supertest": "^2.0.12",
-    "@typescript-eslint/eslint-plugin": "^5.53",
+    "@typescript-eslint/eslint-plugin": "^5.57",
     "@typescript-eslint/parser": "^5.57",
     "conventional-changelog-conventionalcommits": "^5.0.0",
     "eslint": "^8.35.0",
