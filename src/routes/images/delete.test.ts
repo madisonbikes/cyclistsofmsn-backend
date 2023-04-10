@@ -3,12 +3,10 @@ import {
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
-  testDatabase,
   testRequest,
   TestRequest,
 } from "../../test";
-import { Image, PostHistory } from "../../database";
-import { ObjectId } from "mongodb";
+import { Image, ImageDocument, PostHistory } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
@@ -17,7 +15,7 @@ import {
 
 describe("server process - images", () => {
   let request: TestRequest;
-  let testImageId: ObjectId;
+  let testImageId: string;
 
   setupSuite({
     withDatabase: true,
@@ -88,8 +86,9 @@ describe("server process - images", () => {
     // make sure image exists
     let checkImage = await Image.findById(testImageId);
     expect(checkImage).toBeDefined();
+    expect(checkImage).not.toBeNull();
 
-    const createdPostId = await createTestPost(testImageId);
+    const createdPostId = await createTestPost(checkImage as ImageDocument);
 
     // ensure post exists and is assigned to the image
     let checkPost = await PostHistory.findById(createdPostId);
@@ -108,23 +107,23 @@ describe("server process - images", () => {
   });
 
   const createTestImage = async () => {
-    const retval = await testDatabase().collection("images").insertOne({
+    const newImage = new Image({
       filename: "created.jpg",
       deleted: false,
       description_from_exif: false,
     });
-    return retval.insertedId;
+    await newImage.save();
+    return newImage.id;
   };
 
   /** create a test post with the supplied image id */
-  const createTestPost = async (image: ObjectId) => {
-    const retval = await testDatabase()
-      .collection("posts")
-      .insertOne({
-        image,
-        timestamp: new Date(),
-        status: { flag: "pending" },
-      });
-    return retval.insertedId;
+  const createTestPost = async (image: ImageDocument) => {
+    const newPost = new PostHistory({
+      image,
+      timestamp: new Date(),
+      status: { flag: "pending" },
+    });
+    await newPost.save();
+    return newPost.id;
   };
 });

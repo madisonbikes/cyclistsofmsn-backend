@@ -60,7 +60,7 @@ export class PostScheduler {
         }
         return ok(firstPost);
       }
-      await Promise.all(matchingPosts.map((p) => p.delete()));
+      await Promise.all(matchingPosts.map((p) => p.deleteOne()));
     }
 
     const createdPost = await this.createNewScheduledPost(when, selectImage);

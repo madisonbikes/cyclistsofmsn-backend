@@ -8,7 +8,6 @@ import {
   TestRequest,
 } from "../../test";
 import { PostHistory } from "../../database";
-import { ObjectId } from "mongodb";
 import {
   createTestAdminUser,
   createTestEditorUser,
@@ -17,7 +16,7 @@ import {
 
 describe("server process - posts", () => {
   let request: TestRequest;
-  let testPostId: ObjectId;
+  let testPostId: string;
 
   setupSuite({ withDatabase: true, withPhotoServer: true });
 
@@ -73,6 +72,6 @@ describe("server process - posts", () => {
 
   const createTestPost = async () => {
     const retval = await testDatabase().collection("posts").insertOne({});
-    return retval.insertedId;
+    return retval.insertedId.toHexString();
   };
 });
