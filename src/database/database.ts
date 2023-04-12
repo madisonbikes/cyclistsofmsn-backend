@@ -3,9 +3,10 @@ import mongoose, { Mongoose } from "mongoose";
 import { Lifecycle, logger } from "../utils";
 import { injectable, singleton } from "tsyringe";
 import { Version } from "./version";
+import { Image } from "./images";
 
 /** make sure you update switch statement below when bumping db version */
-const CURRENT_DATABASE_VERSION = 1;
+const CURRENT_DATABASE_VERSION = 2;
 
 /** provide unified access to database connection */
 @injectable()
@@ -80,7 +81,7 @@ export class Database implements Lifecycle {
         while (version < CURRENT_DATABASE_VERSION) {
           switch (version) {
             case 1: {
-              // TODO migrate users from admin field to role-based
+              await Image.updateMany({}, { $set: { hidden: false } });
               break;
             }
             default:
