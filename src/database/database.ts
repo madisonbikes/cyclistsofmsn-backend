@@ -81,7 +81,11 @@ export class Database implements Lifecycle {
         while (version < CURRENT_DATABASE_VERSION) {
           switch (version) {
             case 1: {
-              await Image.updateMany({}, { $set: { hidden: false } });
+              // add the image hidden column
+              await Image.updateMany(
+                { hidden: { $exists: false } },
+                { $set: { hidden: false } }
+              );
               break;
             }
             default:
