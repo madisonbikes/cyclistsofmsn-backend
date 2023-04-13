@@ -5,10 +5,10 @@
     "preserveConstEnums": true,
     "noFallthroughCasesInSwitch": true,
     "emitDecoratorMetadata": true,
-    "strict": true,
     "experimentalDecorators": true,
     "allowJs": false,
-    "target": "ES2019",
+    // for tsyringe
+    "target": "es2019",
     "noImplicitOverride": true,
     "typeRoots": ["@types", "./node_modules/@types"]
   },
