@@ -41,7 +41,7 @@
     "express-session": "^1.17.3",
     "helmet": "^6.1.5",
     "lru-cache": "^9.0.3",
-    "mongoose": "^7.0.3",
+    "mongoose": "^7.0.4",
     "oauth-1.0a": "^2.2.6",
     "p-limit": "~3.1.0",
     "passport": "^0.6.0",
