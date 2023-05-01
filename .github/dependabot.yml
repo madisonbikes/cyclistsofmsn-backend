@@ -8,6 +8,7 @@ updates:
     commit-message:
       prefix: "fix"
       prefix-development: "chore"
+    open-pull-requests-limit: 20
 
   - package-ecosystem: "github-actions"
     directory: "/"
