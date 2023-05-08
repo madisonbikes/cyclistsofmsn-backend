@@ -6,15 +6,15 @@ import { injectable } from "tsyringe";
 
 @injectable()
 export class FilesystemRepository {
-  constructor(private configuration: ServerConfiguration) {}
+  private baseDirectory;
 
-  private baseDirectory() {
-    return this.configuration.photosDir;
+  constructor(configuration: ServerConfiguration) {
+    this.baseDirectory = configuration.photosDir;
   }
 
   /** return list of base paths inside the fs repository. treat these as opaque tokens. */
   async imageFiles() {
-    const files = await fs.readdir(this.baseDirectory());
+    const files = await fs.readdir(this.baseDirectory);
     const filteredFiles = files.filter((value) => {
       const extension = path.parse(value).ext.toLowerCase();
       return [".jpg", ".png"].includes(extension);
@@ -36,7 +36,7 @@ export class FilesystemRepository {
   }
 
   photoPath(baseFilename: string) {
-    return `${this.baseDirectory()}/${baseFilename}`;
+    return `${this.baseDirectory}/${baseFilename}`;
   }
 
   async delete(baseFilename: string) {
