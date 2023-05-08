@@ -21,7 +21,7 @@ describe("server process - posts", () => {
   });
 
   it("responds to unauthenticated post list api call", () => {
-    return request.get(`/api/v1/posts`).expect(401);
+    return request.get(`/api/v1/posts`).expect(200);
   });
 
   it("responds to post list api call", async () => {

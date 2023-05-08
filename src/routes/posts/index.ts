@@ -22,7 +22,7 @@ export class PostRouter {
     .Router()
 
     // all posts
-    .get("/", validateAuthenticated(), asyncWrapper(getPostListHandler))
+    .get("/", asyncWrapper(getPostListHandler))
 
     // current post
     .get("/current", asyncWrapper(currentPostHandler))
