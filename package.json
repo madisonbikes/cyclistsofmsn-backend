@@ -55,7 +55,7 @@
     "sharp": "^0.32.1",
     "superagent": "^8.0.9",
     "ts-node": "^10.9.1",
-    "tsyringe": "^4.7.0",
+    "tsyringe": "^4.8.0",
     "twitter-api-client": "^1.6.1",
     "zod": "^3.21.4"
   },
