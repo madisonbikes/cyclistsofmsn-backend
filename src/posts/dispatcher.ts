@@ -38,7 +38,7 @@ export class PostDispatcher implements Lifecycle {
     private simpleScheduler: SimpleScheduler,
     private executor: PostExecutor,
     private imageSelector: ImageSelector,
-    private repositoryScanner: ImageRepositoryScanner
+    private repositoryScanner: ImageRepositoryScanner,
   ) {}
 
   start(): void {
@@ -46,8 +46,8 @@ export class PostDispatcher implements Lifecycle {
       this.simpleScheduler.scheduleRepeat(
         safeAsyncWrapper("dispatch", this.asyncDispatch),
         DISPATCH_INTERVAL,
-        DISPATCH_DELAY
-      )
+        DISPATCH_DELAY,
+      ),
     );
   }
 
@@ -58,6 +58,8 @@ export class PostDispatcher implements Lifecycle {
     });
   }
 
+  // because this method is called by reference above, it must be an arrow function
+  // or the "this" is lost!
   asyncDispatch = async () => {
     const scheduledResult = await this.scheduler.schedulePost({
       when: new Date(this.nowProvider.now()),
@@ -66,7 +68,7 @@ export class PostDispatcher implements Lifecycle {
     if (scheduledResult.isError()) {
       logger.warn(
         { message: scheduledResult.value.message },
-        `Error scheduling post`
+        `Error scheduling post`,
       );
       return;
     }
@@ -119,8 +121,8 @@ export class PostDispatcher implements Lifecycle {
     if (when > DISPATCH_INTERVAL) {
       logger.info(
         `Missed scheduled post ${Math.abs(
-          Math.round(when / 1000 / 60)
-        )} minutes ago, sending immediately.`
+          Math.round(when / 1000 / 60),
+        )} minutes ago, sending immediately.`,
       );
     } else {
       logger.info("Sending scheduled post on schedule");
