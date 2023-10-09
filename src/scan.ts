@@ -11,10 +11,10 @@ import pLimit from "p-limit";
 export class ImageRepositoryScanner implements Lifecycle {
   constructor(
     private fsRepository: FilesystemRepository,
-    private database: Database
+    private database: Database,
   ) {}
 
-  async start(): Promise<void> {
+  async start() {
     const [files, dbFiles] = await Promise.all([
       this.fsRepository.imageFiles(),
       Image.find().exec(),
@@ -43,17 +43,19 @@ export class ImageRepositoryScanner implements Lifecycle {
 
     // remove cruft
     array.push(
-      ...dbCruft.map((elem) => limit(() => this.markFileRemoved(elem)))
+      ...dbCruft.map((elem) => limit(() => this.markFileRemoved(elem))),
     );
 
     // insert new items
     array.push(
-      ...filesToAdd.map((filename) => limit(() => this.addNewFile(filename)))
+      ...filesToAdd.map((filename) => limit(() => this.addNewFile(filename))),
     );
 
     // update existing items
     array.push(
-      ...matchedFiles.map((image) => limit(() => this.updateMatchedFile(image)))
+      ...matchedFiles.map((image) =>
+        limit(() => this.updateMatchedFile(image)),
+      ),
     );
 
     await Promise.all(array);
@@ -107,7 +109,7 @@ export class ImageRepositoryScanner implements Lifecycle {
   }
 
   private parseImageDateTimeTag(
-    tag: StringArrayTag | undefined
+    tag: StringArrayTag | undefined,
   ): Date | undefined {
     if (!tag || tag.value.length === 0) {
       return undefined;
