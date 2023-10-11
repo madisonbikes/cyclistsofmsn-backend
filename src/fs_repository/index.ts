@@ -3,6 +3,7 @@ import { load } from "exifreader";
 import fs from "fs/promises";
 import path from "path";
 import { injectable } from "tsyringe";
+import sharp from "sharp";
 
 @injectable()
 export class FilesystemRepository {
@@ -27,6 +28,12 @@ export class FilesystemRepository {
     const fileData = await fs.readFile(path);
     const tags = load(fileData, { expanded: true });
     return tags;
+  }
+
+  async metadata(baseFilename: string) {
+    const path = this.photoPath(baseFilename);
+    const md = await sharp(path).metadata();
+    return { width: md.width, height: md.height };
   }
 
   async timestamp(baseFilename: string) {

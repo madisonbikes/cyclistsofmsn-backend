@@ -17,6 +17,12 @@ export class ImageClass {
   public exif_createdon?: Date;
 
   @prop()
+  public width?: number;
+
+  @prop()
+  public height?: number;
+
+  @prop()
   public description?: string;
 
   /**

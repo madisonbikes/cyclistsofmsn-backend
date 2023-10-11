@@ -125,19 +125,24 @@ export class ImageRepositoryScanner implements Lifecycle {
   }
 
   private async getFileMetadata(filename: string) {
-    const [fs_timestamp, tags] = await Promise.all([
+    const [fs_timestamp, tags, metadata] = await Promise.all([
       this.fsRepository.timestamp(filename),
       this.fsRepository.tags(filename),
+      this.fsRepository.metadata(filename),
     ]);
     const description = this.parseStringTag(tags?.exif?.ImageDescription);
     const exif_createdon = this.parseImageDateTimeTag(tags?.exif?.DateTime);
     const description_from_exif = description !== undefined;
+    const width = metadata?.width;
+    const height = metadata?.height;
 
     const retval: Partial<ImageDocument> = {
       fs_timestamp,
       exif_createdon,
       description,
       description_from_exif,
+      width,
+      height,
     };
     return retval;
   }

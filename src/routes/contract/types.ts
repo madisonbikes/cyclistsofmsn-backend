@@ -11,12 +11,14 @@ const mutableImageSchema = z.object({
   hidden: z.boolean(),
 });
 
-export const putImageBodySchema = mutableImageSchema.deepPartial();
+export const putImageBodySchema = mutableImageSchema.partial();
 export type PutImageBody = z.infer<typeof putImageBodySchema>;
 
 export const imageSchema = mutableImageSchema.extend({
   id: z.coerce.string(),
   filename: z.string(),
+  width: z.coerce.number().optional(),
+  height: z.coerce.number().optional(),
   fs_timestamp: z.coerce.date(),
   exif_createdon: z.coerce.date().optional(),
   description_from_exif: z.boolean(),

@@ -6,7 +6,7 @@ import { Version } from "./version";
 import { Image } from "./images";
 
 /** make sure you update switch statement below when bumping db version */
-const CURRENT_DATABASE_VERSION = 2;
+const CURRENT_DATABASE_VERSION = 3;
 
 /** provide unified access to database connection */
 @injectable()
@@ -33,7 +33,7 @@ export class Database implements Lifecycle {
     if (this.connection) {
       logger.debug(
         { url: this.configuration.mongodbUri },
-        `Already connected to MongoDB`
+        `Already connected to MongoDB`,
       );
       return false;
     }
@@ -59,13 +59,13 @@ export class Database implements Lifecycle {
     const values = await Version.find();
     if (values.length > 1) {
       throw new Error(
-        "Database has multiple versions, cannot proceeed with migration"
+        "Database has multiple versions, cannot proceeed with migration",
       );
     }
 
     if (values.length === 0) {
       logger.info(
-        `Initializing database version to ${CURRENT_DATABASE_VERSION}`
+        `Initializing database version to ${CURRENT_DATABASE_VERSION}`,
       );
       await this.setCurrentVersion();
     } else {
@@ -75,7 +75,7 @@ export class Database implements Lifecycle {
       } else {
         logger.info(
           { oldVersion: version, currentVersion: CURRENT_DATABASE_VERSION },
-          "Migrating database"
+          "Migrating database",
         );
 
         while (version < CURRENT_DATABASE_VERSION) {
@@ -84,8 +84,13 @@ export class Database implements Lifecycle {
               // add the image hidden column
               await Image.updateMany(
                 { hidden: { $exists: false } },
-                { $set: { hidden: false } }
+                { $set: { hidden: false } },
               );
+              break;
+            }
+            case 2: {
+              // force refresh to add image dimension metadata to the images
+              this.triggerMetadataRefresh();
               break;
             }
             default:

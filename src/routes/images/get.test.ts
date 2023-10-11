@@ -108,8 +108,8 @@ describe("server process - images", () => {
       .expect(200)
       .expect((res) =>
         expect(res.body).toEqual(
-          expect.objectContaining({ filename: "missing.jpg" })
-        )
+          expect.objectContaining({ filename: "missing.jpg" }),
+        ),
       );
   });
 
@@ -141,10 +141,12 @@ describe("server process - images", () => {
     const value = await request.get("/api/v1/images").expect(200);
     const images = imageListSchema.parse(value.body);
     const testImage = images.find(
-      (v) => v.filename === "test_DSC07588_with_description.jpg"
+      (v) => v.filename === "test_DSC07588_with_description.jpg",
     );
     expect(testImage).toBeDefined();
     expect(testImage?.description).toContain("riding a bike");
+    expect(testImage?.height).toBe(2415);
+    expect(testImage?.width).toBe(3622);
   });
 
   it("a marked hidden image returns as hidden", async () => {
