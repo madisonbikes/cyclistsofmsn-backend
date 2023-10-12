@@ -14,7 +14,7 @@ export class ImageSelector {
     private randomProvider: RandomProvider,
     private repostCriteria: RepostCriteria,
     private seasonalityCriteria: SeasonalityCriteria,
-    private unpostedCriteria: UnpostedCriteria
+    private unpostedCriteria: UnpostedCriteria,
   ) {
     // empty
   }
@@ -25,7 +25,7 @@ export class ImageSelector {
       hidden: false,
     });
     if (allImages.length === 0) {
-      return error({ message: "no images" });
+      return error({ message: "no images", critical: true });
     }
 
     const criteria = [
@@ -51,8 +51,8 @@ export class ImageSelector {
       for (const candidatePhoto of orderedPhotoList) {
         const values = await Promise.all(
           activeCriteriaList.map((criteria) =>
-            criteria.satisfiedBy(candidatePhoto)
-          )
+            criteria.satisfiedBy(candidatePhoto),
+          ),
         );
 
         // if any of the criteria were not satisfied, move on to next candidate

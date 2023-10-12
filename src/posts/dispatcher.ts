@@ -66,9 +66,11 @@ export class PostDispatcher implements Lifecycle {
       selectImage: true,
     });
     if (scheduledResult.isError()) {
-      logger.warn(
+      const logMethod =
+        scheduledResult.value.critical === true ? logger.error : logger.info;
+      logMethod(
         { message: scheduledResult.value.message },
-        `Error scheduling post`,
+        `No post scheduled`,
       );
       return;
     }

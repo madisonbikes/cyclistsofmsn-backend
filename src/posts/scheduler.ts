@@ -19,7 +19,7 @@ import { SchedulePostOptions } from "../routes/contract";
 import { ImageSelector } from "./selection/selector";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
-export type PostError = { message: string };
+export type PostError = { message: string; critical?: boolean };
 
 @injectable()
 export class PostScheduler {
@@ -27,7 +27,7 @@ export class PostScheduler {
     private randomProvider: RandomProvider,
     private nowProvider: NowProvider,
     private configuration: ServerConfiguration,
-    private imageSelector: ImageSelector
+    private imageSelector: ImageSelector,
   ) {}
 
   private lastScheduledPostTimestamp: number | undefined;
@@ -46,7 +46,7 @@ export class PostScheduler {
             {
               matchingPosts,
             },
-            `More than one post scheduled for timestamp ${when}`
+            `More than one post scheduled for timestamp ${when}`,
           );
         }
         const firstPost = matchingPosts[0];
@@ -54,7 +54,7 @@ export class PostScheduler {
         if (this.lastScheduledPostTimestamp !== firstPost.timestamp.getTime()) {
           logger.info(
             { when: firstPost.timestamp },
-            "Using existing scheduled post"
+            "Using existing scheduled post",
           );
           this.lastScheduledPostTimestamp = firstPost.timestamp.getTime();
         }
@@ -71,7 +71,7 @@ export class PostScheduler {
 
   private async createNewScheduledPost(
     when: Date,
-    selectImage = false
+    selectImage = false,
   ): Promise<PostResult> {
     const lastPost = await PostHistory.findLatestPost();
     const newPost = new PostHistory();
@@ -96,7 +96,7 @@ export class PostScheduler {
 
   private selectNextTime(
     lastPostTime: Date | undefined,
-    when: Date
+    when: Date,
   ): Result<Date, PostError> {
     const startOfToday = startOfDay(this.nowProvider.now());
     const startOfTomorrow = date_add(startOfToday, { days: 1 });
