@@ -73,7 +73,7 @@
     "@types/passport": "^1.0.14",
     "@types/passport-local": "^1.0.38",
     "@types/readline-sync": "^1.4.8",
-    "@types/supertest": "^2.0.15",
+    "@types/supertest": "^2.0.16",
     "@typescript-eslint/eslint-plugin": "^6.9",
     "@typescript-eslint/parser": "^6.9",
     "conventional-changelog-conventionalcommits": "^7.0.2",
