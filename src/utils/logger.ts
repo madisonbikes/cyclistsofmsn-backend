@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === "test") {
   });
 
   // ensure pino base logger level is set to minimum of the transports
-  const levels = targets.map((t) => t.level).map((l) => pino.levels.values[l]);
+  const levels = [consoleLogLevel, logLevel].map((l) => pino.levels.values[l]);
   const minLevel = Math.min(...levels);
   const level = pino.levels.labels[minLevel];
   newLogger = pino({ level, serializers }, transport);
