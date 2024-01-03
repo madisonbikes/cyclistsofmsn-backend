@@ -14,11 +14,11 @@ jobs:
         with:
           persist-credentials: false
 
-      # semantic-release requires node 18
-      - name: Use Node.js 18.x
+      # semantic-release requires node 20
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
           cache: "npm"
 
       # ignore scripts to avoid husky/commitlint checks
