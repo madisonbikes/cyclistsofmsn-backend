@@ -1,7 +1,7 @@
 import { Database, Image, ImageDocument } from "./database";
 import { FilesystemRepository } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
-import parseDate from "date-fns/parse";
+import { parse } from "date-fns/parse";
 import { Lifecycle, logger } from "./utils";
 import { injectable } from "tsyringe";
 import pLimit from "p-limit";
@@ -114,7 +114,7 @@ export class ImageRepositoryScanner implements Lifecycle {
     if (!tag || tag.value.length === 0) {
       return undefined;
     }
-    return parseDate(tag.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
+    return parse(tag.value[0], "yyyy:MM:dd HH:mm:ss", new Date());
   }
 
   private parseStringTag(tag: StringArrayTag | undefined): string | undefined {
