@@ -38,7 +38,7 @@
     "dotenv": "^16.4.1",
     "exifreader": "^4.20.0",
     "express": "^4.18.2",
-    "express-session": "^1.17.3",
+    "express-session": "^1.18.0",
     "helmet": "^7.1.0",
     "lru-cache": "^10.2.0",
     "oauth-1.0a": "^2.2.6",
