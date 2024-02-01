@@ -51,7 +51,7 @@
     "readline-sync": "^1.4.10",
     "redis": "^4.6.12",
     "reflect-metadata": "^0.2.1",
-    "sharp": "^0.33.1",
+    "sharp": "^0.33.2",
     "superagent": "^8.1.2",
     "ts-node": "^10.9.2",
     "tsyringe": "^4.8.0",
