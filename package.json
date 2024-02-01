@@ -86,7 +86,7 @@
     "husky": "^8.0.3",
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.1.6",
-    "prettier": "3.1.1",
+    "prettier": "3.2.4",
     "semantic-release": "^23.0.0",
     "semantic-release-export-data": "^1.0.1",
     "supertest": "^6.3.3",
