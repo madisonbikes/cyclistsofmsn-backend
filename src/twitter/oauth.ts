@@ -5,7 +5,7 @@ import { Plugin } from "superagent";
 export const oauth_signer = (
   apiKey: string,
   apiSecret: string,
-  data: Record<string, string>
+  data: Record<string, string>,
 ): Plugin => {
   const oauth = new OAuth({
     consumer: { key: apiKey, secret: apiSecret },
@@ -25,6 +25,6 @@ export const oauth_signer = (
     };
     const authorization = oauth.authorize(requestData);
     const header = oauth.toHeader(authorization);
-    void request.set(header);
+    void request.set("Authorization", header.Authorization);
   };
 };
