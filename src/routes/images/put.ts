@@ -31,7 +31,7 @@ export class ImagePut {
         newValue?.description != null
       ) {
         await this.fsRepository.updateImageDescription(
-          id,
+          oldValue.filename,
           newValue?.description,
         );
       }
