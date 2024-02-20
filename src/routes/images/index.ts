@@ -24,36 +24,44 @@ export class ImageRouter {
     private imagePut: ImagePut,
   ) {}
 
-  readonly routes = express
-    .Router()
+  routes = () => {
+    return (
+      express
+        .Router()
 
-    // all images
-    .get("/", validateAuthenticated(), asyncWrapper(this.imageGet.listHandler))
+        // all images
+        .get(
+          "/",
+          validateAuthenticated(),
+          asyncWrapper(this.imageGet.listHandler),
+        )
 
-    .put(
-      "/:id",
-      validateBodySchema({ schema: singleImagePutSchema }),
-      validateRole({ role: Roles.EDITOR }),
-      validateId(),
-      asyncWrapper(this.imagePut.handler),
-    )
+        .put(
+          "/:id",
+          validateBodySchema({ schema: singleImagePutSchema }),
+          validateRole({ role: Roles.EDITOR }),
+          validateId(),
+          asyncWrapper(this.imagePut.handler),
+        )
 
-    // single image metadata
-    .get("/:id", validateId(), asyncWrapper(this.imageGet.metadata))
+        // single image metadata
+        .get("/:id", validateId(), asyncWrapper(this.imageGet.metadata))
 
-    .delete(
-      "/:id",
-      validateAdmin(),
-      validateId(),
-      asyncWrapper(this.singleDelete.handler),
-    )
+        .delete(
+          "/:id",
+          validateAdmin(),
+          validateId(),
+          asyncWrapper(this.singleDelete.handler),
+        )
 
-    // single image, cached
-    .get(
-      "/:id/binary",
-      this.cache.middleware({ callNextWhenCacheable: false }),
-      validateId(),
-      validateQuerySchema({ schema: this.imageGet.querySchema }),
-      asyncWrapper(this.imageGet.binary),
+        // single image, cached
+        .get(
+          "/:id/binary",
+          this.cache.middleware({ callNextWhenCacheable: false }),
+          validateId(),
+          validateQuerySchema({ schema: this.imageGet.querySchema }),
+          asyncWrapper(this.imageGet.binary),
+        )
     );
+  };
 }

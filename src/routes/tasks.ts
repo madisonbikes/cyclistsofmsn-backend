@@ -10,19 +10,21 @@ import { mapPostSchema } from "./posts/types";
 export class TasksRouter {
   constructor(private scheduler: PostScheduler) {}
 
-  readonly routes = express.Router().post(
-    "/schedulePost",
-    validateAdmin(),
-    validateBodySchema({ schema: schedulePostOptionsSchema }),
-    asyncWrapper(async (request, response) => {
-      const postOptions = request.validated as SchedulePostOptions;
-      const result = await this.scheduler.schedulePost(postOptions);
-      if (result.isOk()) {
-        const mapped = mapPostSchema.parse(result.value);
-        response.send(mapped);
-      } else {
-        response.status(400).send(result.value);
-      }
-    })
-  );
+  routes = () => {
+    return express.Router().post(
+      "/schedulePost",
+      validateAdmin(),
+      validateBodySchema({ schema: schedulePostOptionsSchema }),
+      asyncWrapper(async (request, response) => {
+        const postOptions = request.validated as SchedulePostOptions;
+        const result = await this.scheduler.schedulePost(postOptions);
+        if (result.isOk()) {
+          const mapped = mapPostSchema.parse(result.value);
+          response.send(mapped);
+        } else {
+          response.status(400).send(result.value);
+        }
+      }),
+    );
+  };
 }

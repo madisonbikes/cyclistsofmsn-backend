@@ -18,42 +18,46 @@ import { currentPostHandler, getPostHandler, getPostListHandler } from "./get";
 
 @injectable()
 export class PostRouter {
-  readonly routes = express
-    .Router()
+  routes = () => {
+    return (
+      express
+        .Router()
 
-    // all posts
-    .get("/", asyncWrapper(getPostListHandler))
+        // all posts
+        .get("/", asyncWrapper(getPostListHandler))
 
-    // current post
-    .get("/current", asyncWrapper(currentPostHandler))
+        // current post
+        .get("/current", asyncWrapper(currentPostHandler))
 
-    // specific post
-    .get(
-      "/:id",
-      validateAuthenticated(),
-      validateId(),
-      asyncWrapper(getPostHandler)
-    )
+        // specific post
+        .get(
+          "/:id",
+          validateAuthenticated(),
+          validateId(),
+          asyncWrapper(getPostHandler),
+        )
 
-    .put(
-      "/:id",
-      validateBodySchema({ schema: singlePostPutSchema }),
-      validateEditor(),
-      validateId(),
-      asyncWrapper(singlePostPutHandler)
-    )
+        .put(
+          "/:id",
+          validateBodySchema({ schema: singlePostPutSchema }),
+          validateEditor(),
+          validateId(),
+          asyncWrapper(singlePostPutHandler),
+        )
 
-    .delete(
-      "/:id",
-      validateAdmin(),
-      validateId(),
-      asyncWrapper(singlePostDeleteHandler)
-    )
+        .delete(
+          "/:id",
+          validateAdmin(),
+          validateId(),
+          asyncWrapper(singlePostDeleteHandler),
+        )
 
-    // post create operation is secured by editor role
-    .post("/create", validateEditor(), (_req, res) => {
-      return res.send("Submitted new post");
-    });
+        // post create operation is secured by editor role
+        .post("/create", validateEditor(), (_req, res) => {
+          return res.send("Submitted new post");
+        })
+    );
+  };
 }
 
 const validateEditor = () => {

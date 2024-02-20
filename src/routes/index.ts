@@ -16,13 +16,15 @@ export class MainRouter {
     private imageRouter: ImageRouter,
     private postRouter: PostRouter,
     private sessionRouter: SessionRouter,
-    private tasksRouter: TasksRouter
+    private tasksRouter: TasksRouter,
   ) {}
 
-  readonly routes = express
-    .Router()
-    .use("/posts", this.postRouter.routes)
-    .use("/images", this.imageRouter.routes)
-    .use("/session", this.sessionRouter.routes)
-    .use("/tasks", this.tasksRouter.routes);
+  routes = () => {
+    return express
+      .Router()
+      .use("/posts", this.postRouter.routes())
+      .use("/images", this.imageRouter.routes())
+      .use("/session", this.sessionRouter.routes())
+      .use("/tasks", this.tasksRouter.routes());
+  };
 }

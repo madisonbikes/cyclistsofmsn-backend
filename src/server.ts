@@ -41,7 +41,7 @@ export class PhotoServer implements Lifecycle {
     redis: RedisConnection,
     scanner: ImageRepositoryScanner,
     postDispatcher: PostDispatcher,
-    postPopulate: PostPopulate
+    postPopulate: PostPopulate,
   ) {
     this.components.push(database);
     this.components.push(redis);
@@ -91,7 +91,7 @@ export class PhotoServer implements Lifecycle {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use("/api/v1", this.apiRouter.routes);
+    app.use("/api/v1", this.apiRouter.routes());
 
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
