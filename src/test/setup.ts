@@ -13,6 +13,7 @@ import assert from "assert";
 import { PhotoServer } from "../server";
 import { Server } from "./request";
 import { ImageRepositoryScanner } from "../scan";
+import fs from "fs-extra";
 
 let mongoUri: string;
 let mongoServer: MongoMemoryServer | undefined;
@@ -31,6 +32,9 @@ export type SuiteOptions = {
   // after each test
   withPhotoServer: boolean;
 
+  // do we need to ensure that the test resources are mutable?
+  withMutableTestResources: boolean;
+
   // clear images after each test
   clearImages: boolean;
 
@@ -38,16 +42,19 @@ export type SuiteOptions = {
   clearPostHistory: boolean;
 };
 
+let mutablePhotosDir: string | undefined;
+
 /** entry point that should be included first in each describe block */
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   const withDatabase = options.withDatabase ?? false;
   const withPhotoServer = options.withPhotoServer ?? false;
+  const withMutableTestResources = options.withMutableTestResources ?? false;
   const clearPostHistory = options.clearPostHistory ?? false;
   const clearImages = options.clearImages ?? false;
 
   beforeAll(async () => {
     assert(tc === undefined);
-    tc = await initializeSuite();
+    tc = await initializeSuite(withMutableTestResources);
 
     if (withDatabase) {
       // start the mongo in-memory server on an ephemeral port
@@ -58,7 +65,7 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
       tc.register<Database>(
         Database,
         { useClass: Database },
-        { lifecycle: Lifecycle.ContainerScoped }
+        { lifecycle: Lifecycle.ContainerScoped },
       );
 
       await testDatabase().start();
@@ -114,7 +121,7 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
       await testDatabase().stop();
     }
 
-    await cleanupSuite();
+    await cleanupSuite(withMutableTestResources);
     tc = undefined;
   });
 };
@@ -133,7 +140,7 @@ export const testDatabase = () => {
   return testContainer().resolve(Database);
 };
 
-const initializeSuite = () => {
+const initializeSuite = async (withMutableTestResources: boolean) => {
   // don't use value registrations because they will be cleared in the beforeEach() handler
   const testContainer = rootContainer.createChildContainer();
 
@@ -141,13 +148,31 @@ const initializeSuite = () => {
   testContainer.register<ServerConfiguration>(
     ServerConfiguration,
     { useClass: TestConfiguration },
-    { lifecycle: Lifecycle.ContainerScoped }
+    { lifecycle: Lifecycle.ContainerScoped },
   );
+
+  const originalPhotosDir = path.resolve(__dirname, "../../test_resources");
+  if (withMutableTestResources) {
+    const random = Math.random().toString(36).substring(7);
+    mutablePhotosDir = path.resolve(
+      __dirname,
+      `../../output/mutable_test_resources_${random}`,
+    );
+    await fs.mkdirp(mutablePhotosDir);
+    await fs.copy(originalPhotosDir, mutablePhotosDir);
+  } else {
+    mutablePhotosDir = path.resolve(__dirname, "../../test_resources");
+  }
   return Promise.resolve(testContainer);
 };
 
-const cleanupSuite = async () => {
-  // empty
+const cleanupSuite = async (withMutableTestResources: boolean) => {
+  if (withMutableTestResources) {
+    if (mutablePhotosDir != null) {
+      await fs.remove(mutablePhotosDir);
+      mutablePhotosDir = undefined;
+    }
+  }
 };
 
 @injectable()
@@ -160,7 +185,8 @@ class TestConfiguration extends ServerConfiguration {
   constructor() {
     super();
 
-    this.photosDir = path.resolve(__dirname, "../../test_resources");
+    assert(mutablePhotosDir != null, "mutablePhotosDir not set");
+    this.photosDir = mutablePhotosDir;
 
     // use static mongo URI set in suite initialization
     this.mongodbUri = mongoUri;

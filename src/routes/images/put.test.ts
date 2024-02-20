@@ -16,7 +16,11 @@ import {
 describe("server process - images", () => {
   let request: TestRequest;
 
-  setupSuite({ withDatabase: true, withPhotoServer: true });
+  setupSuite({
+    withDatabase: true,
+    withPhotoServer: true,
+    withMutableTestResources: true,
+  });
 
   beforeAll(async () => {
     await Promise.all([
