@@ -1,20 +1,18 @@
 import { execFile } from "promisify-child-process";
 import fs from "fs/promises";
+import tempfile from "tempfile";
 
 export const updateImageDescription = async (
   file: string,
   description: string,
 ) => {
-  const { temporaryWrite, temporaryFile } = await import("tempy");
-  const argFile = await temporaryWrite(description, { name: "args" });
-  const newFile = temporaryFile({ name: "newFile" });
+  const newFile = tempfile(".newFile");
   await execFile("exiftool", [
-    `-mwg:Description<${argFile}`,
+    `-mwg:Description=${description}`,
     file,
     "-o",
     newFile,
   ]);
-  await fs.unlink(argFile);
   await fs.copyFile(newFile, file);
   await fs.unlink(newFile);
 };

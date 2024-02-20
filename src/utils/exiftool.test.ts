@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { updateImageDescription } from "./exiftool";
 import { load } from "exifreader";
+import tempfile from "tempfile";
 
 describe("exiftool", () => {
   const imageFile = path.resolve(
@@ -11,15 +12,22 @@ describe("exiftool", () => {
   let tempFile: string;
 
   beforeEach(async () => {
-    const { temporaryFile } = await import("tempy");
-    tempFile = temporaryFile({ name: "exiftool_test" });
+    tempFile = tempfile(".exiftool_test");
     await fs.copyFile(imageFile, tempFile);
   });
 
   it("behaves", async () => {
     await updateImageDescription(tempFile, "new description");
     const tags = await load(tempFile, { expanded: true });
-    expect(tags.exif?.ImageDescription).toEqual("new description");
+    expect(tags.exif?.ImageDescription?.description).toEqual("new description");
+  });
+
+  it("behaves with funny characters", async () => {
+    await updateImageDescription(tempFile, "new\n!!!description");
+    const tags = await load(tempFile, { expanded: true });
+    expect(tags.exif?.ImageDescription?.description).toEqual(
+      "new\n!!!description",
+    );
   });
 
   afterEach(async () => {
