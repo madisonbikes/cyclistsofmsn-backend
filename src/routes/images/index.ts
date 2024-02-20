@@ -13,17 +13,15 @@ import { asyncWrapper } from "../async";
 import { ImageGet } from "./get";
 import { SingleImageDelete } from "./delete";
 import { Cache } from "../cache";
-import {
-  handler as singleImagePutHandler,
-  bodySchema as singleImagePutSchema,
-} from "./put";
+import { ImagePut, bodySchema as singleImagePutSchema } from "./put";
 
 @injectable()
 export class ImageRouter {
   constructor(
     private cache: Cache,
     private imageGet: ImageGet,
-    private singleDelete: SingleImageDelete
+    private singleDelete: SingleImageDelete,
+    private imagePut: ImagePut,
   ) {}
 
   readonly routes = express
@@ -37,7 +35,7 @@ export class ImageRouter {
       validateBodySchema({ schema: singleImagePutSchema }),
       validateRole({ role: Roles.EDITOR }),
       validateId(),
-      asyncWrapper(singleImagePutHandler)
+      asyncWrapper(this.imagePut.handler),
     )
 
     // single image metadata
@@ -47,7 +45,7 @@ export class ImageRouter {
       "/:id",
       validateAdmin(),
       validateId(),
-      asyncWrapper(this.singleDelete.handler)
+      asyncWrapper(this.singleDelete.handler),
     )
 
     // single image, cached
@@ -56,6 +54,6 @@ export class ImageRouter {
       this.cache.middleware({ callNextWhenCacheable: false }),
       validateId(),
       validateQuerySchema({ schema: this.imageGet.querySchema }),
-      asyncWrapper(this.imageGet.binary)
+      asyncWrapper(this.imageGet.binary),
     );
 }

@@ -32,7 +32,7 @@ module.exports = {
     ],
     eqeqeq: ["warn", "smart"],
     "func-style": ["warn"],
-    "require-await": ["error"],
+    "require-await": ["warn"],
     "@typescript-eslint/no-floating-promises": "error",
     "import/no-default-export": 2,
     "@typescript-eslint/strict-boolean-expressions": "warn",

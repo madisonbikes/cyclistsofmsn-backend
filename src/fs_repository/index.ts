@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { injectable } from "tsyringe";
 import sharp from "sharp";
+import { updateImageDescription } from "../utils/exiftool";
 
 @injectable()
 export class FilesystemRepository {
@@ -54,5 +55,10 @@ export class FilesystemRepository {
       // ignore
       return Promise.resolve();
     }
+  }
+
+  async updateImageDescription(baseFilename: string, description: string) {
+    const originalFile = this.photoPath(baseFilename);
+    await updateImageDescription(originalFile, description);
   }
 }
