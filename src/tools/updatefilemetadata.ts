@@ -30,15 +30,24 @@ export const updateFileMetadata = async (fs: FilesystemRepository) => {
 
   const limit = pLimit(4);
 
-  const promises = images.map((image) =>
-    limit(async () => {
-      const base = image.filename;
-      logger.info(`Updating description for ${base}`);
-      await fs.updateImageDescription(base, image.description ?? "");
-      image.description_from_exif = true;
-      return image.save();
-    }),
-  );
+  const promises = images
+    .filter((image) => image.deleted === false)
+    .map((image) =>
+      limit(async () => {
+        const base = image.filename;
+        logger.info(`Updating description for ${base}`);
+        const retval = await fs.updateImageDescription(
+          base,
+          image.description ?? "",
+        );
+        if (retval.error != null) {
+          return retval;
+        }
+        image.description_from_exif = true;
+        await image.save();
+        return {};
+      }),
+    );
 
   await Promise.all(promises);
   return promises.length;
