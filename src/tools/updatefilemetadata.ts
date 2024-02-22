@@ -21,17 +21,19 @@ export const updateFileMetadata = async () => {
 
   const fs = container.resolve(FilesystemRepository);
 
-  console.log("Looking for images with description_from_exif set to true");
-  const images = await Image.find({ description_from_exif: { $eq: true } });
+  console.log("Looking for images with description_from_exif set to false");
+  const images = await Image.find({ description_from_exif: { $eq: false } });
   console.log(`Found ${images.length} images`);
 
   const limit = pLimit(4);
 
   const promises = images
-    .map((image) => {
+    .map(async (image) => {
       const base = image.filename;
       console.log(`Updating description for ${base}`);
-      return fs.updateImageDescription(base, image.description ?? "");
+      await fs.updateImageDescription(base, image.description ?? "");
+      image.description_from_exif = true;
+      return image.save();
     })
     .map((promise) => limit(() => promise));
 

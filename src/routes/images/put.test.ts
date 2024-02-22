@@ -70,7 +70,9 @@ describe("server process - images", () => {
     const checkImage = await Image.findById(goodImageId);
     expect(checkImage).toBeDefined();
     expect(checkImage?.description).toEqual("blarg");
-    expect(checkImage?.description_from_exif).toEqual(false);
+
+    // this used to false, but not we propagate exif data to the file
+    expect(checkImage?.description_from_exif).toEqual(true);
   });
 
   it("responds to image update api call setting hidden", async () => {

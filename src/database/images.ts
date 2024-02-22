@@ -26,8 +26,8 @@ export class ImageClass {
   public description?: string;
 
   /**
-   * if description is updated through admin UI, set this to false and it will not be updated
-   * when scanning
+   * this is unused now except for migration, but it used to be used to determine if the description
+   * had been modified in the database but not in the image file.
    */
   @prop({ default: true, required: true })
   public description_from_exif!: boolean;
