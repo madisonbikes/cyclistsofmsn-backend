@@ -18,7 +18,7 @@
     "register_twitter": "ts-node src/twitter/register.ts",
     "test_tweet": "ts-node src/twitter/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
     "test_toot": "ts-node src/mastodon/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
-    "check-package-updates": "npx npm-check-updates -x p-limit",
+    "check-package-updates": "npx npm-check-updates -x p-limit -x tempfile",
     "prepare": "husky install"
   },
   "author": "Ben Sandee",
@@ -93,7 +93,6 @@
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.1.6",
     "prettier": "3.2.4",
-    "semantic-release": "^23.0.0",
     "semantic-release-export-data": "^1.0.1",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.2",
