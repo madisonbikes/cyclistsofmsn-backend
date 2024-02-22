@@ -74,16 +74,6 @@ export class ImageRepositoryScanner implements Lifecycle {
     ) {
       logger.debug(`updating existing image ${filename}`);
       const metadata = await this.getFileMetadata(filename);
-
-      // existing image row has modified the description
-      if (!image.description_from_exif) {
-        delete metadata.description_from_exif;
-        delete metadata.description;
-      }
-      // clean up situations where description was unset but also this field is set to false
-      if (image.description === undefined) {
-        image.description_from_exif = true;
-      }
       Object.assign(image, metadata);
       image.deleted = false;
       await image.save();
@@ -103,7 +93,6 @@ export class ImageRepositoryScanner implements Lifecycle {
   private async markFileRemoved(image: ImageDocument) {
     logger.debug(`marking cruft db image ${image.filename}`);
     image.deleted = true;
-    image.description_from_exif = true;
     image.fs_timestamp = undefined;
     await image.save();
   }
@@ -132,7 +121,6 @@ export class ImageRepositoryScanner implements Lifecycle {
     ]);
     const description = this.parseStringTag(tags?.exif?.ImageDescription);
     const exif_createdon = this.parseImageDateTimeTag(tags?.exif?.DateTime);
-    const description_from_exif = description !== undefined;
     const width = metadata?.width;
     const height = metadata?.height;
 
@@ -140,7 +128,6 @@ export class ImageRepositoryScanner implements Lifecycle {
       fs_timestamp,
       exif_createdon,
       description,
-      description_from_exif,
       width,
       height,
     };

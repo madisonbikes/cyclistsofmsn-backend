@@ -11,6 +11,7 @@ import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
+  getGoodImageId,
 } from "../../test/data";
 
 describe("server process - images", () => {
@@ -88,14 +89,4 @@ describe("server process - images", () => {
     expect(checkImage).toBeDefined();
     expect(checkImage?.hidden).toBe(true);
   });
-
-  const getGoodImageId = async () => {
-    const retval = (
-      await Image.findOne({
-        filename: "test_DSC_7020.jpg",
-      })
-    )?._id;
-    expect(retval).toBeDefined();
-    return retval;
-  };
 });

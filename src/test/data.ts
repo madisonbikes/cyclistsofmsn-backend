@@ -1,3 +1,4 @@
+import { Image } from "../database";
 import { testDatabase } from "./setup";
 
 /** returns array of inserted post id's */
@@ -70,4 +71,14 @@ export const createTestEditorUser = async () => {
       hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
       roles: ["editor"],
     });
+};
+
+export const getGoodImageId = async () => {
+  const retval = (
+    await Image.findOne({
+      filename: "test_DSC_7020.jpg",
+    })
+  )?._id;
+  expect(retval).toBeDefined();
+  return retval;
 };

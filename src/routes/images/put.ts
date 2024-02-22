@@ -31,9 +31,6 @@ export class ImagePut {
           oldValue.filename,
           newValue?.description,
         );
-
-        // and reset the description_from_exif flag
-        newValue.description_from_exif = true;
         await newValue.save();
       }
       res.send(lenientImageSchema.parse(newValue));
