@@ -12,7 +12,9 @@ if (require.main === module) {
       const db = container.resolve(Database);
       await db.start();
 
-      return updateFileMetadata();
+      const fs = container.resolve(FilesystemRepository);
+
+      return updateFileMetadata(fs);
 
       await db.stop();
     })
@@ -21,9 +23,7 @@ if (require.main === module) {
     });
 }
 
-export const updateFileMetadata = async () => {
-  const fs = container.resolve(FilesystemRepository);
-
+export const updateFileMetadata = async (fs: FilesystemRepository) => {
   logger.info("Looking for images with description_from_exif set to false");
   const images = await Image.find({ description_from_exif: { $eq: false } });
   logger.info(`Found ${images.length} images`);
