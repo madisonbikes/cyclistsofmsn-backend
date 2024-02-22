@@ -59,6 +59,6 @@ export class FilesystemRepository {
 
   async updateImageDescription(baseFilename: string, description: string) {
     const originalFile = this.photoPath(baseFilename);
-    await updateImageDescription(originalFile, description);
+    return await updateImageDescription(originalFile, description);
   }
 }
