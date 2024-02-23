@@ -15,9 +15,9 @@ describe("updateFileMetadata", () => {
     const goodImageId = await getGoodImageId();
     const image = await Image.findById(goodImageId);
     expect(image).toBeDefined();
-
-    expect(image?.description_from_exif).toBe(true);
     if (!image) throw new Error("image is undefined");
+    expect(image.description).toBe("blarg");
+    expect(image.description_from_exif).toBe(true);
 
     image.description_from_exif = false;
     await image.save();

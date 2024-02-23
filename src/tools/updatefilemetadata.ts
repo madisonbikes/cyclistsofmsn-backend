@@ -31,12 +31,13 @@ export const updateFileMetadata = async (fs: FilesystemRepository) => {
   const limit = pLimit(4);
 
   const promises = images
-    .filter((image) => image.deleted === false)
+    .filter((image) => !image.deleted)
+    .filter((image) => !image.description_from_exif)
     .filter((image) => image.description != null && image.description !== "")
     .map((image) =>
       limit(async () => {
         const base = image.filename;
-        logger.info(`Updating description for ${base}`);
+        console.log(`Updating description for ${base}`);
         const retval = await fs.updateImageDescription(
           base,
           image.description ?? "",
