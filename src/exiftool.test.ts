@@ -1,19 +1,22 @@
-import fs from "fs/promises";
+import fs from "fs-extra";
 import path from "path";
 import { updateImageDescription } from "./exiftool";
 import { load } from "exifreader";
 import tempfile from "tempfile";
+import { testResourcesDir } from "./test";
 
 describe("exiftool", () => {
   const testImageFile = path.resolve(
-    __dirname,
-    "../../test_resources/test_DSC07588_with_description.jpg",
+    testResourcesDir(),
+    "test_DSC07588_with_description.jpg",
   );
 
   let tempFile: string;
   beforeEach(async () => {
     tempFile = tempfile(".exiftool_test");
-    await fs.copyFile(testImageFile, tempFile);
+    await fs.copy(testImageFile, tempFile, {
+      errorOnExist: true,
+    });
   });
 
   // clean up the temp file
