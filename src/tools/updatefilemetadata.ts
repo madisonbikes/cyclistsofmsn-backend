@@ -14,9 +14,9 @@ if (require.main === module) {
 
       const fs = container.resolve(FilesystemRepository);
 
-      return updateFileMetadata(fs);
+      await updateFileMetadata(fs);
 
-      await db.stop();
+      return db.stop();
     })
     .catch((error) => {
       console.log(error);
@@ -25,17 +25,19 @@ if (require.main === module) {
 
 export const updateFileMetadata = async (fs: FilesystemRepository) => {
   logger.info("Looking for images with description_from_exif set to false");
-  const images = await Image.find({ description_from_exif: { $eq: false } });
+  const images = await Image.find();
   logger.info(`Found ${images.length} images`);
 
   const limit = pLimit(4);
 
   const promises = images
-    .filter((image) => image.deleted === false)
+    .filter((image) => !image.deleted)
+    .filter((image) => !image.description_from_exif)
+    .filter((image) => image.description != null && image.description !== "")
     .map((image) =>
       limit(async () => {
         const base = image.filename;
-        logger.info(`Updating description for ${base}`);
+        console.log(`Updating description for ${base}`);
         const retval = await fs.updateImageDescription(
           base,
           image.description ?? "",

@@ -16,14 +16,21 @@ export const updateImageDescription = async (
   const argFile = tempfile(".argFile");
   await fs.writeFile(argFile, description);
   const newFile = tempfile(".newFile");
-  await execFile("exiftool", [
-    `-mwg:Description<=${argFile}`,
-    file,
-    "-o",
-    newFile,
-  ]);
+  await fs.copy(file, newFile, {
+    overwrite: false,
+    errorOnExist: true,
+    preserveTimestamps: true,
+  });
+  logger.info(`Updating ${newFile} with description: ${description}`);
+  const { stdout, stderr } = await execFile(
+    "exiftool",
+    ["-overwrite_original", `-mwg:Description<=${argFile}`, newFile],
+    { maxBuffer: 1024 * 1024 * 1024 },
+  );
+  if (stdout != null) logger.info("execFile stdout:", stdout);
+  if (stderr != null) logger.info("execFile stderr:", stderr);
   await fs.unlink(argFile);
-  await fs.copyFile(newFile, file);
+  await fs.copy(newFile, file, { overwrite: true, preserveTimestamps: true });
   await fs.unlink(newFile);
   return {};
 };

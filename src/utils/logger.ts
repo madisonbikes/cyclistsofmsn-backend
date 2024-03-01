@@ -2,10 +2,11 @@
 import { ConnectionString } from "connection-string";
 import pino, { Logger, stdSerializers, TransportTargetOptions } from "pino";
 import { initEnv } from "./env";
+import fs from "fs-extra";
 
 initEnv();
 
-const logFile = process.env.LOG_FILE ?? "backend.log";
+const logFile = process.env.LOG_FILE ?? "output/backend.log";
 const logLevel = process.env.LOG_LEVEL ?? "info";
 const consoleLogLevel = process.env.CONSOLE_LOG_LEVEL ?? "info";
 const testLogLevel = process.env.TEST_LOG_LEVEL ?? "silent";
@@ -34,6 +35,7 @@ if (process.env.NODE_ENV === "test") {
   });
   newLogger = pino({ level: testLogLevel, serializers }, transport);
 } else {
+  fs.ensureFileSync(logFile); // ensure log file/directory exists before creating logger
   const targets: TransportTargetOptions[] = [
     {
       level: consoleLogLevel,

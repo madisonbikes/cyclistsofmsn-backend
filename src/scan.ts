@@ -84,7 +84,10 @@ export class ImageRepositoryScanner implements Lifecycle {
   private async addNewFile(filename: string) {
     logger.debug(`adding new image ${filename}`);
     const metadata = await this.getFileMetadata(filename);
-    const newImage = new Image({ filename, ...metadata });
+    const newImage = new Image({
+      filename,
+      ...metadata,
+    });
     logger.trace(newImage, "image data");
     await newImage.save();
   }
