@@ -31,7 +31,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^12.1.0",
+    "@typegoose/typegoose": "^12.2.0",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^7.1.1",
     "connection-string": "^4.4.0",
