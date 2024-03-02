@@ -1,7 +1,6 @@
 /* istanbul ignore file */
 import "reflect-metadata";
 import { NowProvider, RandomProvider } from "../utils";
-import path from "path";
 export * from "./assertions";
 export * from "./setup";
 export * from "./request";
