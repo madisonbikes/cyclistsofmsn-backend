@@ -4,7 +4,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
-    target-branch: "develop"
+    target-branch: "main"
     commit-message:
       prefix: "fix"
       prefix-development: "chore"
