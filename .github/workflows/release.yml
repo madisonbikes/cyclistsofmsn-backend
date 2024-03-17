@@ -1,31 +1,17 @@
-name: Release
-concurrency: ci-release
-
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
 jobs:
-  release:
-    name: Release
+  release-please:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: google-github-actions/release-please-action@v4
         with:
-          persist-credentials: false
-
-      # semantic-release requires node 20
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: "npm"
-
-      # ignore scripts to avoid husky/commitlint checks
-      - name: Prepare packages
-        run: npm ci --ignore-scripts
-
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # use supplied semantic release gh-token with extra permissions
-        run: npx semantic-release
+          token: ${{ secrets.GH_TOKEN }}

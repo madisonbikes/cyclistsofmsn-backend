@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { injectable } from "tsyringe";
 import sharp from "sharp";
-import { updateImageDescription } from "../utils/exiftool";
+import { updateImageDescription } from "../exiftool";
 
 @injectable()
 export class FilesystemRepository {

@@ -24,6 +24,10 @@ let tc: DependencyContainer | undefined;
 export let photoServer: PhotoServer | undefined;
 export let runningPhotoServer: Server | undefined;
 
+export const testResourcesDir = () => {
+  return path.resolve(__dirname, "../../test_resources");
+};
+
 export type SuiteOptions = {
   // spin up a memory mongodb instance for testing purposes
   withDatabase: boolean;
@@ -151,7 +155,7 @@ const initializeSuite = async (withMutableTestResources: boolean) => {
     { lifecycle: Lifecycle.ContainerScoped },
   );
 
-  const originalPhotosDir = path.resolve(__dirname, "../../test_resources");
+  const originalPhotosDir = testResourcesDir();
   if (withMutableTestResources) {
     const random = Math.random().toString(36).substring(7);
     mutablePhotosDir = path.resolve(
@@ -161,7 +165,7 @@ const initializeSuite = async (withMutableTestResources: boolean) => {
     await fs.mkdirp(mutablePhotosDir);
     await fs.copy(originalPhotosDir, mutablePhotosDir);
   } else {
-    mutablePhotosDir = path.resolve(__dirname, "../../test_resources");
+    mutablePhotosDir = originalPhotosDir;
   }
   return Promise.resolve(testContainer);
 };

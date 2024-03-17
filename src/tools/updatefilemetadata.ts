@@ -37,7 +37,7 @@ export const updateFileMetadata = async (fs: FilesystemRepository) => {
     .map((image) =>
       limit(async () => {
         const base = image.filename;
-        console.log(`Updating description for ${base}`);
+        logger.debug(`Updating description for ${base}`);
         const retval = await fs.updateImageDescription(
           base,
           image.description ?? "",
