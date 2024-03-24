@@ -4,27 +4,6 @@ initEnv();
 
 const isDev = process.env.NODE_ENV === "development";
 
-export type ServerConfiguration = {
-  serverPort: number;
-  photosDir: string;
-  reactStaticRootDir: string;
-  mongodbUri: string;
-  firstPostHour: number;
-  lastPostHour: number;
-  twitterApiKey: string;
-  twitterApiSecret: string;
-  twitterAccessToken: string;
-  twitterAccessTokenSecret: string;
-  mastodonUri: string;
-  mastodonAccessToken: string;
-  mastodonStatusVisibility: string | undefined;
-  redisUri: string;
-  sessionStoreSecret: string;
-  secureCookie: boolean;
-  trustProxy: boolean;
-  enableCors: boolean;
-};
-
 const parseIntWithDefault = (
   value: string | undefined,
   defaultValue: number,
@@ -50,18 +29,17 @@ const parseBooleanWithDefault = (
   return retval;
 };
 
-export const overrideConfigurationForTests = (
-  values: Partial<ServerConfiguration>,
-) => {
+export const setConfigurationForTests = (values: ServerConfiguration) => {
   if (process.env.NODE_ENV !== "test") {
     throw new Error(
       "overrideConfigurationForTests should only be called in test environment",
     );
   }
+
   Object.assign(configuration, values);
 };
 
-export const configuration: ServerConfiguration = {
+const defaultConfiguration = {
   serverPort: parseIntWithDefault(process.env.PORT, 3001),
   photosDir: process.env.PHOTOS_DIR ?? "photos",
   reactStaticRootDir: process.env.STATIC_ROOT_DIR ?? "",
@@ -82,3 +60,7 @@ export const configuration: ServerConfiguration = {
   trustProxy: parseBooleanWithDefault(process.env.TRUST_PROXY, false),
   enableCors: parseBooleanWithDefault(process.env.ENABLE_CORS, false),
 };
+
+export const configuration = { ...defaultConfiguration } as const;
+
+export type ServerConfiguration = typeof defaultConfiguration;
