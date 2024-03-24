@@ -4,9 +4,9 @@ import { Lifecycle, logger } from "./utils";
 import { configuration } from "./config";
 import { imageRepositoryScanner } from "./scan";
 import { database } from "./database";
-import { MainRouter } from "./routes";
-import { PostDispatcher } from "./posts/dispatcher";
-import { PostPopulate } from "./posts/populate";
+import apiRouter from "./routes";
+import { createDispatcher } from "./posts/dispatcher";
+import { createPopulate } from "./posts/populate";
 
 import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
@@ -28,9 +28,8 @@ if (require.main === module) {
 }
 
 export class PhotoServer implements Lifecycle {
-  private readonly apiRouter = new MainRouter();
-  private readonly postDispatcher = new PostDispatcher();
-  private readonly postPopulate = new PostPopulate();
+  private readonly postDispatcher = createDispatcher();
+  private readonly postPopulate = createPopulate();
 
   constructor() {
     this.components.push(database);
@@ -81,7 +80,7 @@ export class PhotoServer implements Lifecycle {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use("/api/v1", this.apiRouter.routes());
+    app.use("/api/v1", apiRouter.routes());
 
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");

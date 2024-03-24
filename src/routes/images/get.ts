@@ -8,7 +8,7 @@ import { logger } from "../../utils";
 import { getImageQuerySchema, GetImageQuery } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 
-export class ImageGet {
+class ImageGet {
   readonly querySchema = getImageQuerySchema;
 
   metadata = async (req: Request, res: Response) => {
@@ -67,3 +67,5 @@ export class ImageGet {
     res.send(retval);
   };
 }
+
+export default new ImageGet();

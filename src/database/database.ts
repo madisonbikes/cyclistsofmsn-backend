@@ -8,7 +8,7 @@ import { Image } from "./images";
 const CURRENT_DATABASE_VERSION = 3;
 
 /** provide unified access to database connection */
-export class Database implements Lifecycle {
+class Database implements Lifecycle {
   constructor() {}
 
   private connection?: Mongoose;

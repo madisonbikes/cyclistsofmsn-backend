@@ -3,7 +3,7 @@ import passport from "passport";
 import { validateBodySchema, validateAuthenticated } from "../security";
 import { loginBodySchema, AuthenticatedUser } from "./contract";
 
-export class SessionRouter {
+class SessionRouter {
   routes = () => {
     return express
       .Router()
@@ -34,3 +34,5 @@ export class SessionRouter {
       });
   };
 }
+
+export default new SessionRouter();

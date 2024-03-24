@@ -5,9 +5,9 @@ import { PutImageBody, putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 import { fsRepository } from "../../fs_repository";
 
-export const bodySchema = putImageBodySchema;
+class ImagePut {
+  bodySchema = putImageBodySchema;
 
-export class ImagePut {
   handler = async (req: Request, res: Response) => {
     const body = req.validated as PutImageBody;
 
@@ -36,3 +36,4 @@ export class ImagePut {
     }
   };
 }
+export default new ImagePut();

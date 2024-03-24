@@ -8,7 +8,7 @@ import {
 } from "../utils";
 import now from "../utils/now";
 import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
-import { PostError, postScheduler } from "./postScheduler";
+import { PostError, schedulePost } from "./postScheduler";
 import { post } from "./postExecutor";
 import {
   ImageDocument,
@@ -26,7 +26,7 @@ const DISPATCH_DELAY = 5 * 1000;
 /**
  * The post dispatcher is responsible for orchestrating posting photos.
  */
-export class PostDispatcher implements Lifecycle {
+class PostDispatcher implements Lifecycle {
   private scheduled: Array<Cancellable | undefined> = [];
 
   start(): void {
@@ -49,7 +49,7 @@ export class PostDispatcher implements Lifecycle {
   // because this method is called by reference above, it must be an arrow function
   // or the "this" is lost!
   asyncDispatch = async () => {
-    const scheduledResult = await postScheduler.schedulePost({
+    const scheduledResult = await schedulePost({
       when: new Date(now()),
       selectImage: true,
     });
@@ -141,4 +141,6 @@ export class PostDispatcher implements Lifecycle {
   }
 }
 
-export const postDispatcher = new PostDispatcher();
+export const createDispatcher = () => {
+  return new PostDispatcher();
+};

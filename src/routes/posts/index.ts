@@ -8,46 +8,43 @@ import {
   validateId,
   validateRole,
 } from "../../security";
-import {
-  bodySchema as singlePostPutSchema,
-  handler as singlePostPutHandler,
-} from "./put";
-import { handler as singlePostDeleteHandler } from "./delete";
-import { currentPostHandler, getPostHandler, getPostListHandler } from "./get";
+import singlePostPut from "./put";
+import singlePostDelete from "./delete";
+import postGet from "./get";
 
-export class PostRouter {
+class PostRouter {
   routes = () => {
     return (
       express
         .Router()
 
         // all posts
-        .get("/", asyncWrapper(getPostListHandler))
+        .get("/", asyncWrapper(postGet.postListHandler))
 
         // current post
-        .get("/current", asyncWrapper(currentPostHandler))
+        .get("/current", asyncWrapper(postGet.currentPostHandler))
 
         // specific post
         .get(
           "/:id",
           validateAuthenticated(),
           validateId(),
-          asyncWrapper(getPostHandler),
+          asyncWrapper(postGet.singlePostHandler),
         )
 
         .put(
           "/:id",
-          validateBodySchema({ schema: singlePostPutSchema }),
+          validateBodySchema({ schema: singlePostPut.bodySchema }),
           validateEditor(),
           validateId(),
-          asyncWrapper(singlePostPutHandler),
+          asyncWrapper(singlePostPut.handler),
         )
 
         .delete(
           "/:id",
           validateAdmin(),
           validateId(),
-          asyncWrapper(singlePostDeleteHandler),
+          asyncWrapper(singlePostDelete.handler),
         )
 
         // post create operation is secured by editor role
@@ -61,3 +58,5 @@ export class PostRouter {
 const validateEditor = () => {
   return validateRole({ role: Roles.EDITOR });
 };
+
+export default new PostRouter();

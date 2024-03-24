@@ -1,11 +1,11 @@
 import express from "express";
-import { postScheduler } from "../posts/postScheduler";
+import { schedulePost } from "../posts/postScheduler";
 import { validateAdmin, validateBodySchema } from "../security";
 import { asyncWrapper } from "./async";
 import { SchedulePostOptions, schedulePostOptionsSchema } from "./contract";
 import { mapPostSchema } from "./posts/types";
 
-export class TasksRouter {
+class TasksRouter {
   routes = () => {
     return express.Router().post(
       "/schedulePost",
@@ -13,7 +13,7 @@ export class TasksRouter {
       validateBodySchema({ schema: schedulePostOptionsSchema }),
       asyncWrapper(async (request, response) => {
         const postOptions = request.validated as SchedulePostOptions;
-        const result = await postScheduler.schedulePost(postOptions);
+        const result = await schedulePost(postOptions);
         if (result.isOk()) {
           const mapped = mapPostSchema.parse(result.value);
           response.send(mapped);
@@ -24,3 +24,5 @@ export class TasksRouter {
     );
   };
 }
+
+export default new TasksRouter();

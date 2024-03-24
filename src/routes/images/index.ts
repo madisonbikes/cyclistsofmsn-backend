@@ -9,44 +9,36 @@ import {
   validateAdmin,
 } from "../../security";
 import { asyncWrapper } from "../async";
-import { ImageGet } from "./get";
-import { SingleImageDelete } from "./delete";
+import imageGet from "./get";
+import singleImageDelete from "./delete";
 import cache from "../cache";
-import { ImagePut, bodySchema as singleImagePutSchema } from "./put";
+import imagePut from "./put";
 
-export class ImageRouter {
-  private readonly imageGet = new ImageGet();
-  private readonly singleDelete = new SingleImageDelete();
-  private readonly imagePut = new ImagePut();
-
+class ImageRouter {
   routes = () => {
     return (
       express
         .Router()
 
         // all images
-        .get(
-          "/",
-          validateAuthenticated(),
-          asyncWrapper(this.imageGet.listHandler),
-        )
+        .get("/", validateAuthenticated(), asyncWrapper(imageGet.listHandler))
 
         .put(
           "/:id",
-          validateBodySchema({ schema: singleImagePutSchema }),
+          validateBodySchema({ schema: imagePut.bodySchema }),
           validateRole({ role: Roles.EDITOR }),
           validateId(),
-          asyncWrapper(this.imagePut.handler),
+          asyncWrapper(imagePut.handler),
         )
 
         // single image metadata
-        .get("/:id", validateId(), asyncWrapper(this.imageGet.metadata))
+        .get("/:id", validateId(), asyncWrapper(imageGet.metadata))
 
         .delete(
           "/:id",
           validateAdmin(),
           validateId(),
-          asyncWrapper(this.singleDelete.handler),
+          asyncWrapper(singleImageDelete.handler),
         )
 
         // single image, cached
@@ -54,9 +46,11 @@ export class ImageRouter {
           "/:id/binary",
           cache.middleware({ callNextWhenCacheable: false }),
           validateId(),
-          validateQuerySchema({ schema: this.imageGet.querySchema }),
-          asyncWrapper(this.imageGet.binary),
+          validateQuerySchema({ schema: imageGet.querySchema }),
+          asyncWrapper(imageGet.binary),
         )
     );
   };
 }
+
+export default new ImageRouter();

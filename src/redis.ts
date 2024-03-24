@@ -3,8 +3,9 @@ import RedisStore from "connect-redis";
 import { createClient, RedisClientType } from "redis";
 import { logger, Lifecycle, maskUriPassword } from "./utils";
 
-export class RedisConnection implements Lifecycle {
+class RedisConnection implements Lifecycle {
   private client?: RedisClientType;
+  private started = false;
 
   constructor() {
     if (this.isEnabled()) {
@@ -22,6 +23,10 @@ export class RedisConnection implements Lifecycle {
   }
 
   async start() {
+    if (this.started) {
+      throw new Error("cannot start multiple redis connection instances");
+    }
+    this.started = true;
     if (this.client !== undefined) {
       logger.info(
         `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
@@ -31,6 +36,10 @@ export class RedisConnection implements Lifecycle {
   }
 
   async stop() {
+    if (!this.started) {
+      throw new Error("cannot stop a redis connection that isn't started");
+    }
+    this.started = false;
     if (this.client !== undefined) {
       await this.client.disconnect();
       this.client = undefined;

@@ -6,10 +6,8 @@ import sharp from "sharp";
 import { updateImageDescription } from "../exiftool";
 
 class FilesystemRepository {
-  private baseDirectory;
-
-  constructor() {
-    this.baseDirectory = configuration.photosDir;
+  get baseDirectory() {
+    return configuration.photosDir;
   }
 
   /** return list of base paths inside the fs repository. treat these as opaque tokens. */

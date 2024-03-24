@@ -4,7 +4,7 @@ import { fsRepository } from "../../fs_repository";
 import { logger } from "../../utils";
 import pLimit from "p-limit";
 
-export class SingleImageDelete {
+class SingleImageDelete {
   handler = async (req: Request, res: Response) => {
     const id = req.params.id;
     logger.trace({ id }, "delete single image");
@@ -41,3 +41,5 @@ export class SingleImageDelete {
     res.sendStatus(200);
   };
 }
+
+export default new SingleImageDelete();

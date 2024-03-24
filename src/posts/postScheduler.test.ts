@@ -1,5 +1,5 @@
 import { assertError, assertInstanceOf, assertOk, setupSuite } from "../test";
-import { PostError, postScheduler } from "./postScheduler";
+import { PostError, schedulePost } from "./postScheduler";
 import {
   add as date_add,
   set as date_set,
@@ -209,7 +209,7 @@ describe("test schedule component", () => {
       const now_815 = date_set(startOfToday(), { hours: 8, minutes: 15 });
       mockNow.mockReturnValue(now_815.getTime());
 
-      let result = await postScheduler.schedulePost({ when: now_815 });
+      let result = await schedulePost({ when: now_815 });
       assertOk(result);
       let { value: newPost } = result;
       assertInstanceOf(newPost, PostHistory);
@@ -224,7 +224,7 @@ describe("test schedule component", () => {
         minutes: 15,
       });
 
-      result = await postScheduler.schedulePost({ when: now_1015 });
+      result = await schedulePost({ when: now_1015 });
       assertError(result);
       expect(result.value.message).toEqual("Already posted today");
 
@@ -235,12 +235,12 @@ describe("test schedule component", () => {
         }).getTime(),
       );
 
-      result = await postScheduler.schedulePost({ when: now_1015 });
+      result = await schedulePost({ when: now_1015 });
       assertError(result);
       expect(result.value.message).toEqual("Already posted today");
 
       const tomorrow = date_add(startOfTomorrow(), { hours: 8, minutes: 50 });
-      result = await postScheduler.schedulePost({ when: tomorrow });
+      result = await schedulePost({ when: tomorrow });
       assertOk(result);
 
       newPost = result.value;
@@ -265,7 +265,7 @@ describe("test schedule component", () => {
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       mockNow.mockReturnValue(now.getTime());
 
-      const result = await postScheduler.schedulePost({
+      const result = await schedulePost({
         when: now,
         selectImage: true,
       });
@@ -278,7 +278,7 @@ describe("test schedule component", () => {
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       mockNow.mockReturnValue(now.getTime());
 
-      const result = await postScheduler.schedulePost({
+      const result = await schedulePost({
         when: now,
         selectImage: false,
       });
@@ -293,13 +293,13 @@ describe("test schedule component", () => {
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       mockNow.mockReturnValue(now.getTime());
 
-      let result = await postScheduler.schedulePost({
+      let result = await schedulePost({
         when: now,
       });
       assertOk(result);
 
       const tomorrow = date_add(now, { days: 1 });
-      result = await postScheduler.schedulePost({
+      result = await schedulePost({
         when: tomorrow,
       });
       assertOk(result);
@@ -324,7 +324,7 @@ describe("test schedule component", () => {
     options: SchedulePostOptions,
   ): Promise<PostHistoryDocument> => {
     mockNow.mockReturnValue(options.when.getTime());
-    const result = await postScheduler.schedulePost(options);
+    const result = await schedulePost(options);
     assertOk(result);
     const newPost = result.value;
     assertInstanceOf(newPost, PostHistory);
@@ -335,7 +335,7 @@ describe("test schedule component", () => {
     options: SchedulePostOptions,
   ): Promise<PostError> => {
     mockNow.mockReturnValue(options.when.getTime());
-    const result = await postScheduler.schedulePost(options);
+    const result = await schedulePost(options);
     assertError(result);
     return result.value;
   };

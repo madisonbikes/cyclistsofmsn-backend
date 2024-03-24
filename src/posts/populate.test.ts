@@ -1,9 +1,9 @@
 import { setupSuite } from "../test";
-import { postPopulate } from "./populate";
-import { postScheduler } from "./postScheduler";
+import { createPopulate } from "./populate";
+import { schedulePost } from "./postScheduler";
 
 jest.mock("./postScheduler");
-const mockPostscheduler = jest.mocked(postScheduler);
+const mockSchedulePost = jest.mocked(schedulePost);
 
 describe("post populate component", () => {
   setupSuite({ withDatabase: true });
@@ -17,12 +17,13 @@ describe("post populate component", () => {
   });
 
   it("starts", async () => {
-    postPopulate.start();
+    const populate = createPopulate();
+    populate.start();
     await jest.advanceTimersByTimeAsync(45000);
     expect(jest.getTimerCount()).toBe(1);
 
-    expect(mockPostscheduler.schedulePost).toHaveBeenCalledTimes(7);
-    postPopulate.stop();
+    expect(mockSchedulePost).toHaveBeenCalledTimes(7);
+    populate.stop();
     expect(jest.getTimerCount()).toBe(0);
   });
 });

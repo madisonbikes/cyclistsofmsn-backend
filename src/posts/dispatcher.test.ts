@@ -1,8 +1,8 @@
 import { setupSuite } from "../test";
-import { postDispatcher } from "./dispatcher";
-import { postScheduler } from "./postScheduler";
+import { createDispatcher } from "./dispatcher";
+import { schedulePost } from "./postScheduler";
 jest.mock("./postScheduler");
-const mockPostscheduler = jest.mocked(postScheduler);
+const mockSchedulePost = jest.mocked(schedulePost);
 
 describe("post dispatcher component", () => {
   setupSuite({ withDatabase: true });
@@ -16,13 +16,14 @@ describe("post dispatcher component", () => {
   });
 
   it("starts", async () => {
-    postDispatcher.start();
+    const dispatcher = createDispatcher();
+    dispatcher.start();
     expect(jest.getTimerCount()).toBe(1);
 
     await jest.advanceTimersByTimeAsync(10000);
-    expect(mockPostscheduler.schedulePost).toHaveBeenCalledTimes(1);
+    expect(mockSchedulePost).toHaveBeenCalledTimes(1);
 
-    postDispatcher.stop();
+    dispatcher.stop();
     expect(jest.getTimerCount()).toBe(0);
   });
 });
