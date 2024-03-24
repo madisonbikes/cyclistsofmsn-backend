@@ -24,18 +24,16 @@ const serializers = {
 
 let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
-  // const transport = pino.transport({
-  //   targets: [
-  //     {
-  //       level: testLogLevel,
-  //       target: "pino-pretty",
-  //       options: { destination: 1 }, // stdout
-  //     },
-  //   ],
-  // });
-  // newLogger = pino({ level: testLogLevel, serializers }, transport);
-  // no logging in test environment
-  newLogger = pino({ level: "silent" });
+  const transport = pino.transport({
+    targets: [
+      {
+        level: testLogLevel,
+        target: "pino-pretty",
+        options: { destination: 1 }, // stdout
+      },
+    ],
+  });
+  newLogger = pino({ level: testLogLevel, serializers }, transport);
 } else {
   fs.ensureFileSync(logFile); // ensure log file/directory exists before creating logger
   const targets: TransportTargetOptions[] = [
