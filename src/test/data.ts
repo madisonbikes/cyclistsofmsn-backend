@@ -1,16 +1,13 @@
-import { Image } from "../database";
-import { testDatabase } from "./setup";
+import { Image, database } from "../database";
 
 /** returns array of inserted post id's */
 export const createTestPosts = async () => {
-  const { insertedId: image } = await testDatabase()
-    .collection("images")
-    .insertOne({
-      filename: "blarg.jpg",
-      deleted: false,
-      description_from_exif: false,
-    });
-  const { insertedIds, insertedCount } = await testDatabase()
+  const { insertedId: image } = await database.collection("images").insertOne({
+    filename: "blarg.jpg",
+    deleted: false,
+    description_from_exif: false,
+  });
+  const { insertedIds, insertedCount } = await database
     .collection("posts")
     .insertMany([
       {
@@ -46,7 +43,7 @@ const PASSWORD_WITH_LOW_WORK_FACTOR =
   "$2y$04$lQNknVpHEe6ddO3Et1nMGe6q4lNrtNcC3ikrhshs.wT.neD7JwBbm";
 
 export const createTestUser = async () => {
-  await testDatabase().collection("users").insertOne({
+  await database.collection("users").insertOne({
     username: "testuser",
     hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
     roles: [],
@@ -54,23 +51,19 @@ export const createTestUser = async () => {
 };
 
 export const createTestAdminUser = async () => {
-  await testDatabase()
-    .collection("users")
-    .insertOne({
-      username: "testadmin",
-      hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-      roles: ["admin", "editor"],
-    });
+  await database.collection("users").insertOne({
+    username: "testadmin",
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    roles: ["admin", "editor"],
+  });
 };
 
 export const createTestEditorUser = async () => {
-  await testDatabase()
-    .collection("users")
-    .insertOne({
-      username: "testeditor",
-      hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
-      roles: ["editor"],
-    });
+  await database.collection("users").insertOne({
+    username: "testeditor",
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    roles: ["editor"],
+  });
 };
 
 export const getGoodImageId = async () => {

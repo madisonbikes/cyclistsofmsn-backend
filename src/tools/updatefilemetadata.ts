@@ -1,7 +1,5 @@
-import "reflect-metadata";
-import { Database, Image } from "../database";
-import { container } from "tsyringe";
-import { FilesystemRepository } from "../fs_repository";
+import { database, Image } from "../database";
+import { fsRepository } from "../fs_repository";
 import { logger } from "../utils";
 import pLimit from "p-limit";
 
@@ -9,21 +7,18 @@ if (require.main === module) {
   Promise.resolve()
     .then(async () => {
       // connect to the database
-      const db = container.resolve(Database);
-      await db.start();
+      await database.start();
 
-      const fs = container.resolve(FilesystemRepository);
+      await updateFileMetadata();
 
-      await updateFileMetadata(fs);
-
-      return db.stop();
+      return database.stop();
     })
     .catch((error) => {
       console.log(error);
     });
 }
 
-export const updateFileMetadata = async (fs: FilesystemRepository) => {
+export const updateFileMetadata = async () => {
   logger.info("Looking for images with description_from_exif set to false");
   const images = await Image.find();
   logger.info(`Found ${images.length} images`);
@@ -38,7 +33,7 @@ export const updateFileMetadata = async (fs: FilesystemRepository) => {
       limit(async () => {
         const base = image.filename;
         logger.debug(`Updating description for ${base}`);
-        const retval = await fs.updateImageDescription(
+        const retval = await fsRepository.updateImageDescription(
           base,
           image.description ?? "",
         );

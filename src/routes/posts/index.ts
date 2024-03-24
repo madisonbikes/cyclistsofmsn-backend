@@ -1,5 +1,4 @@
 import express from "express";
-import { injectable } from "tsyringe";
 import { asyncWrapper } from "../async";
 import {
   Roles,
@@ -16,7 +15,6 @@ import {
 import { handler as singlePostDeleteHandler } from "./delete";
 import { currentPostHandler, getPostHandler, getPostListHandler } from "./get";
 
-@injectable()
 export class PostRouter {
   routes = () => {
     return (

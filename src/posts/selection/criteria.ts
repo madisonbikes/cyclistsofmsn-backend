@@ -1,7 +1,6 @@
 import { ImageDocument, PostHistory } from "../../database";
 import { getDayOfYear, startOfDay, subDays } from "date-fns";
-import { injectable } from "tsyringe";
-import { NowProvider } from "../../utils";
+import now from "../../utils/now";
 
 const MINIMUM_REPOST_INTERVAL_IN_DAYS = 180;
 const SEASONALITY_WINDOW = 45;
@@ -11,7 +10,6 @@ interface MatchCriteria {
 }
 
 /** returns true if the photo has never been posted */
-@injectable()
 export class UnpostedCriteria implements MatchCriteria {
   async satisfiedBy(image: ImageDocument) {
     const posts = await PostHistory.find().where("image", image);
@@ -19,14 +17,11 @@ export class UnpostedCriteria implements MatchCriteria {
   }
 }
 
-@injectable()
 export class RepostCriteria implements MatchCriteria {
-  constructor(private nowProvider: NowProvider) {}
-
   async satisfiedBy(image: ImageDocument) {
     const threshold = subDays(
-      startOfDay(this.nowProvider.now()),
-      MINIMUM_REPOST_INTERVAL_IN_DAYS
+      startOfDay(now()),
+      MINIMUM_REPOST_INTERVAL_IN_DAYS,
     );
     const matchingPosts = await PostHistory.find({
       timestamp: { $gte: threshold },
@@ -36,10 +31,7 @@ export class RepostCriteria implements MatchCriteria {
   }
 }
 
-@injectable()
 export class SeasonalityCriteria implements MatchCriteria {
-  constructor(private nowProvider: NowProvider) {}
-
   satisfiedBy(image: ImageDocument) {
     const createdOnDate = image.exif_createdon;
     if (!createdOnDate) {
@@ -47,10 +39,8 @@ export class SeasonalityCriteria implements MatchCriteria {
     }
 
     return Promise.resolve(
-      this.dayDifferencesBetweenDates(
-        createdOnDate,
-        startOfDay(this.nowProvider.now())
-      ) <= SEASONALITY_WINDOW
+      this.dayDifferencesBetweenDates(createdOnDate, startOfDay(now())) <=
+        SEASONALITY_WINDOW,
     );
   }
 

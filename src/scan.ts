@@ -1,22 +1,15 @@
-import { Database, Image, ImageDocument } from "./database";
-import { FilesystemRepository } from "./fs_repository";
+import { database, Image, ImageDocument } from "./database";
+import { fsRepository } from "./fs_repository";
 import { StringArrayTag } from "exifreader";
 import { parse } from "date-fns/parse";
 import { Lifecycle, logger } from "./utils";
-import { injectable } from "tsyringe";
 import pLimit from "p-limit";
 
 /** expose scanning operation.  requires database connection to be established */
-@injectable()
-export class ImageRepositoryScanner implements Lifecycle {
-  constructor(
-    private fsRepository: FilesystemRepository,
-    private database: Database,
-  ) {}
-
+class ImageRepositoryScanner implements Lifecycle {
   async start() {
     const [files, dbFiles] = await Promise.all([
-      this.fsRepository.imageFiles(),
+      fsRepository.imageFiles(),
       Image.find().exec(),
     ]);
     const matchedFiles: ImageDocument[] = [];
@@ -67,10 +60,10 @@ export class ImageRepositoryScanner implements Lifecycle {
   private async updateMatchedFile(image: ImageDocument) {
     const filename = image.filename;
 
-    const newTimestamp = await this.fsRepository.timestamp(filename);
+    const newTimestamp = await fsRepository.timestamp(filename);
     if (
       image.fs_timestamp?.getTime() !== newTimestamp.getTime() ||
-      this.database.refreshAllMetadata
+      database.refreshAllMetadata
     ) {
       logger.debug(`updating existing image ${filename}`);
       const metadata = await this.getFileMetadata(filename);
@@ -118,9 +111,9 @@ export class ImageRepositoryScanner implements Lifecycle {
 
   private async getFileMetadata(filename: string) {
     const [fs_timestamp, tags, metadata] = await Promise.all([
-      this.fsRepository.timestamp(filename),
-      this.fsRepository.tags(filename),
-      this.fsRepository.metadata(filename),
+      fsRepository.timestamp(filename),
+      fsRepository.tags(filename),
+      fsRepository.metadata(filename),
     ]);
     const description = this.parseStringTag(tags?.exif?.ImageDescription);
     const exif_createdon = this.parseImageDateTimeTag(tags?.exif?.DateTime);
@@ -137,3 +130,5 @@ export class ImageRepositoryScanner implements Lifecycle {
     return retval;
   }
 }
+
+export const imageRepositoryScanner = new ImageRepositoryScanner();

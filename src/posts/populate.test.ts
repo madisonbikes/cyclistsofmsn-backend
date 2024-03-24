@@ -1,44 +1,28 @@
-import { MutableNow, setupSuite, testContainer } from "../test";
-import { PostScheduler } from "./scheduler";
-import { PostPopulate } from "./populate";
-import { NowProvider, SimpleScheduler } from "../utils";
-import { MockSimpleScheduler } from "../test/mock_scheduler";
-import { MockPostScheduler } from "./test/mocks";
+import { setupSuite } from "../test";
+import { postPopulate } from "./populate";
+import { postScheduler } from "./postScheduler";
+
+jest.mock("./postScheduler");
+const mockPostscheduler = jest.mocked(postScheduler);
 
 describe("post populate component", () => {
   setupSuite({ withDatabase: true });
 
-  const now = new MutableNow(5000);
-  const mockScheduler = new MockSimpleScheduler(now);
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
 
   afterEach(() => {
-    mockScheduler.mockReset();
+    jest.useRealTimers();
   });
 
   it("starts", async () => {
-    const { postPopulate, postScheduler } = buildMocks();
     postPopulate.start();
-    now.when += 45000;
-    await mockScheduler.mockRunPending();
+    await jest.advanceTimersByTimeAsync(45000);
+    expect(jest.getTimerCount()).toBe(1);
 
-    expect(postScheduler.scheduledCount).toBe(7);
-
+    expect(mockPostscheduler.schedulePost).toHaveBeenCalledTimes(7);
     postPopulate.stop();
+    expect(jest.getTimerCount()).toBe(0);
   });
-
-  const buildMocks = () => {
-    const childContainer = testContainer()
-      .createChildContainer()
-      .registerInstance(SimpleScheduler, mockScheduler)
-      .registerInstance(NowProvider, now);
-
-    const postScheduler = childContainer.resolve(MockPostScheduler);
-
-    childContainer.registerInstance(PostScheduler, postScheduler);
-    const postPopulate = childContainer.resolve(PostPopulate);
-    return {
-      postScheduler,
-      postPopulate,
-    };
-  };
 });

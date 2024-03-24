@@ -1,7 +1,6 @@
-import { ServerConfiguration } from "../config";
+import { configuration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
 import { Lifecycle, logger } from "../utils";
-import { injectable, singleton } from "tsyringe";
 import { Version } from "./version";
 import { Image } from "./images";
 
@@ -9,10 +8,8 @@ import { Image } from "./images";
 const CURRENT_DATABASE_VERSION = 3;
 
 /** provide unified access to database connection */
-@injectable()
-@singleton()
 export class Database implements Lifecycle {
-  constructor(private configuration: ServerConfiguration) {}
+  constructor() {}
 
   private connection?: Mongoose;
 
@@ -30,19 +27,17 @@ export class Database implements Lifecycle {
   }
 
   async start(): Promise<boolean> {
+    const uri = configuration.mongodbUri;
     if (this.connection) {
-      logger.debug(
-        { url: this.configuration.mongodbUri },
-        `Already connected to MongoDB`,
-      );
+      logger.debug({ url: uri }, `Already connected to MongoDB`);
       return false;
     }
-    logger.info(`Connecting to MongoDB on ${this.configuration.mongodbUri}`);
+    logger.info(`Connecting to MongoDB on ${uri}`);
 
     // this is the default value from mongoose 7 forward, be explicit to avoid deprecation notice
     mongoose.set("strictQuery", false);
 
-    this.connection = await mongoose.connect(this.configuration.mongodbUri);
+    this.connection = await mongoose.connect(uri);
     await this.versionCheck();
     return true;
   }
@@ -116,3 +111,5 @@ export class Database implements Lifecycle {
     await versionRecord.save();
   }
 }
+
+export const database = new Database();

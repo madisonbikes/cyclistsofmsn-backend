@@ -1,9 +1,17 @@
-import { setupSuite, testContainer } from "../test";
+import { setupSuite } from "../test";
 import { Image } from "../database";
-import { PostExecutor } from "./postExecutor";
-import { injectable } from "tsyringe";
-import { PhotoTwitterClient } from "../twitter/post";
-import { PhotoMastodonClient } from "../mastodon/post";
+import { postExecutor } from "./postExecutor";
+import { photoTooter } from "../mastodon/post";
+import { photoTweeter } from "../twitter/post";
+
+jest.mock("../mastodon/post");
+jest.mock("../twitter/post");
+
+const mockPhotoTooter = jest.mocked(photoTooter);
+mockPhotoTooter.isEnabled.mockReturnValue(true);
+
+const mockPhotoTweeter = jest.mocked(photoTweeter);
+mockPhotoTweeter.isEnabled.mockReturnValue(true);
 
 describe("test executor component", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
@@ -15,33 +23,10 @@ describe("test executor component", () => {
       newImage.fs_timestamp = new Date();
       await newImage.save();
 
-      const executor = buildExecutor();
+      await postExecutor.post(newImage);
 
-      await executor.post(newImage);
+      expect(mockPhotoTooter.post).toHaveBeenCalledTimes(1);
+      expect(mockPhotoTweeter.post).toHaveBeenCalledTimes(1);
     });
   });
-
-  const buildExecutor = () => {
-    const noopTweeter = testContainer().resolve(NoopPhotoTweeter);
-    const noopTooter = testContainer().resolve(NoopPhotoTooter);
-
-    return testContainer()
-      .register(PhotoTwitterClient, { useValue: noopTweeter })
-      .register(PhotoMastodonClient, { useValue: noopTooter })
-      .resolve(PostExecutor);
-  };
 });
-
-@injectable()
-class NoopPhotoTweeter extends PhotoTwitterClient {
-  override post(_image: string): Promise<number> {
-    return Promise.resolve(0);
-  }
-}
-
-@injectable()
-class NoopPhotoTooter extends PhotoMastodonClient {
-  override post(_image: string): Promise<string> {
-    return Promise.resolve("0");
-  }
-}

@@ -1,5 +1,4 @@
 import express from "express";
-import { injectable } from "tsyringe";
 import {
   validateBodySchema,
   validateQuerySchema,
@@ -12,17 +11,13 @@ import {
 import { asyncWrapper } from "../async";
 import { ImageGet } from "./get";
 import { SingleImageDelete } from "./delete";
-import { Cache } from "../cache";
+import cache from "../cache";
 import { ImagePut, bodySchema as singleImagePutSchema } from "./put";
 
-@injectable()
 export class ImageRouter {
-  constructor(
-    private cache: Cache,
-    private imageGet: ImageGet,
-    private singleDelete: SingleImageDelete,
-    private imagePut: ImagePut,
-  ) {}
+  private readonly imageGet = new ImageGet();
+  private readonly singleDelete = new SingleImageDelete();
+  private readonly imagePut = new ImagePut();
 
   routes = () => {
     return (
@@ -57,7 +52,7 @@ export class ImageRouter {
         // single image, cached
         .get(
           "/:id/binary",
-          this.cache.middleware({ callNextWhenCacheable: false }),
+          cache.middleware({ callNextWhenCacheable: false }),
           validateId(),
           validateQuerySchema({ schema: this.imageGet.querySchema }),
           asyncWrapper(this.imageGet.binary),

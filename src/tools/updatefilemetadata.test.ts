@@ -1,8 +1,7 @@
-import { setupSuite, testContainer } from "../test";
+import { setupSuite } from "../test";
 import { Image } from "../database";
 import { getGoodImageId } from "../test/data";
 import { updateFileMetadata } from "./updatefilemetadata";
-import { FilesystemRepository } from "../fs_repository";
 
 describe("updateFileMetadata", () => {
   setupSuite({
@@ -22,8 +21,7 @@ describe("updateFileMetadata", () => {
     image.description_from_exif = false;
     await image.save();
 
-    const fs = testContainer().resolve(FilesystemRepository);
-    const count = await updateFileMetadata(fs);
+    const count = await updateFileMetadata();
     expect(count).toBe(1);
 
     const image2 = await Image.findById(goodImageId);

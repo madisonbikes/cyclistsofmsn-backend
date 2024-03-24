@@ -1,13 +1,5 @@
-import {
-  assertError,
-  assertInstanceOf,
-  assertOk,
-  MutableNow,
-  NotVeryRandom,
-  setupSuite,
-  testContainer,
-} from "../test";
-import { PostError, PostScheduler } from "./scheduler";
+import { assertError, assertInstanceOf, assertOk, setupSuite } from "../test";
+import { PostError, postScheduler } from "./postScheduler";
 import {
   add as date_add,
   set as date_set,
@@ -21,11 +13,19 @@ import {
   PostHistoryDocument,
   PostStatus,
 } from "../database";
-import { NowProvider, RandomProvider } from "../utils";
-import { ServerConfiguration } from "../config";
+import { configuration } from "../config";
 import { SchedulePostOptions } from "../routes/contract";
+import { randomInt } from "../utils/random";
+import now from "../utils/now";
 
 const RANDOM_VALUE = 50;
+
+jest.mock("../utils/random");
+const mockRandomInt = jest.mocked(randomInt);
+mockRandomInt.mockReturnValue(50);
+
+jest.mock("../utils/now");
+const mockNow = jest.mocked(now);
 
 describe("test schedule component", () => {
   setupSuite({ withDatabase: true, clearImages: true, clearPostHistory: true });
@@ -34,13 +34,13 @@ describe("test schedule component", () => {
     it("should succeed, will fail at actual posting time", async function () {
       // set current time to 10:00 AM
       const now = date_add(startOfToday(), {
-        hours: configuration().firstPostHour + 2,
+        hours: configuration.firstPostHour + 2,
       });
       const newPost = await getOkPostResult({ when: now });
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
       expect(JSON.stringify(newPost.timestamp)).toEqual(
-        JSON.stringify(expected)
+        JSON.stringify(expected),
       );
     });
   });
@@ -56,14 +56,14 @@ describe("test schedule component", () => {
     it("should schedule a post today", async () => {
       // set current time to 10:00 AM
       const now = date_add(startOfToday(), {
-        hours: configuration().firstPostHour + 2,
+        hours: configuration.firstPostHour + 2,
       });
       const newPost = await getOkPostResult({ when: now });
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(now, { minutes: RANDOM_VALUE });
       expect(JSON.stringify(newPost.timestamp)).toEqual(
-        JSON.stringify(expected)
+        JSON.stringify(expected),
       );
     });
 
@@ -79,7 +79,7 @@ describe("test schedule component", () => {
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), {
         minutes: RANDOM_VALUE,
-        hours: configuration().firstPostHour,
+        hours: configuration.firstPostHour,
       });
       expect(newPost.timestamp).toEqual(expected);
     });
@@ -102,7 +102,7 @@ describe("test schedule component", () => {
     it("should schedule a post today", async () => {
       // set current time to 10:00 AM
       const now = date_set(startOfToday(), {
-        hours: configuration().firstPostHour + 3,
+        hours: configuration.firstPostHour + 3,
       });
 
       const newPost = await getOkPostResult({ when: now });
@@ -124,7 +124,7 @@ describe("test schedule component", () => {
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), {
         minutes: RANDOM_VALUE,
-        hours: configuration().firstPostHour,
+        hours: configuration.firstPostHour,
       });
       expect(newPost.timestamp).toEqual(expected);
     });
@@ -141,7 +141,7 @@ describe("test schedule component", () => {
       newPost.image = newImage.id;
       newPost.status.flag = PostStatus.COMPLETE;
       newPost.timestamp = date_set(startOfToday(), {
-        hours: configuration().firstPostHour,
+        hours: configuration.firstPostHour,
         minutes: 15,
       });
       await newPost.save();
@@ -150,7 +150,7 @@ describe("test schedule component", () => {
     it("should schedule a post tomorrow", async () => {
       // set current time to 11:00 AM
       const now = date_set(startOfToday(), {
-        hours: configuration().firstPostHour + 3,
+        hours: configuration.firstPostHour + 3,
       });
       const error = await getErrorPostResult({ when: now });
       expect(error.message).toContain("Already posted today");
@@ -160,7 +160,7 @@ describe("test schedule component", () => {
 
       // expected is 50 minutes after now due to injected random
       const expected = date_add(startOfTomorrow(), {
-        hours: configuration().firstPostHour,
+        hours: configuration.firstPostHour,
         minutes: RANDOM_VALUE,
       });
       expect(newPost.timestamp).toEqual(expected);
@@ -178,7 +178,7 @@ describe("test schedule component", () => {
       // expected is 50 minutes after earliest time (8am) due to injected random
       const expected = date_set(startOfTomorrow(), {
         minutes: RANDOM_VALUE,
-        hours: configuration().firstPostHour,
+        hours: configuration.firstPostHour,
       });
       expect(newPost.timestamp).toEqual(expected);
     });
@@ -211,10 +211,9 @@ describe("test schedule component", () => {
     it("should do nothing at 8:15, then at 10:30 it should generate the next post", async () => {
       // set current time to 8:15 AM
       const now_815 = date_set(startOfToday(), { hours: 8, minutes: 15 });
-      const nowProvider = new MutableNow(now_815);
-      const scheduler = buildScheduler(nowProvider);
+      mockNow.mockReturnValue(now_815.getTime());
 
-      let result = await scheduler.schedulePost({ when: now_815 });
+      let result = await postScheduler.schedulePost({ when: now_815 });
       assertOk(result);
       let { value: newPost } = result;
       assertInstanceOf(newPost, PostHistory);
@@ -229,21 +228,23 @@ describe("test schedule component", () => {
         minutes: 15,
       });
 
-      result = await scheduler.schedulePost({ when: now_1015 });
+      result = await postScheduler.schedulePost({ when: now_1015 });
       assertError(result);
       expect(result.value.message).toEqual("Already posted today");
 
-      nowProvider.when = date_set(startOfToday(), {
-        hours: 10,
-        minutes: 30,
-      }).getTime();
+      mockNow.mockReturnValue(
+        date_set(startOfToday(), {
+          hours: 10,
+          minutes: 30,
+        }).getTime(),
+      );
 
-      result = await scheduler.schedulePost({ when: now_1015 });
+      result = await postScheduler.schedulePost({ when: now_1015 });
       assertError(result);
       expect(result.value.message).toEqual("Already posted today");
 
       const tomorrow = date_add(startOfTomorrow(), { hours: 8, minutes: 50 });
-      result = await scheduler.schedulePost({ when: tomorrow });
+      result = await postScheduler.schedulePost({ when: tomorrow });
       assertOk(result);
 
       newPost = result.value;
@@ -266,10 +267,9 @@ describe("test schedule component", () => {
     it("successfully select image", async () => {
       // set current time to 8:15 AM
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
-      const nowProvider = new MutableNow(now);
-      const scheduler = buildScheduler(nowProvider);
+      mockNow.mockReturnValue(now.getTime());
 
-      const result = await scheduler.schedulePost({
+      const result = await postScheduler.schedulePost({
         when: now,
         selectImage: true,
       });
@@ -280,10 +280,9 @@ describe("test schedule component", () => {
     it("successfully defer image selection", async () => {
       // set current time to 8:15 AM
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
-      const nowProvider = new MutableNow(now);
-      const scheduler = buildScheduler(nowProvider);
+      mockNow.mockReturnValue(now.getTime());
 
-      const result = await scheduler.schedulePost({
+      const result = await postScheduler.schedulePost({
         when: now,
         selectImage: false,
       });
@@ -296,16 +295,15 @@ describe("test schedule component", () => {
     it("successfully schedule multiples", async () => {
       // set current time to 8:15 AM
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
-      const nowProvider = new MutableNow(now);
-      const scheduler = buildScheduler(nowProvider);
+      mockNow.mockReturnValue(now.getTime());
 
-      let result = await scheduler.schedulePost({
+      let result = await postScheduler.schedulePost({
         when: now,
       });
       assertOk(result);
 
       const tomorrow = date_add(now, { days: 1 });
-      result = await scheduler.schedulePost({
+      result = await postScheduler.schedulePost({
         when: tomorrow,
       });
       assertOk(result);
@@ -327,9 +325,10 @@ describe("test schedule component", () => {
   });
 
   const getOkPostResult = async (
-    options: SchedulePostOptions
+    options: SchedulePostOptions,
   ): Promise<PostHistoryDocument> => {
-    const result = await buildScheduler(options.when).schedulePost(options);
+    mockNow.mockReturnValue(options.when.getTime());
+    const result = await postScheduler.schedulePost(options);
     assertOk(result);
     const newPost = result.value;
     assertInstanceOf(newPost, PostHistory);
@@ -337,28 +336,11 @@ describe("test schedule component", () => {
   };
 
   const getErrorPostResult = async (
-    options: SchedulePostOptions
+    options: SchedulePostOptions,
   ): Promise<PostError> => {
-    const result = await buildScheduler(options.when).schedulePost(options);
+    mockNow.mockReturnValue(options.when.getTime());
+    const result = await postScheduler.schedulePost(options);
     assertError(result);
     return result.value;
-  };
-
-  /** build a scheduler based on a specific time stamp or mutable now */
-  const buildScheduler = (now: MutableNow | Date) => {
-    if (now instanceof Date) {
-      now = new MutableNow(now);
-    }
-    return testContainer()
-      .createChildContainer()
-      .register<RandomProvider>(RandomProvider, {
-        useValue: new NotVeryRandom(RANDOM_VALUE),
-      })
-      .register<NowProvider>(NowProvider, { useValue: now })
-      .resolve(PostScheduler);
-  };
-
-  const configuration = (): ServerConfiguration => {
-    return testContainer().resolve(ServerConfiguration);
   };
 });

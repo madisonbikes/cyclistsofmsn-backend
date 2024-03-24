@@ -1,10 +1,8 @@
 import express from "express";
 import passport from "passport";
-import { injectable } from "tsyringe";
 import { validateBodySchema, validateAuthenticated } from "../security";
 import { loginBodySchema, AuthenticatedUser } from "./contract";
 
-@injectable()
 export class SessionRouter {
   routes = () => {
     return express

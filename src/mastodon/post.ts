@@ -1,9 +1,7 @@
-import "reflect-metadata";
 import { readFile } from "fs/promises";
-import { container, injectable } from "tsyringe";
-import { ServerConfiguration } from "../config";
+import { configuration } from "../config";
 import sharp from "sharp";
-import { FilesystemRepository } from "../fs_repository";
+import { fsRepository } from "../fs_repository";
 import request from "superagent";
 import crypto from "crypto";
 import { logger } from "../utils";
@@ -29,22 +27,16 @@ type TootPostOptions = {
   image?: TootPostImageOptions;
 };
 
-@injectable()
-export class PhotoMastodonClient {
-  constructor(
-    private configuration: ServerConfiguration,
-    private repository: FilesystemRepository
-  ) {}
-
+class PhotoMastodonClient {
   isEnabled() {
     return (
-      this.configuration.mastodonUri !== "" &&
-      this.configuration.mastodonAccessToken !== ""
+      configuration.mastodonUri !== "" &&
+      configuration.mastodonAccessToken !== ""
     );
   }
 
   async post(filename: string, description?: string): Promise<string> {
-    const photoFilename = this.repository.photoPath(filename);
+    const photoFilename = fsRepository.photoPath(filename);
     const buffer = await sharp(photoFilename)
       .resize({ width: 1600, withoutEnlargement: true })
       .toFormat("jpeg")
@@ -52,7 +44,7 @@ export class PhotoMastodonClient {
 
     const visibility = statusUpdateVisibilitySchema
       .optional()
-      .parse(this.configuration.mastodonStatusVisibility);
+      .parse(configuration.mastodonStatusVisibility);
     return this.postToot({
       status: "#cyclistsofmadison",
       visibility,
@@ -68,7 +60,7 @@ export class PhotoMastodonClient {
         description: options.image.description,
       };
       const mediaRequest = this.buildAuthorizedMastodonPostRequest(
-        "/api/v2/media"
+        "/api/v2/media",
       ).attach("file", options.image.buffer, options.image.filename);
 
       for (const [key, value] of Object.entries(mediaFields)) {
@@ -80,7 +72,7 @@ export class PhotoMastodonClient {
       const mediaResponse = await mediaRequest;
       if (!mediaResponse.ok) {
         throw new Error(
-          `Upload media error: ${JSON.stringify(mediaResponse.body)}`
+          `Upload media error: ${JSON.stringify(mediaResponse.body)}`,
         );
       }
 
@@ -99,14 +91,14 @@ export class PhotoMastodonClient {
     // FIXME when we introduce message queue/etc use same UUID for retries
     const uuid = crypto.randomUUID();
     const tootResponse = await this.buildAuthorizedMastodonPostRequest(
-      "/api/v1/statuses"
+      "/api/v1/statuses",
     )
       .set("Idempotency-Key", uuid)
       .send(requestBody);
 
     if (!tootResponse.ok) {
       throw new Error(
-        `Post status error: ${JSON.stringify(tootResponse.body)}`
+        `Post status error: ${JSON.stringify(tootResponse.body)}`,
       );
     }
 
@@ -116,18 +108,19 @@ export class PhotoMastodonClient {
 
   private buildAuthorizedMastodonPostRequest(api: string) {
     return request
-      .post(`${this.configuration.mastodonUri}/${api}`)
-      .set("Authorization", `Bearer ${this.configuration.mastodonAccessToken}`);
+      .post(`${configuration.mastodonUri}/${api}`)
+      .set("Authorization", `Bearer ${configuration.mastodonAccessToken}`);
   }
 }
 
+export const photoTooter = new PhotoMastodonClient();
+
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {
-  const client = container.resolve(PhotoMastodonClient);
   const fileBuffer = await readFile(args[1]);
 
   console.log("loaded file");
-  return client.postToot({
+  return photoTooter.postToot({
     status: args[0],
     visibility: "direct",
     image: {

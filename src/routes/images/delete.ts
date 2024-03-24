@@ -1,14 +1,10 @@
 import { Request, Response } from "express";
-import { injectable } from "tsyringe";
 import { Image, PostHistory } from "../../database";
-import { FilesystemRepository } from "../../fs_repository";
+import { fsRepository } from "../../fs_repository";
 import { logger } from "../../utils";
 import pLimit from "p-limit";
 
-@injectable()
 export class SingleImageDelete {
-  constructor(private repository: FilesystemRepository) {}
-
   handler = async (req: Request, res: Response) => {
     const id = req.params.id;
     logger.trace({ id }, "delete single image");
@@ -26,8 +22,8 @@ export class SingleImageDelete {
     }
     const { filename } = result.value;
     if (filename != null) {
-      const fullPath = this.repository.photoPath(filename);
-      await this.repository.delete(fullPath);
+      const fullPath = fsRepository.photoPath(filename);
+      await fsRepository.delete(fullPath);
     }
 
     const postList = await PostHistory.find({ image: id });

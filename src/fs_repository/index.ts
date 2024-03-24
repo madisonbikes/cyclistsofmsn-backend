@@ -1,16 +1,14 @@
-import { ServerConfiguration } from "../config";
 import { load } from "exifreader";
+import { configuration } from "../config";
 import fs from "fs/promises";
 import path from "path";
-import { injectable } from "tsyringe";
 import sharp from "sharp";
 import { updateImageDescription } from "../exiftool";
 
-@injectable()
-export class FilesystemRepository {
+class FilesystemRepository {
   private baseDirectory;
 
-  constructor(configuration: ServerConfiguration) {
+  constructor() {
     this.baseDirectory = configuration.photosDir;
   }
 
@@ -62,3 +60,5 @@ export class FilesystemRepository {
     return await updateImageDescription(originalFile, description);
   }
 }
+
+export const fsRepository = new FilesystemRepository();

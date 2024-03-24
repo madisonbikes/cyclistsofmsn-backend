@@ -1,25 +1,23 @@
 import {
-  Cancellable,
   error,
   Lifecycle,
   logger,
-  NowProvider,
   ok,
   Result,
   safeAsyncWrapper,
-  SimpleScheduler,
 } from "../utils";
-import { PostError, PostScheduler } from "./scheduler";
-import { injectable } from "tsyringe";
-import { PostExecutor } from "./postExecutor";
+import now from "../utils/now";
+import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
+import { PostError, postScheduler } from "./postScheduler";
+import { postExecutor } from "./postExecutor";
 import {
   ImageDocument,
   PostHistoryDocument,
   PostStatus,
   Image,
 } from "../database";
-import { ImageSelector } from "./selection/selector";
-import { ImageRepositoryScanner } from "../scan";
+import { imageSelector } from "./selection/selector";
+import { imageRepositoryScanner } from "../scan";
 
 /** dispatch posts every five minutes */
 const DISPATCH_INTERVAL = 5 * 60 * 1000;
@@ -28,22 +26,12 @@ const DISPATCH_DELAY = 5 * 1000;
 /**
  * The post dispatcher is responsible for orchestrating posting photos.
  */
-@injectable()
 export class PostDispatcher implements Lifecycle {
   private scheduled: Array<Cancellable | undefined> = [];
 
-  constructor(
-    private scheduler: PostScheduler,
-    private nowProvider: NowProvider,
-    private simpleScheduler: SimpleScheduler,
-    private executor: PostExecutor,
-    private imageSelector: ImageSelector,
-    private repositoryScanner: ImageRepositoryScanner,
-  ) {}
-
   start(): void {
     this.scheduled.push(
-      this.simpleScheduler.scheduleRepeat(
+      scheduleRepeat(
         safeAsyncWrapper("dispatch", this.asyncDispatch),
         DISPATCH_INTERVAL,
         DISPATCH_DELAY,
@@ -61,8 +49,8 @@ export class PostDispatcher implements Lifecycle {
   // because this method is called by reference above, it must be an arrow function
   // or the "this" is lost!
   asyncDispatch = async () => {
-    const scheduledResult = await this.scheduler.schedulePost({
-      when: new Date(this.nowProvider.now()),
+    const scheduledResult = await postScheduler.schedulePost({
+      when: new Date(now()),
       selectImage: true,
     });
     if (scheduledResult.isError()) {
@@ -104,7 +92,7 @@ export class PostDispatcher implements Lifecycle {
 
     if (postImage != null) {
       // execute the post and then if it's sucessful, update the post status
-      await this.executor.post(postImage);
+      await postExecutor.post(postImage);
 
       nextPost.image = postImage;
       nextPost.status.flag = PostStatus.COMPLETE;
@@ -114,7 +102,7 @@ export class PostDispatcher implements Lifecycle {
 
   /** returns true if it's time to execute this post, false if it's in the future */
   private isTimeToPost(post: PostHistoryDocument) {
-    const when = this.nowProvider.now() - post.timestamp.getTime();
+    const when = now() - post.timestamp.getTime();
     if (post.status.flag !== PostStatus.PENDING) {
       logger.warn({ post }, "isTimeToPost expects PENDING posts only");
       return false;
@@ -139,10 +127,11 @@ export class PostDispatcher implements Lifecycle {
 
   private async selectImage(): Promise<Result<ImageDocument, PostError>> {
     // first, scan repository for new images
-    await this.repositoryScanner.start();
+    // FIXME This doesn't do what you think it does ben
+    await imageRepositoryScanner.start();
 
     // select image
-    const retval = await this.imageSelector.nextImage();
+    const retval = await imageSelector.nextImage();
     if (retval.isError()) {
       logger.warn({ error: retval.value }, `Could not find an image to post`);
       return error(retval.value);
@@ -151,3 +140,5 @@ export class PostDispatcher implements Lifecycle {
     }
   }
 }
+
+export const postDispatcher = new PostDispatcher();

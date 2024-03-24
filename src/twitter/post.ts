@@ -1,29 +1,21 @@
-import "reflect-metadata";
 import { TwitterClient } from "twitter-api-client";
 import { readFile } from "fs/promises";
-import { container, injectable } from "tsyringe";
-import { ServerConfiguration } from "../config";
+import { configuration } from "../config";
 import sharp from "sharp";
-import { FilesystemRepository } from "../fs_repository";
+import { fsRepository } from "../fs_repository";
 import { logger } from "../utils";
 
-@injectable()
-export class PhotoTwitterClient {
-  constructor(
-    private configuration: ServerConfiguration,
-    private repository: FilesystemRepository
-  ) {}
-
+class PhotoTwitterClient {
   isEnabled() {
     return (
-      this.configuration.twitterApiKey !== "" &&
-      this.configuration.twitterAccessToken !== "" &&
-      this.configuration.twitterAccessTokenSecret !== ""
+      configuration.twitterApiKey !== "" &&
+      configuration.twitterAccessToken !== "" &&
+      configuration.twitterAccessTokenSecret !== ""
     );
   }
 
   async post(filename: string): Promise<number> {
-    const photoFilename = this.repository.photoPath(filename);
+    const photoFilename = fsRepository.photoPath(filename);
     const buffer = await sharp(photoFilename)
       .resize({ width: 1600, withoutEnlargement: true })
       .toFormat("jpeg")
@@ -33,10 +25,10 @@ export class PhotoTwitterClient {
 
   async postTweet(status: string, buffer: Buffer): Promise<number> {
     const twitterClient = new TwitterClient({
-      apiKey: this.configuration.twitterApiKey,
-      apiSecret: this.configuration.twitterApiSecret,
-      accessToken: this.configuration.twitterAccessToken,
-      accessTokenSecret: this.configuration.twitterAccessTokenSecret,
+      apiKey: configuration.twitterApiKey,
+      apiSecret: configuration.twitterApiSecret,
+      accessToken: configuration.twitterAccessToken,
+      accessTokenSecret: configuration.twitterAccessTokenSecret,
     });
     const base64Buffer = buffer.toString("base64");
 
@@ -53,9 +45,11 @@ export class PhotoTwitterClient {
   }
 }
 
+export const photoTweeter = new PhotoTwitterClient();
+
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {
-  const twitterClient = container.resolve(PhotoTwitterClient);
+  const twitterClient = new PhotoTwitterClient();
   const fileBuffer = await readFile(args[1]);
 
   logger.debug("loaded file");

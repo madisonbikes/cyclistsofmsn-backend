@@ -3,15 +3,11 @@ import { Image, ImageDocument } from "../../database";
 import { logger } from "../../utils";
 import { PutImageBody, putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
-import { FilesystemRepository } from "../../fs_repository";
-import { injectable } from "tsyringe";
+import { fsRepository } from "../../fs_repository";
 
 export const bodySchema = putImageBodySchema;
 
-@injectable()
 export class ImagePut {
-  constructor(private fsRepository: FilesystemRepository) {}
-
   handler = async (req: Request, res: Response) => {
     const body = req.validated as PutImageBody;
 
@@ -27,7 +23,7 @@ export class ImagePut {
         newValue?.description != null
       ) {
         // if the description changes, update the exif on the image
-        await this.fsRepository.updateImageDescription(
+        await fsRepository.updateImageDescription(
           oldValue.filename,
           newValue?.description,
         );

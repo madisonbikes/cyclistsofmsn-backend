@@ -1,4 +1,4 @@
-import { SimpleScheduler } from "./simple_scheduler";
+import { scheduleOnce, scheduleRepeat } from "./simple_scheduler";
 
 describe("simple scheduler", () => {
   beforeEach(() => {
@@ -13,8 +13,7 @@ describe("simple scheduler", () => {
   it("call timeout executes method", () => {
     let called = 0;
 
-    const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleOnce(() => {
+    const cancel = scheduleOnce(() => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
@@ -30,8 +29,7 @@ describe("simple scheduler", () => {
   it("call timeout executes async method", () => {
     let called = 0;
 
-    const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleOnce(() => {
+    const cancel = scheduleOnce(() => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
@@ -47,8 +45,7 @@ describe("simple scheduler", () => {
   it("call timeout cancellation works", () => {
     let called = 0;
 
-    const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleOnce(() => {
+    const cancel = scheduleOnce(() => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
@@ -61,8 +58,7 @@ describe("simple scheduler", () => {
   it("call interval executes method twice then cancel", () => {
     let called = 0;
 
-    const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleRepeat(() => {
+    const cancel = scheduleRepeat(() => {
       called++;
     }, 5000);
     jest.advanceTimersByTime(4000);
@@ -85,13 +81,12 @@ describe("simple scheduler", () => {
   it("call interval with delay executes method twice then cancel", () => {
     let called = 0;
 
-    const scheduler = new SimpleScheduler();
-    const cancel = scheduler.scheduleRepeat(
+    const cancel = scheduleRepeat(
       () => {
         called++;
       },
       5000,
-      2000
+      2000,
     );
     jest.advanceTimersByTime(3000);
     expect(called).toBe(1);

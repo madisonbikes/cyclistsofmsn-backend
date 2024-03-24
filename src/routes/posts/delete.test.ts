@@ -3,11 +3,10 @@ import {
   loginTestEditorUser,
   loginTestUser,
   setupSuite,
-  testDatabase,
   testRequest,
   TestRequest,
 } from "../../test";
-import { PostHistory } from "../../database";
+import { database, PostHistory } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
@@ -71,7 +70,7 @@ describe("server process - posts", () => {
   });
 
   const createTestPost = async () => {
-    const retval = await testDatabase().collection("posts").insertOne({});
+    const retval = await database.collection("posts").insertOne({});
     return retval.insertedId.toHexString();
   };
 });

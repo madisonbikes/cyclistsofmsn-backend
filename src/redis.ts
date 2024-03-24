@@ -1,17 +1,14 @@
-import { injectable, singleton } from "tsyringe";
-import { ServerConfiguration } from "./config";
+import { configuration } from "./config";
 import RedisStore from "connect-redis";
 import { createClient, RedisClientType } from "redis";
 import { logger, Lifecycle, maskUriPassword } from "./utils";
 
-@injectable()
-@singleton()
 export class RedisConnection implements Lifecycle {
   private client?: RedisClientType;
 
-  constructor(private config: ServerConfiguration) {
+  constructor() {
     if (this.isEnabled()) {
-      this.client = createClient({ url: config.redisUri });
+      this.client = createClient({ url: configuration.redisUri });
       this.client.on("error", (err) => logger.warn(err, "Redis Client Error"));
     } else {
       logger.info("Redis disabled");
@@ -19,13 +16,15 @@ export class RedisConnection implements Lifecycle {
   }
 
   isEnabled() {
-    return this.config.redisUri !== undefined && this.config.redisUri !== "";
+    return (
+      configuration.redisUri !== undefined && configuration.redisUri !== ""
+    );
   }
 
   async start() {
     if (this.client !== undefined) {
       logger.info(
-        `Connecting to redis on ${maskUriPassword(this.config.redisUri)}`
+        `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
       );
       await this.client.connect();
     }
@@ -42,3 +41,5 @@ export class RedisConnection implements Lifecycle {
     return new RedisStore({ client: this.client });
   }
 }
+
+export const redis = new RedisConnection();
