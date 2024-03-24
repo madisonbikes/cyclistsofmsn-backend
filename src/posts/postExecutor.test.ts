@@ -1,6 +1,6 @@
 import { setupSuite } from "../test";
 import { Image } from "../database";
-import { postExecutor } from "./postExecutor";
+import { post } from "./postExecutor";
 import { photoTooter } from "../mastodon/post";
 import { photoTweeter } from "../twitter/post";
 
@@ -23,7 +23,7 @@ describe("test executor component", () => {
       newImage.fs_timestamp = new Date();
       await newImage.save();
 
-      await postExecutor.post(newImage);
+      await post(newImage);
 
       expect(mockPhotoTooter.post).toHaveBeenCalledTimes(1);
       expect(mockPhotoTweeter.post).toHaveBeenCalledTimes(1);

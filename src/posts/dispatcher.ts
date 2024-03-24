@@ -9,7 +9,7 @@ import {
 import now from "../utils/now";
 import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
 import { PostError, postScheduler } from "./postScheduler";
-import { postExecutor } from "./postExecutor";
+import { post } from "./postExecutor";
 import {
   ImageDocument,
   PostHistoryDocument,
@@ -92,7 +92,7 @@ export class PostDispatcher implements Lifecycle {
 
     if (postImage != null) {
       // execute the post and then if it's sucessful, update the post status
-      await postExecutor.post(postImage);
+      await post(postImage);
 
       nextPost.image = postImage;
       nextPost.status.flag = PostStatus.COMPLETE;
