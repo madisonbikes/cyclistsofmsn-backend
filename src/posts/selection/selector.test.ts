@@ -3,11 +3,8 @@ import { Image, ImageDocument, PostHistory } from "../../database";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
 import { imageSelector } from "./selector";
-import { randomInt } from "../../utils/random";
 
 jest.mock("../../utils/random");
-const mockRandomInt = jest.mocked(randomInt);
-mockRandomInt.mockReturnValue(101);
 
 describe("test post image selector components", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });

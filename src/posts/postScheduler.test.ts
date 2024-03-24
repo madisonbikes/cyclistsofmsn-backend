@@ -15,17 +15,13 @@ import {
 } from "../database";
 import { configuration } from "../config";
 import { SchedulePostOptions } from "../routes/contract";
-import { randomInt } from "../utils/random";
 import now from "../utils/now";
 
-const RANDOM_VALUE = 50;
-
 jest.mock("../utils/random");
-const mockRandomInt = jest.mocked(randomInt);
-mockRandomInt.mockReturnValue(50);
-
 jest.mock("../utils/now");
 const mockNow = jest.mocked(now);
+
+const RANDOM_VALUE = 50;
 
 describe("test schedule component", () => {
   setupSuite({ withDatabase: true, clearImages: true, clearPostHistory: true });
