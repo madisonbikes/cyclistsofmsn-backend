@@ -1,9 +1,11 @@
 import { setupSuite } from "../test";
+import { error } from "../utils";
 import { createPopulate } from "./populate";
 import { schedulePost } from "./postScheduler";
 
 jest.mock("./postScheduler");
 const mockSchedulePost = jest.mocked(schedulePost);
+mockSchedulePost.mockResolvedValue(error({ message: "mocked" }));
 
 describe("post populate component", () => {
   setupSuite({ withDatabase: true });

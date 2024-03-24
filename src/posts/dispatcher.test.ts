@@ -1,8 +1,10 @@
 import { setupSuite } from "../test";
+import { error } from "../utils";
 import { createDispatcher } from "./dispatcher";
 import { schedulePost } from "./postScheduler";
 jest.mock("./postScheduler");
 const mockSchedulePost = jest.mocked(schedulePost);
+mockSchedulePost.mockResolvedValue(error({ message: "mocked" }));
 
 describe("post dispatcher component", () => {
   setupSuite({ withDatabase: true });
