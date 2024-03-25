@@ -7,16 +7,7 @@ class RedisConnection implements Lifecycle {
   private client?: RedisClientType;
   private started = false;
 
-  constructor() {
-    if (this.isEnabled()) {
-      this.client = createClient({ url: configuration.redisUri });
-      this.client.on("error", (err) => logger.warn(err, "Redis Client Error"));
-    } else {
-      logger.info("Redis disabled");
-    }
-  }
-
-  isEnabled() {
+  get isEnabled() {
     return (
       configuration.redisUri !== undefined && configuration.redisUri !== ""
     );
@@ -26,16 +17,25 @@ class RedisConnection implements Lifecycle {
     if (this.started) {
       throw new Error("cannot start multiple redis connection instances");
     }
-    this.started = true;
-    if (this.client !== undefined) {
-      logger.info(
-        `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
-      );
-      await this.client.connect();
+    if (!this.isEnabled) {
+      logger.info("Redis disabled");
+      return;
     }
+
+    this.started = true;
+
+    this.client = createClient({ url: configuration.redisUri });
+    this.client.on("error", (err) => logger.warn(err, "Redis Client Error"));
+    logger.info(
+      `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
+    );
+    await this.client.connect();
   }
 
   async stop() {
+    if (!this.isEnabled) {
+      return; // ignore
+    }
     if (!this.started) {
       throw new Error("cannot stop a redis connection that isn't started");
     }
@@ -51,4 +51,5 @@ class RedisConnection implements Lifecycle {
   }
 }
 
+// singleton hack because we don't have good DI
 export const redis = new RedisConnection();
