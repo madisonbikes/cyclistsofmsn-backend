@@ -1,8 +1,4 @@
-import {
-  ServerConfiguration,
-  configuration,
-  setConfigurationForTests,
-} from "../config";
+import { configuration, testConfiguration } from "../config";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import path from "path";
 import { database } from "../database";
@@ -45,40 +41,26 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   const clearImages = options.clearImages ?? false;
 
   let mongoServer: MongoMemoryServer | undefined;
-  let savedConfiguration: ServerConfiguration;
 
   beforeAll(async () => {
-    // create a copy of the configuration
-    savedConfiguration = { ...configuration };
-    const overrideConfiguration: Partial<ServerConfiguration> = {};
+    testConfiguration.reset();
+    testConfiguration.add({
+      // disable redis for testing
+      redisUri: "",
 
-    // don't enable redis for testing
-    overrideConfiguration.redisUri = "";
-
-    // tests don't use SSL
-    overrideConfiguration.secureCookie = false;
-
-    setConfigurationForTests({
-      ...savedConfiguration,
-      ...overrideConfiguration,
+      // tests don't use SSL
+      secureCookie: false,
     });
 
-    await initializeSuite(
-      withMutableTestResources,
-      savedConfiguration,
-      overrideConfiguration,
-    );
+    await initializeSuite(withMutableTestResources);
 
     if (withDatabase) {
       // start the mongo in-memory server on an ephemeral port
       mongoServer = await MongoMemoryServer.create();
       const mongodbUri = mongoServer.getUri();
-      overrideConfiguration.mongodbUri = mongodbUri;
 
-      setConfigurationForTests({
-        ...savedConfiguration,
-        ...overrideConfiguration,
-      });
+      // set the custom mongodb uri
+      testConfiguration.add({ mongodbUri });
 
       await database.start();
     }
@@ -123,18 +105,10 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
     }
 
     await cleanupSuite(withMutableTestResources);
-
-    // reset the configuration
-    setConfigurationForTests(savedConfiguration);
   });
 };
 
-const initializeSuite = async (
-  withMutableTestResources: boolean,
-  savedConfiguration: ServerConfiguration,
-  overrideConfiguration: Partial<ServerConfiguration>,
-) => {
-  const originalPhotosDir = testResourcesDir();
+const initializeSuite = async (withMutableTestResources: boolean) => {
   if (withMutableTestResources) {
     const random = Math.random().toString(36).substring(7);
     const mutablePhotosDir = path.resolve(
@@ -142,13 +116,11 @@ const initializeSuite = async (
       `../../output/mutable_test_resources_${random}`,
     );
     await fs.mkdirp(mutablePhotosDir);
-    await fs.copy(originalPhotosDir, mutablePhotosDir);
+    await fs.copy(testResourcesDir(), mutablePhotosDir);
 
-    overrideConfiguration.photosDir = mutablePhotosDir;
-    setConfigurationForTests({
-      ...savedConfiguration,
-      ...overrideConfiguration,
-    });
+    testConfiguration.add({ photosDir: mutablePhotosDir });
+  } else {
+    testConfiguration.add({ photosDir: testResourcesDir() });
   }
 };
 

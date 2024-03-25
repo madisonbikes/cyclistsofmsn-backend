@@ -29,14 +29,23 @@ const parseBooleanWithDefault = (
   return retval;
 };
 
-export const setConfigurationForTests = (values: ServerConfiguration) => {
-  if (process.env.NODE_ENV !== "test") {
-    throw new Error(
-      "overrideConfigurationForTests should only be called in test environment",
-    );
-  }
-
-  Object.assign(configuration, values);
+export const testConfiguration = {
+  reset: function () {
+    if (process.env.NODE_ENV !== "test") {
+      throw new Error(
+        "overrideConfigurationForTests should only be called in test environment",
+      );
+    }
+    Object.assign(configuration, defaultConfiguration);
+  },
+  add(values: Partial<ServerConfiguration>) {
+    if (process.env.NODE_ENV !== "test") {
+      throw new Error(
+        "overrideConfigurationForTests should only be called in test environment",
+      );
+    }
+    Object.assign(configuration, values);
+  },
 };
 
 const defaultConfiguration = {
