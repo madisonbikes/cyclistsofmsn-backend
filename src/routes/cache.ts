@@ -1,6 +1,5 @@
 import express, { RequestHandler } from "express";
 import { LRUCache } from "lru-cache";
-import { injectable, singleton } from "tsyringe";
 import { logger } from "../utils";
 
 const CACHE_SIZE = 20 * 1024 * 1024;
@@ -15,47 +14,45 @@ type MiddlewareOptions = {
   callNextWhenCacheable: boolean;
 };
 
-@injectable()
-@singleton()
-export class Cache {
+class Cache {
   private memoryCache = new LRUCache<string, Holder>({
     maxSize: CACHE_SIZE,
     sizeCalculation: (holder: Holder): number => {
       const v = holder.value as { length: number };
       if (v === undefined) {
         throw new Error(
-          `Unable to calculate size of ${JSON.stringify(holder.value)}`
+          `Unable to calculate size of ${JSON.stringify(holder.value)}`,
         );
       }
       return v.length;
     },
   });
 
-  wrapper = (
+  wrapper(
     fn: (
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction
-    ) => Promise<express.Response | void>
-  ) => {
+      next: express.NextFunction,
+    ) => Promise<express.Response | void>,
+  ) {
     return async (
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction
+      next: express.NextFunction,
     ) => {
       if (await this.isCached(res)) return;
       // eslint-disable-next-line promise/no-callback-in-promise
       return fn(req, res, next).catch(next);
     };
-  };
+  }
 
-  middleware = (
-    options: MiddlewareOptions = { callNextWhenCacheable: false }
-  ): RequestHandler => {
+  middleware(
+    options: MiddlewareOptions = { callNextWhenCacheable: false },
+  ): RequestHandler {
     return (
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction
+      next: express.NextFunction,
     ) => {
       const cached = this.memoryCache.get(req.url);
       if (cached !== undefined) {
@@ -88,13 +85,15 @@ export class Cache {
       };
       return next();
     };
-  };
+  }
 
-  isCached = (res: express.Response): Promise<boolean> => {
+  isCached(res: express.Response): Promise<boolean> {
     return Promise.resolve(res.get("x-cached-response") === "HIT");
-  };
+  }
 
-  clear = () => {
+  clear() {
     this.memoryCache.clear();
-  };
+  }
 }
+
+export default new Cache();

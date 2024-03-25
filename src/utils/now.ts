@@ -1,5 +1,1 @@
-export class NowProvider {
-  now(): number {
-    return Date.now();
-  }
-}
+export default (): number => Date.now();

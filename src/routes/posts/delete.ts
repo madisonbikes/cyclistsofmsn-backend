@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PostHistory } from "../../database";
 import { logger } from "../../utils";
 
-export const handler = async (req: Request, res: Response) => {
+async function handler(req: Request, res: Response) {
   const { id } = req.params;
   logger.trace({ id }, "delete single post");
 
@@ -13,4 +13,6 @@ export const handler = async (req: Request, res: Response) => {
     // not found
     res.sendStatus(404);
   }
-};
+}
+
+export default { handler };

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Image } from "../../database";
-import { FilesystemRepository } from "../../fs_repository";
-import { injectable } from "tsyringe";
+import { fsRepository } from "../../fs_repository";
 import { access } from "fs/promises";
 import { constants } from "fs";
 import sharp from "sharp";
@@ -9,10 +8,7 @@ import { logger } from "../../utils";
 import { getImageQuerySchema, GetImageQuery } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 
-@injectable()
-export class ImageGet {
-  constructor(private fsRepository: FilesystemRepository) {}
-
+class ImageGet {
   readonly querySchema = getImageQuerySchema;
 
   metadata = async (req: Request, res: Response) => {
@@ -35,7 +31,7 @@ export class ImageGet {
       return res.sendStatus(404);
     }
 
-    const imageFile = this.fsRepository.photoPath(filename);
+    const imageFile = fsRepository.photoPath(filename);
 
     let { width } = query;
     if (width === undefined && query.height === undefined) {
@@ -48,7 +44,7 @@ export class ImageGet {
     } catch (err) {
       logger.info(
         { imageFile },
-        `Requested file not found in image repository`
+        `Requested file not found in image repository`,
       );
       return res.sendStatus(404);
     }
@@ -71,3 +67,5 @@ export class ImageGet {
     res.send(retval);
   };
 }
+
+export default new ImageGet();

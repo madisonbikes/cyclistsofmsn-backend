@@ -1,65 +1,56 @@
-import "reflect-metadata";
 import { TwitterClient } from "twitter-api-client";
 import { readFile } from "fs/promises";
-import { container, injectable } from "tsyringe";
-import { ServerConfiguration } from "../config";
+import { configuration } from "../config";
 import sharp from "sharp";
-import { FilesystemRepository } from "../fs_repository";
+import { fsRepository } from "../fs_repository";
 import { logger } from "../utils";
 
-@injectable()
-export class PhotoTwitterClient {
-  constructor(
-    private configuration: ServerConfiguration,
-    private repository: FilesystemRepository
-  ) {}
+export default { isEnabled, post };
 
-  isEnabled() {
-    return (
-      this.configuration.twitterApiKey !== "" &&
-      this.configuration.twitterAccessToken !== "" &&
-      this.configuration.twitterAccessTokenSecret !== ""
-    );
-  }
+function isEnabled() {
+  return (
+    configuration.twitterApiKey !== "" &&
+    configuration.twitterAccessToken !== "" &&
+    configuration.twitterAccessTokenSecret !== ""
+  );
+}
 
-  async post(filename: string): Promise<number> {
-    const photoFilename = this.repository.photoPath(filename);
-    const buffer = await sharp(photoFilename)
-      .resize({ width: 1600, withoutEnlargement: true })
-      .toFormat("jpeg")
-      .toBuffer();
-    return this.postTweet("#cyclistsofmadison", buffer);
-  }
+async function post(filename: string): Promise<number> {
+  const photoFilename = fsRepository.photoPath(filename);
+  const buffer = await sharp(photoFilename)
+    .resize({ width: 1600, withoutEnlargement: true })
+    .toFormat("jpeg")
+    .toBuffer();
+  return postTweet("#cyclistsofmadison", buffer);
+}
 
-  async postTweet(status: string, buffer: Buffer): Promise<number> {
-    const twitterClient = new TwitterClient({
-      apiKey: this.configuration.twitterApiKey,
-      apiSecret: this.configuration.twitterApiSecret,
-      accessToken: this.configuration.twitterAccessToken,
-      accessTokenSecret: this.configuration.twitterAccessTokenSecret,
-    });
-    const base64Buffer = buffer.toString("base64");
+async function postTweet(status: string, buffer: Buffer): Promise<number> {
+  const twitterClient = new TwitterClient({
+    apiKey: configuration.twitterApiKey,
+    apiSecret: configuration.twitterApiSecret,
+    accessToken: configuration.twitterAccessToken,
+    accessTokenSecret: configuration.twitterAccessTokenSecret,
+  });
+  const base64Buffer = buffer.toString("base64");
 
-    const mediaResult = await twitterClient.media.mediaUpload({
-      media: base64Buffer,
-    });
-    logger.info(mediaResult, `uploaded media`);
+  const mediaResult = await twitterClient.media.mediaUpload({
+    media: base64Buffer,
+  });
+  logger.info(mediaResult, `uploaded media`);
 
-    const tweetResult = await twitterClient.tweets.statusesUpdate({
-      status: status,
-      media_ids: mediaResult.media_id_string,
-    });
-    return tweetResult.id;
-  }
+  const tweetResult = await twitterClient.tweets.statusesUpdate({
+    status: status,
+    media_ids: mediaResult.media_id_string,
+  });
+  return tweetResult.id;
 }
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {
-  const twitterClient = container.resolve(PhotoTwitterClient);
   const fileBuffer = await readFile(args[1]);
 
   logger.debug("loaded file");
-  return twitterClient.postTweet(args[0], fileBuffer);
+  return postTweet(args[0], fileBuffer);
 };
 
 if (require.main === module) {

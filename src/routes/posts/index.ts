@@ -1,5 +1,4 @@
 import express from "express";
-import { injectable } from "tsyringe";
 import { asyncWrapper } from "../async";
 import {
   Roles,
@@ -9,57 +8,53 @@ import {
   validateId,
   validateRole,
 } from "../../security";
-import {
-  bodySchema as singlePostPutSchema,
-  handler as singlePostPutHandler,
-} from "./put";
-import { handler as singlePostDeleteHandler } from "./delete";
-import { currentPostHandler, getPostHandler, getPostListHandler } from "./get";
+import singlePostPut from "./put";
+import singlePostDelete from "./delete";
+import postGet from "./get";
 
-@injectable()
-export class PostRouter {
-  routes = () => {
-    return (
-      express
-        .Router()
-
-        // all posts
-        .get("/", asyncWrapper(getPostListHandler))
-
-        // current post
-        .get("/current", asyncWrapper(currentPostHandler))
-
-        // specific post
-        .get(
-          "/:id",
-          validateAuthenticated(),
-          validateId(),
-          asyncWrapper(getPostHandler),
-        )
-
-        .put(
-          "/:id",
-          validateBodySchema({ schema: singlePostPutSchema }),
-          validateEditor(),
-          validateId(),
-          asyncWrapper(singlePostPutHandler),
-        )
-
-        .delete(
-          "/:id",
-          validateAdmin(),
-          validateId(),
-          asyncWrapper(singlePostDeleteHandler),
-        )
-
-        // post create operation is secured by editor role
-        .post("/create", validateEditor(), (_req, res) => {
-          return res.send("Submitted new post");
-        })
-    );
-  };
+function validateEditor() {
+  return validateRole({ role: Roles.EDITOR });
 }
 
-const validateEditor = () => {
-  return validateRole({ role: Roles.EDITOR });
-};
+function routes() {
+  return (
+    express
+      .Router()
+
+      // all posts
+      .get("/", asyncWrapper(postGet.postListHandler))
+
+      // current post
+      .get("/current", asyncWrapper(postGet.currentPostHandler))
+
+      // specific post
+      .get(
+        "/:id",
+        validateAuthenticated(),
+        validateId(),
+        asyncWrapper(postGet.singlePostHandler),
+      )
+
+      .put(
+        "/:id",
+        validateBodySchema({ schema: singlePostPut.bodySchema }),
+        validateEditor(),
+        validateId(),
+        asyncWrapper(singlePostPut.handler),
+      )
+
+      .delete(
+        "/:id",
+        validateAdmin(),
+        validateId(),
+        asyncWrapper(singlePostDelete.handler),
+      )
+
+      // post create operation is secured by editor role
+      .post("/create", validateEditor(), (_req, res) => {
+        return res.send("Submitted new post");
+      })
+  );
+}
+
+export default { routes };

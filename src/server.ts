@@ -1,27 +1,24 @@
-import "reflect-metadata";
 import http, { Server } from "http";
 import cors from "cors";
 import { Lifecycle, logger } from "./utils";
-import { container, injectable } from "tsyringe";
-import { ServerConfiguration } from "./config";
-import { ImageRepositoryScanner } from "./scan";
-import { Database } from "./database";
-import { MainRouter } from "./routes";
-import { PostDispatcher } from "./posts/dispatcher";
-import { PostPopulate } from "./posts/populate";
-
+import { configuration } from "./config";
+import { imageRepositoryScanner } from "./scan";
+import { database } from "./database";
+import { createDispatcher } from "./posts/dispatcher";
+import { createPopulate } from "./posts/populate";
+import api from "./routes";
 import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
-import { Strategies } from "./security";
-import { RedisConnection } from "./redis";
-import { SessionMiddlewareConfigurator } from "./session";
+import { strategies } from "./security";
+import { redis } from "./redis";
+import { sessionMiddlewareConfigurator } from "./session";
 
 /** expose command-line launcher */
 if (require.main === module) {
   /** launches server. this syntax allows server startup to run as async function */
   Promise.resolve()
     .then(() => {
-      const server = container.resolve(PhotoServer);
+      const server = new PhotoServer();
       return server.start();
     })
     .catch((error) => {
@@ -29,25 +26,13 @@ if (require.main === module) {
     });
 }
 
-@injectable()
 export class PhotoServer implements Lifecycle {
-  constructor(
-    private configuration: ServerConfiguration,
-    private strategies: Strategies,
-    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator,
-    private apiRouter: MainRouter,
-
-    database: Database,
-    redis: RedisConnection,
-    scanner: ImageRepositoryScanner,
-    postDispatcher: PostDispatcher,
-    postPopulate: PostPopulate,
-  ) {
+  constructor() {
     this.components.push(database);
     this.components.push(redis);
-    this.components.push(scanner);
-    this.components.push(postDispatcher);
-    this.components.push(postPopulate);
+    this.components.push(imageRepositoryScanner);
+    this.components.push(createDispatcher());
+    this.components.push(createPopulate());
   }
 
   components: Lifecycle[] = [];
@@ -63,18 +48,18 @@ export class PhotoServer implements Lifecycle {
 
     app.use(express.json());
 
-    if (this.configuration.enableCors) {
+    if (configuration.enableCors) {
       // cors should only be used for development -- production serves from same server/port
       app.use(cors());
     }
 
     // in production mode, serve the production React app from here
-    if (this.configuration.reactStaticRootDir) {
-      app.use("/", express.static(this.configuration.reactStaticRootDir));
+    if (configuration.reactStaticRootDir) {
+      app.use("/", express.static(configuration.reactStaticRootDir));
     }
 
     // init passport
-    passport.use(this.strategies.local);
+    passport.use(strategies.local);
     passport.serializeUser<string>((user, done) => {
       logger.trace(user, "serialize user");
       const data = JSON.stringify(user);
@@ -87,11 +72,11 @@ export class PhotoServer implements Lifecycle {
       done(null, user);
     });
 
-    app.use(this.sessionMiddlewareConfigurator.build());
+    app.use(sessionMiddlewareConfigurator());
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use("/api/v1", this.apiRouter.routes());
+    app.use("/api/v1", api.routes());
 
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
@@ -109,8 +94,8 @@ export class PhotoServer implements Lifecycle {
   /** called to create and start listener */
   async start(): Promise<void> {
     await this.create();
-    this.server?.listen(this.configuration.serverPort);
-    logger.info(`Server is listening on port ${this.configuration.serverPort}`);
+    this.server?.listen(configuration.serverPort);
+    logger.info(`Server is listening on port ${configuration.serverPort}`);
   }
 
   async stop(): Promise<void> {

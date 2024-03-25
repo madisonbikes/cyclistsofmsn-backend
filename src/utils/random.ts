@@ -1,8 +1,5 @@
-import { randomInt as otherRandomInt } from "crypto";
+import { randomInt as actualRandomInt } from "crypto";
 
-export class RandomProvider {
-  /** min (inclusive), max (exclusive) */
-  randomInt(min: number, max: number): number {
-    return otherRandomInt(min, max);
-  }
-}
+export const randomInt = (min: number, max: number): number => {
+  return actualRandomInt(min, max);
+};

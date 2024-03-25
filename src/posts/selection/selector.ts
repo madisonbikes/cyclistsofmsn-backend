@@ -1,23 +1,16 @@
-import { injectable } from "tsyringe";
-import { error, ok, RandomProvider, Result, arrayShuffle } from "../../utils";
+import { error, ok, Result, arrayShuffle } from "../../utils";
 import { Image, ImageDocument } from "../../database";
-import { PostError } from "../scheduler";
+import { PostError } from "../postScheduler";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
 } from "./criteria";
 
-@injectable()
-export class ImageSelector {
-  constructor(
-    private randomProvider: RandomProvider,
-    private repostCriteria: RepostCriteria,
-    private seasonalityCriteria: SeasonalityCriteria,
-    private unpostedCriteria: UnpostedCriteria,
-  ) {
-    // empty
-  }
+class ImageSelector {
+  private readonly repostCriteria = new RepostCriteria();
+  private readonly seasonalityCriteria = new SeasonalityCriteria();
+  private readonly unpostedCriteria = new UnpostedCriteria();
 
   public async nextImage(): Promise<Result<ImageDocument, PostError>> {
     const allImages = await Image.find({
@@ -43,7 +36,7 @@ export class ImageSelector {
       [this.repostCriteria],
     ];
 
-    const orderedPhotoList = arrayShuffle(this.randomProvider, allImages);
+    const orderedPhotoList = arrayShuffle(allImages);
 
     // run through complete repo for each criteria list in order
     for (const activeCriteriaList of criteria) {
@@ -74,3 +67,5 @@ export class ImageSelector {
     return ok(orderedPhotoList[0]);
   }
 }
+
+export const imageSelector = new ImageSelector();

@@ -1,33 +1,26 @@
 import {
   loginTestUser,
   setupSuite,
-  testContainer,
-  testDatabase,
   testRequest,
   TestRequest,
 } from "../../test";
-import { Cache } from "../cache";
 import { imageListSchema } from "../contract";
 import { createTestUser } from "../../test/data";
+import { database } from "../../database";
+import cache from "../cache";
 
 describe("server process - images", () => {
   let request: TestRequest;
-  let cache: Cache;
 
   setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    cache = testContainer().resolve(Cache);
-
     await createTestUser();
   });
 
   beforeEach(() => {
-    request = testRequest();
-  });
-
-  afterEach(() => {
     cache.clear();
+    request = testRequest();
   });
 
   it("responds to image list api call", async () => {
@@ -173,7 +166,7 @@ describe("server process - images", () => {
   };
 
   const createMissingImage = async () => {
-    const retval = await testDatabase().collection("images").insertOne({
+    const retval = await database.collection("images").insertOne({
       filename: "missing.jpg",
       deleted: false,
       description_from_exif: false,
@@ -182,7 +175,7 @@ describe("server process - images", () => {
   };
 
   const markImageHidden = async (filename: string) => {
-    const retval = await testDatabase()
+    const retval = await database
       .collection("images")
       .updateOne({ filename }, { $set: { hidden: true } });
     expect(retval.modifiedCount).toBe(1);

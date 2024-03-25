@@ -1,22 +1,17 @@
-import {
-  assertError,
-  NotVeryRandom,
-  setupSuite,
-  testContainer,
-} from "../../test";
+import { assertError, setupSuite } from "../../test";
 import { Image, ImageDocument, PostHistory } from "../../database";
-import { ImageSelector } from "./selector";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
-import { RandomProvider } from "../../utils";
+import { imageSelector } from "./selector";
+
+jest.mock("../../utils/random");
 
 describe("test post image selector components", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
 
   describe("selector", () => {
     it("fail with no image", async () => {
-      const selector = buildSelector();
-      const image = await selector.nextImage();
+      const image = await imageSelector.nextImage();
       assertError(image);
       expect(image.value.message).toEqual("no images");
     });
@@ -24,8 +19,7 @@ describe("test post image selector components", () => {
     it("succeed with one image", async () => {
       const image = await createImage();
 
-      const selector = buildSelector();
-      const post = await selector.nextImage();
+      const post = await imageSelector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
       expect(post.value.id).toEqual(image.id);
@@ -37,8 +31,7 @@ describe("test post image selector components", () => {
 
       const newImage = await createImage("newImage");
 
-      const selector = buildSelector();
-      const post = await selector.nextImage();
+      const post = await imageSelector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
       expect(post.value.id).toEqual(newImage.id);
@@ -47,14 +40,13 @@ describe("test post image selector components", () => {
     it("pick seasonal repost over non-seasonal unposted", async () => {
       const _nonSeasonalImage = await createImage(
         "nonSeasonalImage",
-        subDays(startOfToday(), 60)
+        subDays(startOfToday(), 60),
       );
 
       const seasonalImage = await createImage("seasonalImage");
       await createPost(seasonalImage, subDays(startOfToday(), 190));
 
-      const selector = buildSelector();
-      const image = await selector.nextImage();
+      const image = await imageSelector.nextImage();
       expect(image.isOk()).toBeTruthy();
       assert(image.isOk());
       expect(image.value.id).toEqual(seasonalImage.id);
@@ -65,8 +57,7 @@ describe("test post image selector components", () => {
       hidden.hidden = true;
       await hidden.save();
 
-      const selector = buildSelector();
-      const image = await selector.nextImage();
+      const image = await imageSelector.nextImage();
       assertError(image);
       expect(image.value.message).toEqual("no images");
     });
@@ -78,8 +69,7 @@ describe("test post image selector components", () => {
 
       const normalImage = await createImage("normal");
 
-      const selector = buildSelector();
-      const image = await selector.nextImage();
+      const image = await imageSelector.nextImage();
 
       expect(image.isOk()).toBeTruthy();
       assert(image.isOk());
@@ -89,7 +79,7 @@ describe("test post image selector components", () => {
 
   const createImage = (
     name = "testImage",
-    exif_createdon: Date | undefined = startOfToday()
+    exif_createdon: Date | undefined = startOfToday(),
   ) => {
     const image = new Image();
     image.filename = name;
@@ -102,15 +92,5 @@ describe("test post image selector components", () => {
     post.image = image;
     post.timestamp = postDate;
     return post.save();
-  };
-
-  /** build post selector that uses deterministic RNG so testing is reliable */
-  const buildSelector = () => {
-    return testContainer()
-      .createChildContainer()
-      .register<RandomProvider>(RandomProvider, {
-        useValue: new NotVeryRandom(101),
-      })
-      .resolve(ImageSelector);
   };
 });

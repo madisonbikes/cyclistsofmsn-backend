@@ -1,5 +1,3 @@
-import "reflect-metadata";
-import { injectable } from "tsyringe";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { User, UserDocument } from "../database";
@@ -29,11 +27,10 @@ export const localMiddleware = passport.authenticate("local", {
 export type ExpressMiddleware = (
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => void;
 
-@injectable()
-export class Strategies {
+class Strategies {
   /** passport strategy implementation for username/pw against mongodb */
   readonly local = new LocalStrategy(async (username, password, done) => {
     logger.trace({ username }, "local passport auth");
@@ -73,3 +70,5 @@ export class Strategies {
 export const generateHashedPassword = (password: string) => {
   return bcrypt.hash(password, BCRYPT_HASH_SIZE);
 };
+
+export const strategies = new Strategies();

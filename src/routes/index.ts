@@ -1,30 +1,20 @@
-// router.ts
 /**
  * This has the routes defined.
  */
-import { injectable } from "tsyringe";
 import express from "express";
-import { PostRouter } from "./posts";
-import { ImageRouter } from "./images";
-import { SessionRouter } from "./session";
-import { TasksRouter } from "./tasks";
+import postRouter from "./posts";
+import imageRouter from "./images";
+import sessionRouter from "./session";
+import tasksRouter from "./tasks";
 
 /** Provide REST API routes for images, posts */
-@injectable()
-export class MainRouter {
-  constructor(
-    private imageRouter: ImageRouter,
-    private postRouter: PostRouter,
-    private sessionRouter: SessionRouter,
-    private tasksRouter: TasksRouter,
-  ) {}
-
-  routes = () => {
-    return express
-      .Router()
-      .use("/posts", this.postRouter.routes())
-      .use("/images", this.imageRouter.routes())
-      .use("/session", this.sessionRouter.routes())
-      .use("/tasks", this.tasksRouter.routes());
-  };
+function routes() {
+  return express
+    .Router()
+    .use("/posts", postRouter.routes())
+    .use("/images", imageRouter.routes())
+    .use("/session", sessionRouter.routes())
+    .use("/tasks", tasksRouter.routes());
 }
+
+export default { routes };

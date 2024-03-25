@@ -1,25 +1,11 @@
-import "reflect-metadata";
-import { ServerConfiguration } from "../config";
+import { configuration, testConfiguration } from "../config";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import {
-  container as rootContainer,
-  DependencyContainer,
-  injectable,
-  Lifecycle,
-} from "tsyringe";
 import path from "path";
-import { Database } from "../database";
-import assert from "assert";
+import { database } from "../database";
 import { PhotoServer } from "../server";
 import { Server } from "./request";
-import { ImageRepositoryScanner } from "../scan";
+import { imageRepositoryScanner } from "../scan";
 import fs from "fs-extra";
-
-let mongoUri: string;
-let mongoServer: MongoMemoryServer | undefined;
-
-// the test container is initialized once for the suite
-let tc: DependencyContainer | undefined;
 
 export let photoServer: PhotoServer | undefined;
 export let runningPhotoServer: Server | undefined;
@@ -46,8 +32,6 @@ export type SuiteOptions = {
   clearPostHistory: boolean;
 };
 
-let mutablePhotosDir: string | undefined;
-
 /** entry point that should be included first in each describe block */
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   const withDatabase = options.withDatabase ?? false;
@@ -56,46 +40,44 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   const clearPostHistory = options.clearPostHistory ?? false;
   const clearImages = options.clearImages ?? false;
 
+  let mongoServer: MongoMemoryServer | undefined;
+
   beforeAll(async () => {
-    assert(tc === undefined);
-    tc = await initializeSuite(withMutableTestResources);
+    testConfiguration.reset();
+    testConfiguration.add({
+      // disable redis for testing
+      redisUri: "",
+
+      // tests don't use SSL
+      secureCookie: false,
+    });
+
+    await initializeSuite(withMutableTestResources);
 
     if (withDatabase) {
       // start the mongo in-memory server on an ephemeral port
       mongoServer = await MongoMemoryServer.create();
-      mongoUri = mongoServer.getUri();
+      const mongodbUri = mongoServer.getUri();
 
-      // provide a Database object scoped to the container rather, overriding singleton normally
-      tc.register<Database>(
-        Database,
-        { useClass: Database },
-        { lifecycle: Lifecycle.ContainerScoped },
-      );
+      // set the custom mongodb uri
+      testConfiguration.add({ mongodbUri });
 
-      await testDatabase().start();
-    } else {
-      // if database not enabled, trigger an error if we try to inject a database object
-      tc.register<Database>(Database, {
-        useFactory: () => {
-          throw new Error("No database allowed for this test suite");
-        },
-      });
+      await database.start();
     }
 
     if (withPhotoServer) {
-      photoServer = tc.resolve(PhotoServer);
+      photoServer = new PhotoServer();
       runningPhotoServer = await photoServer.create();
     }
   });
 
   afterEach(async () => {
-    assert(tc !== undefined);
     const queries: Array<Promise<unknown>> = [];
     if (clearPostHistory || withPhotoServer) {
-      queries.push(testDatabase().collection("posts")?.deleteMany({}));
+      queries.push(database.collection("posts")?.deleteMany({}));
     }
     if (clearImages || withPhotoServer) {
-      queries.push(testDatabase().collection("images")?.deleteMany({}));
+      queries.push(database.collection("images")?.deleteMany({}));
     }
 
     if (queries.length > 0) {
@@ -104,14 +86,11 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
 
     // this has to run after we've wiped the database
     if (withPhotoServer) {
-      const scanner = tc.resolve(ImageRepositoryScanner);
-      await scanner.start();
+      await imageRepositoryScanner.start();
     }
   });
 
   afterAll(async () => {
-    assert(tc);
-
     if (withPhotoServer) {
       runningPhotoServer = undefined;
       await photoServer?.stop();
@@ -122,83 +101,31 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
       await mongoServer?.stop();
       mongoServer = undefined;
 
-      await testDatabase().stop();
+      await database.stop();
     }
 
     await cleanupSuite(withMutableTestResources);
-    tc = undefined;
   });
 };
 
-/**
- * Callers that make modifications to the container should do so in a CHILD container because the container is not reset
- * between test
- */
-export const testContainer = () => {
-  assert(tc);
-  return tc;
-};
-
-/** return the object managing the connection to the mongodb instance */
-export const testDatabase = () => {
-  return testContainer().resolve(Database);
-};
-
 const initializeSuite = async (withMutableTestResources: boolean) => {
-  // don't use value registrations because they will be cleared in the beforeEach() handler
-  const testContainer = rootContainer.createChildContainer();
-
-  // provide a custom TestConfiguration adapted for the testing environment
-  testContainer.register<ServerConfiguration>(
-    ServerConfiguration,
-    { useClass: TestConfiguration },
-    { lifecycle: Lifecycle.ContainerScoped },
-  );
-
-  const originalPhotosDir = testResourcesDir();
   if (withMutableTestResources) {
     const random = Math.random().toString(36).substring(7);
-    mutablePhotosDir = path.resolve(
+    const mutablePhotosDir = path.resolve(
       __dirname,
       `../../output/mutable_test_resources_${random}`,
     );
     await fs.mkdirp(mutablePhotosDir);
-    await fs.copy(originalPhotosDir, mutablePhotosDir);
+    await fs.copy(testResourcesDir(), mutablePhotosDir);
+
+    testConfiguration.add({ photosDir: mutablePhotosDir });
   } else {
-    mutablePhotosDir = originalPhotosDir;
+    testConfiguration.add({ photosDir: testResourcesDir() });
   }
-  return Promise.resolve(testContainer);
 };
 
 const cleanupSuite = async (withMutableTestResources: boolean) => {
   if (withMutableTestResources) {
-    if (mutablePhotosDir != null) {
-      await fs.remove(mutablePhotosDir);
-      mutablePhotosDir = undefined;
-    }
+    await fs.remove(configuration.photosDir);
   }
 };
-
-@injectable()
-class TestConfiguration extends ServerConfiguration {
-  public override photosDir;
-  public override mongodbUri;
-  public override redisUri;
-  public override secureCookie;
-
-  constructor() {
-    super();
-
-    assert(mutablePhotosDir != null, "mutablePhotosDir not set");
-    this.photosDir = mutablePhotosDir;
-
-    // use static mongo URI set in suite initialization
-    this.mongodbUri = mongoUri;
-
-    // don't enable redis for testing
-    this.redisUri = "";
-
-    // tests don't use SSL
-    this.secureCookie = false;
-  }
-}
