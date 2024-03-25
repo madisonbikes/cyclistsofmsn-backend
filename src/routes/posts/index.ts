@@ -12,51 +12,49 @@ import singlePostPut from "./put";
 import singlePostDelete from "./delete";
 import postGet from "./get";
 
-class PostRouter {
-  routes = () => {
-    return (
-      express
-        .Router()
-
-        // all posts
-        .get("/", asyncWrapper(postGet.postListHandler))
-
-        // current post
-        .get("/current", asyncWrapper(postGet.currentPostHandler))
-
-        // specific post
-        .get(
-          "/:id",
-          validateAuthenticated(),
-          validateId(),
-          asyncWrapper(postGet.singlePostHandler),
-        )
-
-        .put(
-          "/:id",
-          validateBodySchema({ schema: singlePostPut.bodySchema }),
-          validateEditor(),
-          validateId(),
-          asyncWrapper(singlePostPut.handler),
-        )
-
-        .delete(
-          "/:id",
-          validateAdmin(),
-          validateId(),
-          asyncWrapper(singlePostDelete.handler),
-        )
-
-        // post create operation is secured by editor role
-        .post("/create", validateEditor(), (_req, res) => {
-          return res.send("Submitted new post");
-        })
-    );
-  };
+function validateEditor() {
+  return validateRole({ role: Roles.EDITOR });
 }
 
-const validateEditor = () => {
-  return validateRole({ role: Roles.EDITOR });
-};
+function routes() {
+  return (
+    express
+      .Router()
 
-export default new PostRouter();
+      // all posts
+      .get("/", asyncWrapper(postGet.postListHandler))
+
+      // current post
+      .get("/current", asyncWrapper(postGet.currentPostHandler))
+
+      // specific post
+      .get(
+        "/:id",
+        validateAuthenticated(),
+        validateId(),
+        asyncWrapper(postGet.singlePostHandler),
+      )
+
+      .put(
+        "/:id",
+        validateBodySchema({ schema: singlePostPut.bodySchema }),
+        validateEditor(),
+        validateId(),
+        asyncWrapper(singlePostPut.handler),
+      )
+
+      .delete(
+        "/:id",
+        validateAdmin(),
+        validateId(),
+        asyncWrapper(singlePostDelete.handler),
+      )
+
+      // post create operation is secured by editor role
+      .post("/create", validateEditor(), (_req, res) => {
+        return res.send("Submitted new post");
+      })
+  );
+}
+
+export default { routes };

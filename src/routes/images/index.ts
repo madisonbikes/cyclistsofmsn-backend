@@ -14,43 +14,41 @@ import singleImageDelete from "./delete";
 import cache from "../cache";
 import imagePut from "./put";
 
-class ImageRouter {
-  routes = () => {
-    return (
-      express
-        .Router()
+function routes() {
+  return (
+    express
+      .Router()
 
-        // all images
-        .get("/", validateAuthenticated(), asyncWrapper(imageGet.listHandler))
+      // all images
+      .get("/", validateAuthenticated(), asyncWrapper(imageGet.listHandler))
 
-        .put(
-          "/:id",
-          validateBodySchema({ schema: imagePut.bodySchema }),
-          validateRole({ role: Roles.EDITOR }),
-          validateId(),
-          asyncWrapper(imagePut.handler),
-        )
+      .put(
+        "/:id",
+        validateBodySchema({ schema: imagePut.bodySchema }),
+        validateRole({ role: Roles.EDITOR }),
+        validateId(),
+        asyncWrapper(imagePut.handler),
+      )
 
-        // single image metadata
-        .get("/:id", validateId(), asyncWrapper(imageGet.metadata))
+      // single image metadata
+      .get("/:id", validateId(), asyncWrapper(imageGet.metadata))
 
-        .delete(
-          "/:id",
-          validateAdmin(),
-          validateId(),
-          asyncWrapper(singleImageDelete.handler),
-        )
+      .delete(
+        "/:id",
+        validateAdmin(),
+        validateId(),
+        asyncWrapper(singleImageDelete.handler),
+      )
 
-        // single image, cached
-        .get(
-          "/:id/binary",
-          cache.middleware({ callNextWhenCacheable: false }),
-          validateId(),
-          validateQuerySchema({ schema: imageGet.querySchema }),
-          asyncWrapper(imageGet.binary),
-        )
-    );
-  };
+      // single image, cached
+      .get(
+        "/:id/binary",
+        cache.middleware({ callNextWhenCacheable: false }),
+        validateId(),
+        validateQuerySchema({ schema: imageGet.querySchema }),
+        asyncWrapper(imageGet.binary),
+      )
+  );
 }
 
-export default new ImageRouter();
+export default { routes };

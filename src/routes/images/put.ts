@@ -8,7 +8,7 @@ import { fsRepository } from "../../fs_repository";
 class ImagePut {
   bodySchema = putImageBodySchema;
 
-  handler = async (req: Request, res: Response) => {
+  async handler(req: Request, res: Response) {
     const body = req.validated as PutImageBody;
 
     const { id } = req.params;
@@ -34,6 +34,6 @@ class ImagePut {
       // not found
       res.sendStatus(404);
     }
-  };
+  }
 }
 export default new ImagePut();

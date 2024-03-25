@@ -31,7 +31,6 @@ module.exports = {
       },
     ],
     eqeqeq: ["warn", "smart"],
-    "func-style": ["warn"],
     "require-await": ["warn"],
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/strict-boolean-expressions": "warn",

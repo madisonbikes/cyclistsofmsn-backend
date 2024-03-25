@@ -4,10 +4,9 @@ import { Lifecycle, logger } from "./utils";
 import { configuration } from "./config";
 import { imageRepositoryScanner } from "./scan";
 import { database } from "./database";
-import apiRouter from "./routes";
 import { createDispatcher } from "./posts/dispatcher";
 import { createPopulate } from "./posts/populate";
-
+import api from "./routes";
 import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { strategies } from "./security";
@@ -76,11 +75,11 @@ export class PhotoServer implements Lifecycle {
       done(null, user);
     });
 
-    app.use(sessionMiddlewareConfigurator.build());
+    app.use(sessionMiddlewareConfigurator());
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use("/api/v1", apiRouter.routes());
+    app.use("/api/v1", api.routes());
 
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");

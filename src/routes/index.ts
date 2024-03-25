@@ -1,4 +1,3 @@
-// router.ts
 /**
  * This has the routes defined.
  */
@@ -9,15 +8,13 @@ import sessionRouter from "./session";
 import tasksRouter from "./tasks";
 
 /** Provide REST API routes for images, posts */
-class MainRouter {
-  routes = () => {
-    return express
-      .Router()
-      .use("/posts", postRouter.routes())
-      .use("/images", imageRouter.routes())
-      .use("/session", sessionRouter.routes())
-      .use("/tasks", tasksRouter.routes());
-  };
+function routes() {
+  return express
+    .Router()
+    .use("/posts", postRouter.routes())
+    .use("/images", imageRouter.routes())
+    .use("/session", sessionRouter.routes())
+    .use("/tasks", tasksRouter.routes());
 }
 
-export default new MainRouter();
+export default { routes };

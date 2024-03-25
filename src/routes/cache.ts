@@ -14,7 +14,7 @@ type MiddlewareOptions = {
   callNextWhenCacheable: boolean;
 };
 
-export class Cache {
+class Cache {
   private memoryCache = new LRUCache<string, Holder>({
     maxSize: CACHE_SIZE,
     sizeCalculation: (holder: Holder): number => {
@@ -28,13 +28,13 @@ export class Cache {
     },
   });
 
-  wrapper = (
+  wrapper(
     fn: (
       req: express.Request,
       res: express.Response,
       next: express.NextFunction,
     ) => Promise<express.Response | void>,
-  ) => {
+  ) {
     return async (
       req: express.Request,
       res: express.Response,
@@ -44,11 +44,11 @@ export class Cache {
       // eslint-disable-next-line promise/no-callback-in-promise
       return fn(req, res, next).catch(next);
     };
-  };
+  }
 
-  middleware = (
+  middleware(
     options: MiddlewareOptions = { callNextWhenCacheable: false },
-  ): RequestHandler => {
+  ): RequestHandler {
     return (
       req: express.Request,
       res: express.Response,
@@ -85,16 +85,15 @@ export class Cache {
       };
       return next();
     };
-  };
+  }
 
-  isCached = (res: express.Response): Promise<boolean> => {
+  isCached(res: express.Response): Promise<boolean> {
     return Promise.resolve(res.get("x-cached-response") === "HIT");
-  };
+  }
 
-  clear = () => {
+  clear() {
     this.memoryCache.clear();
-  };
+  }
 }
 
-const cache = new Cache();
-export default cache;
+export default new Cache();

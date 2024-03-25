@@ -4,29 +4,23 @@ import {
   testRequest,
   TestRequest,
 } from "../../test";
-import { Cache } from "../cache";
 import { imageListSchema } from "../contract";
 import { createTestUser } from "../../test/data";
 import { database } from "../../database";
+import cache from "../cache";
 
 describe("server process - images", () => {
   let request: TestRequest;
-  let cache: Cache;
 
   setupSuite({ withDatabase: true, withPhotoServer: true });
 
   beforeAll(async () => {
-    cache = new Cache();
-
     await createTestUser();
   });
 
   beforeEach(() => {
-    request = testRequest();
-  });
-
-  afterEach(() => {
     cache.clear();
+    request = testRequest();
   });
 
   it("responds to image list api call", async () => {
