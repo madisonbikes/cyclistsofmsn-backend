@@ -126,7 +126,7 @@ class PostDispatcher implements Lifecycle {
   private async selectImage(): Promise<Result<ImageDocument, PostError>> {
     // first, scan repository for new images
     // FIXME This doesn't do what you think it does ben
-    await imageRepositoryScanner.start();
+    await imageRepositoryScanner.scan();
 
     // select image
     const retval = await imageSelector.nextImage();

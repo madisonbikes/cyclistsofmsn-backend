@@ -17,7 +17,7 @@ export function sessionMiddlewareConfigurator() {
       sameSite: configuration.secureCookie ? "strict" : "lax",
     },
   };
-  if (redis.isEnabled()) {
+  if (redis.isEnabled) {
     sessionOptions.store = redis.createStore();
   }
   return session(sessionOptions);

@@ -17,12 +17,11 @@ class RedisConnection implements Lifecycle {
     if (this.started) {
       throw new Error("cannot start multiple redis connection instances");
     }
+    this.started = true;
     if (!this.isEnabled) {
       logger.info("Redis disabled");
       return;
     }
-
-    this.started = true;
 
     this.client = createClient({ url: configuration.redisUri });
     this.client.on("error", (err) => logger.warn(err, "Redis Client Error"));
@@ -33,9 +32,6 @@ class RedisConnection implements Lifecycle {
   }
 
   async stop() {
-    if (!this.isEnabled) {
-      return; // ignore
-    }
     if (!this.started) {
       throw new Error("cannot stop a redis connection that isn't started");
     }
@@ -47,6 +43,9 @@ class RedisConnection implements Lifecycle {
   }
 
   createStore() {
+    if (!this.client) {
+      throw new Error("Redis connection not started");
+    }
     return new RedisStore({ client: this.client });
   }
 }

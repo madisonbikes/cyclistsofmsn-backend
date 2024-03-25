@@ -7,7 +7,11 @@ import pLimit from "p-limit";
 
 /** expose scanning operation.  requires database connection to be established */
 class ImageRepositoryScanner implements Lifecycle {
-  async start() {
+  start() {
+    return this.scan();
+  }
+
+  async scan() {
     const [files, dbFiles] = await Promise.all([
       fsRepository.imageFiles(),
       Image.find().exec(),
@@ -131,4 +135,5 @@ class ImageRepositoryScanner implements Lifecycle {
   }
 }
 
+// singleton hack instead of DI because it's used by other components
 export const imageRepositoryScanner = new ImageRepositoryScanner();
