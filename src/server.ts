@@ -27,15 +27,12 @@ if (require.main === module) {
 }
 
 export class PhotoServer implements Lifecycle {
-  private readonly postDispatcher = createDispatcher();
-  private readonly postPopulate = createPopulate();
-
   constructor() {
     this.components.push(database);
     this.components.push(redis);
     this.components.push(imageRepositoryScanner);
-    this.components.push(this.postDispatcher);
-    this.components.push(this.postPopulate);
+    this.components.push(createDispatcher());
+    this.components.push(createPopulate());
   }
 
   components: Lifecycle[] = [];
