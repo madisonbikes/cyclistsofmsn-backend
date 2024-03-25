@@ -1,10 +1,10 @@
 import { ImageDocument } from "../database";
-import { photoTooter } from "../mastodon/post";
-import { photoTweeter } from "../twitter/post";
+import photoTooter from "../mastodon/post";
+import photoTweeter from "../twitter/post";
 import { logger } from "../utils";
 
 /** responsible for actually posting photos */
-export const post = async (image: ImageDocument) => {
+async function post(image: ImageDocument) {
   if (photoTweeter.isEnabled()) {
     try {
       logger.debug("Twitter enabled");
@@ -23,4 +23,5 @@ export const post = async (image: ImageDocument) => {
       logger.error(e, "Error posting to Mastodon");
     }
   }
-};
+}
+export default { post };

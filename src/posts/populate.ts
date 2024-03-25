@@ -33,7 +33,7 @@ class PostPopulate implements Lifecycle {
     });
   }
 
-  asyncPopulate = async () => {
+  async asyncPopulate() {
     logger.info(`Populating ${POPULATE_COUNT} days of posts`);
     const start = startOfDay(now());
     for (let i = 0; i < POPULATE_COUNT; i++) {
@@ -43,7 +43,7 @@ class PostPopulate implements Lifecycle {
         selectImage: true,
       });
     }
-  };
+  }
 }
 
 export const createPopulate = () => {

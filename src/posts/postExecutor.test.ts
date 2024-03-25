@@ -1,8 +1,8 @@
 import { setupSuite } from "../test";
 import { Image } from "../database";
-import { post } from "./postExecutor";
-import { photoTooter } from "../mastodon/post";
-import { photoTweeter } from "../twitter/post";
+import postExecutor from "./postExecutor";
+import photoTooter from "../mastodon/post";
+import photoTweeter from "../twitter/post";
 
 jest.mock("../mastodon/post");
 jest.mock("../twitter/post");
@@ -23,7 +23,7 @@ describe("test executor component", () => {
       newImage.fs_timestamp = new Date();
       await newImage.save();
 
-      await post(newImage);
+      await postExecutor.post(newImage);
 
       expect(mockPhotoTooter.post).toHaveBeenCalledTimes(1);
       expect(mockPhotoTweeter.post).toHaveBeenCalledTimes(1);

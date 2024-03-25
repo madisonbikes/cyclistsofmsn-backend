@@ -9,7 +9,7 @@ import {
 import now from "../utils/now";
 import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
 import { PostError, schedulePost } from "./postScheduler";
-import { post } from "./postExecutor";
+import postExecutor from "./postExecutor";
 import {
   ImageDocument,
   PostHistoryDocument,
@@ -46,9 +46,7 @@ class PostDispatcher implements Lifecycle {
     });
   }
 
-  // because this method is called by reference above, it must be an arrow function
-  // or the "this" is lost!
-  asyncDispatch = async () => {
+  async asyncDispatch() {
     const scheduledResult = await schedulePost({
       when: new Date(now()),
       selectImage: true,
@@ -92,13 +90,13 @@ class PostDispatcher implements Lifecycle {
 
     if (postImage != null) {
       // execute the post and then if it's sucessful, update the post status
-      await post(postImage);
+      await postExecutor.post(postImage);
 
       nextPost.image = postImage;
       nextPost.status.flag = PostStatus.COMPLETE;
     }
     await nextPost.save();
-  };
+  }
 
   /** returns true if it's time to execute this post, false if it's in the future */
   private isTimeToPost(post: PostHistoryDocument) {
