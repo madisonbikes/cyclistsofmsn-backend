@@ -1,5 +1,12 @@
 # Changes
 
+## [1.0.5](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.4...cyclistsofmsn-backend-v1.0.5) (2024-03-26)
+
+
+### Bug Fixes
+
+* update release to set major/minor release tags ([23ba7e1](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/23ba7e1bcf7dfba84a57b58a7f40c1087d73fda5))
+
 ## [1.0.4](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.3...cyclistsofmsn-backend-v1.0.4) (2024-03-26)
 
 
