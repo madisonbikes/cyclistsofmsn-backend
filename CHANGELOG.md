@@ -1,5 +1,12 @@
 # Changes
 
+## [1.0.4](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.3...cyclistsofmsn-backend-v1.0.4) (2024-03-26)
+
+
+### Bug Fixes
+
+* update pm2 config to run dist and run raw js files ([6e35d87](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6e35d8715a0f115076e77f1f22485ca1126ec1b8))
+
 ## 1.0.3 (2024-03-25)
 
 
