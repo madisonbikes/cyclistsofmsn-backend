@@ -4,9 +4,10 @@
   "compilerOptions": {
     "preserveConstEnums": true,
     "noFallthroughCasesInSwitch": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noImplicitOverride": true,
-    "typeRoots": ["@types", "./node_modules/@types"],
+    "outDir": "dist",
+    "typeRoots": ["@types", "./node_modules/@types"]
   }
 }
