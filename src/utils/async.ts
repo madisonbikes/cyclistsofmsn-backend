@@ -1,7 +1,10 @@
 import { logger } from "./logger";
 
-/** async function is fine for setInterval(), but it should NEVER throw an exception */
-export function safeAsyncWrapper(name: string, fn: () => Promise<void>) {
+/**
+ * Async function is fine for setInterval(), but it should NEVER throw an exception.
+ * This must be an arrow function to preserve the calling context.
+ */
+export const safeAsyncWrapper = (name: string, fn: () => Promise<void>) => {
   // capture calling stack trace
   const stackTrace = Error();
   return async () => {
@@ -12,4 +15,4 @@ export function safeAsyncWrapper(name: string, fn: () => Promise<void>) {
       logger.error(stackTrace, "Source stack trace");
     }
   };
-}
+};

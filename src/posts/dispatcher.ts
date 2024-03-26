@@ -46,7 +46,8 @@ class PostDispatcher implements Lifecycle {
     });
   }
 
-  async asyncDispatch() {
+  // arrow function to preserve calling context
+  private asyncDispatch = async () => {
     const scheduledResult = await schedulePost({
       when: new Date(now()),
       selectImage: true,
@@ -96,7 +97,7 @@ class PostDispatcher implements Lifecycle {
       nextPost.status.flag = PostStatus.COMPLETE;
     }
     await nextPost.save();
-  }
+  };
 
   /** returns true if it's time to execute this post, false if it's in the future */
   private isTimeToPost(post: PostHistoryDocument) {
