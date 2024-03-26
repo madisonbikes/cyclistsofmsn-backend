@@ -3,3 +3,4 @@ output
 jest.config.js
 .eslintrc.js
 ecosystem.config.js
+dist
