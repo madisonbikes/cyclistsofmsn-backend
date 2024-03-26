@@ -1,4 +1,4 @@
-name: Release on github with release-please
+name: Run release-please to generate release PR's and perform releases
 
 on:
   push:
