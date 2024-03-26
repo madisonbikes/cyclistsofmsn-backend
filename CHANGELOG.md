@@ -1,5 +1,12 @@
 # Changes
 
+## [1.0.6](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.5...cyclistsofmsn-backend-v1.0.6) (2024-03-26)
+
+
+### Bug Fixes
+
+* errors related to async dispatcher ([7cf2788](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/7cf27885c4cf01fcb0ef34df3838b0f972576577))
+
 ## [1.0.5](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.4...cyclistsofmsn-backend-v1.0.5) (2024-03-26)
 
 
