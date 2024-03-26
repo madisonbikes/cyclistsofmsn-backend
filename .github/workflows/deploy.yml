@@ -4,7 +4,6 @@
 
 name: Deploy to server
 on:
-  workflow_dispatch:
   release:
     types: [published]
 
@@ -19,6 +18,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Tag published version
+        run: |
+          git tag -a latest -f -m "Published version latest" ${GITHUB_SHA}
+          git push origin latest
 
       - name: Install exiftool
         run: sudo apt-get install -y exiftool
