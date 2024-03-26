@@ -1,5 +1,12 @@
 # Changes
 
+## [1.0.7](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.6...cyclistsofmsn-backend-v1.0.7) (2024-03-26)
+
+
+### Bug Fixes
+
+* don't need ts-node at runtime any more ([102b9b0](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/102b9b04bb51aab3ec17d807a2596f48220666d8))
+
 ## [1.0.6](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.5...cyclistsofmsn-backend-v1.0.6) (2024-03-26)
 
 
