@@ -30,7 +30,7 @@ const parseBooleanWithDefault = (
 };
 
 export const testConfiguration = {
-  reset: function () {
+  reset() {
     if (process.env.NODE_ENV !== "test") {
       throw new Error(
         "overrideConfigurationForTests should only be called in test environment",
