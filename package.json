@@ -64,7 +64,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.2.0",
     "@commitlint/config-conventional": "^19.1.0",
-    "@tsconfig/node20": "^20.1.2",
+    "@tsconfig/node20": "^20.1.4",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
