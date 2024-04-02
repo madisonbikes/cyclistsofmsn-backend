@@ -1,4 +1,4 @@
-name: Run release-please to generate release PR's and perform releases
+name: Run release-please
 
 on:
   push:
