@@ -1,5 +1,16 @@
 # Changes
 
+## [1.0.8](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.7...cyclistsofmsn-backend-v1.0.8) (2024-04-02)
+
+
+### Bug Fixes
+
+* bump date-fns from 3.5.0 to 3.6.0 ([d1ecf6a](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d1ecf6ac187c38ecd8f028d11b566350309a09a5))
+* bump date-fns from 3.5.0 to 3.6.0 ([745a86b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/745a86b099a64bef325688d76b6ab43fcaff932d))
+* bump pino-pretty from 10.3.1 to 11.0.0 ([d47a07f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d47a07fb9550d3bed367898d967a9926a6f2cfd2))
+* bump pino-pretty from 10.3.1 to 11.0.0 ([d2f31db](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d2f31db4896d90c9ce98ab15005a34b5307d8211))
+* more strict lint fixes ([b49a1dc](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/b49a1dc8eaac53f610bd32f33f32f9d9a502646c))
+
 ## [1.0.7](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.6...cyclistsofmsn-backend-v1.0.7) (2024-03-26)
 
 
