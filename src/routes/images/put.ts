@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
 import { Image, ImageDocument } from "../../database";
 import { logger } from "../../utils";
-import { PutImageBody, putImageBodySchema } from "../contract";
+import { putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 import { fsRepository } from "../../fs_repository";
+import { z } from "zod";
 
 class ImagePut {
   bodySchema = putImageBodySchema;
 
-  async handler(req: Request, res: Response) {
-    const body = req.validated as PutImageBody;
+  handler = async (req: Request, res: Response) => {
+    const body = req.validated as z.infer<typeof putImageBodySchema>;
 
     const { id } = req.params;
     logger.trace({ id, body }, "put single image");
@@ -34,6 +35,6 @@ class ImagePut {
       // not found
       res.sendStatus(404);
     }
-  }
+  };
 }
 export default new ImagePut();

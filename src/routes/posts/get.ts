@@ -4,16 +4,16 @@ import { Request, Response } from "express";
 import { logger } from "../../utils";
 
 class PostGet {
-  async currentPostHandler(_req: Request, res: Response) {
+  currentPostHandler = async (_req: Request, res: Response) => {
     const post = await PostHistory.findLatestPost();
     if (post != null) {
       return res.send(mapPostSchema.parse(post));
     } else {
       return res.sendStatus(404);
     }
-  }
+  };
 
-  async singlePostHandler(req: Request, res: Response) {
+  singlePostHandler = async (req: Request, res: Response) => {
     const { id } = req.params;
     logger.debug(`loading post ${id}`);
     const post = await PostHistory.findById(id);
@@ -24,13 +24,13 @@ class PostGet {
     } else {
       return res.sendStatus(404);
     }
-  }
+  };
 
-  async postListHandler(_req: Request, res: Response) {
+  postListHandler = async (_req: Request, res: Response) => {
     const posts = await PostHistory.findOrderedPosts();
     const parsed = mapPostSchema.array().parse(posts);
     logger.trace({ posts: parsed }, "returned posts");
     return res.send(parsed);
-  }
+  };
 }
 export default new PostGet();

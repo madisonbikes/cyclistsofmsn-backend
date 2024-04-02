@@ -16,6 +16,7 @@ import {
 import { configuration } from "../config";
 import { SchedulePostOptions } from "../routes/contract";
 import now from "../utils/now";
+import { ObjectId } from "mongodb";
 
 jest.mock("../utils/random");
 jest.mock("../utils/now");
@@ -89,7 +90,7 @@ describe("test schedule component", () => {
       await newImage.save();
 
       const newPost = new PostHistory();
-      newPost.image = newImage.id;
+      newPost.image = newImage._id;
       newPost.status.flag = PostStatus.COMPLETE;
       newPost.timestamp = date_set(startOfYesterday(), { hours: 10 });
       await newPost.save();
@@ -134,7 +135,7 @@ describe("test schedule component", () => {
       await newImage.save();
 
       const newPost = new PostHistory();
-      newPost.image = newImage.id;
+      newPost.image = newImage._id;
       newPost.status.flag = PostStatus.COMPLETE;
       newPost.timestamp = date_set(startOfToday(), {
         hours: configuration.firstPostHour,
@@ -188,7 +189,7 @@ describe("test schedule component", () => {
       await newImage.save();
 
       const newPost = new PostHistory();
-      newPost.image = newImage.id;
+      newPost.image = newImage._id;
       newPost.status.flag = PostStatus.PENDING;
       newPost.timestamp = date_set(startOfToday(), { hours: 10, minutes: 15 });
       await newPost.save();
@@ -250,14 +251,14 @@ describe("test schedule component", () => {
   });
 
   describe("image selection options", () => {
-    let imageId = "";
+    let imageId: ObjectId;
 
     beforeEach(async () => {
       const newImage = new Image();
       newImage.filename = "blarg";
       newImage.fs_timestamp = new Date();
       await newImage.save();
-      imageId = newImage.id;
+      imageId = newImage._id;
     });
 
     it("successfully select image", async () => {
@@ -270,7 +271,8 @@ describe("test schedule component", () => {
         selectImage: true,
       });
       assertOk(result);
-      expect(result.value.image?.id).toEqual(imageId);
+      const id = result.value.image?._id;
+      expect(id).toEqual(imageId);
     });
 
     it("successfully defer image selection", async () => {

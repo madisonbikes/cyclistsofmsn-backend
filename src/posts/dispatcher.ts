@@ -75,7 +75,7 @@ class PostDispatcher implements Lifecycle {
     let postImage: ImageDocument | null = null;
     if (nextPost.image != null) {
       // use existing selected image, if it exists
-      const { id } = nextPost.image;
+      const id = nextPost.image._id;
       postImage = await Image.findById(id);
     }
     if (postImage == null) {
@@ -102,7 +102,7 @@ class PostDispatcher implements Lifecycle {
   /** returns true if it's time to execute this post, false if it's in the future */
   private isTimeToPost(post: PostHistoryDocument) {
     const when = now() - post.timestamp.getTime();
-    if (post.status.flag !== PostStatus.PENDING) {
+    if (post.status.flag !== PostStatus.PENDING.toString()) {
       logger.warn({ post }, "isTimeToPost expects PENDING posts only");
       return false;
     }

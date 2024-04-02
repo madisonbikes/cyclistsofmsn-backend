@@ -67,7 +67,7 @@ export class PhotoServer implements Lifecycle {
     });
 
     passport.deserializeUser<string>((data, done) => {
-      const user = JSON.parse(data);
+      const user = JSON.parse(data) as unknown as Express.User;
       logger.trace(user, "deserialize user");
       done(null, user);
     });

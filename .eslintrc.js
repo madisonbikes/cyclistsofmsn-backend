@@ -7,7 +7,7 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:promise/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
@@ -33,6 +33,12 @@ module.exports = {
     eqeqeq: ["warn", "smart"],
     "require-await": ["warn"],
     "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        checksVoidReturn: false,
+      },
+    ],
     "@typescript-eslint/strict-boolean-expressions": "warn",
   },
 };

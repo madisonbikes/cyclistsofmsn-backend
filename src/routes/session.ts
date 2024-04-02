@@ -1,4 +1,4 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import passport from "passport";
 import { validateBodySchema, validateAuthenticated } from "../security";
 import { loginBodySchema, AuthenticatedUser } from "./contract";
@@ -9,7 +9,10 @@ function routes() {
     .post(
       "/login",
       validateBodySchema({ schema: loginBodySchema }),
-      passport.authenticate("local", { session: true, failWithError: false }),
+      passport.authenticate("local", {
+        session: true,
+        failWithError: false,
+      }) as unknown as RequestHandler,
       (request, response) => {
         const user = request.user as AuthenticatedUser;
         response.send(user);

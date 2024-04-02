@@ -89,7 +89,7 @@ describe("server process - images", () => {
     const missingImage = await createMissingImage();
 
     return request
-      .get(`/api/v1/images/${missingImage.insertedId}/binary`)
+      .get(`/api/v1/images/${missingImage.insertedId.toString()}/binary`)
       .expect(404);
   });
 
@@ -97,7 +97,7 @@ describe("server process - images", () => {
     const missingImage = await createMissingImage();
 
     return request
-      .get(`/api/v1/images/${missingImage.insertedId}`)
+      .get(`/api/v1/images/${missingImage.insertedId.toString()}`)
       .expect(200)
       .expect((res) =>
         expect(res.body).toEqual(

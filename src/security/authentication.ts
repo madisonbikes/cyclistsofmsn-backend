@@ -22,7 +22,7 @@ export const userHasRole = (user: AuthenticatedUser, role: string) => {
 
 export const localMiddleware = passport.authenticate("local", {
   session: true,
-});
+}) as unknown;
 
 export type ExpressMiddleware = (
   request: Request,

@@ -74,7 +74,10 @@ async function postToot(options: TootPostOptions): Promise<string> {
       );
     }
 
-    logger.debug({ response: mediaResponse.body }, `Uploaded media response`);
+    logger.debug(
+      { response: mediaResponse.body as unknown },
+      `Uploaded media response`,
+    );
 
     const { id } = mediaUploadResponseSchema.parse(mediaResponse.body);
     mediaId = [id];
@@ -98,7 +101,10 @@ async function postToot(options: TootPostOptions): Promise<string> {
     throw new Error(`Post status error: ${JSON.stringify(tootResponse.body)}`);
   }
 
-  logger.debug({ response: tootResponse.body }, `Posted status response`);
+  logger.debug(
+    { response: tootResponse.body as unknown },
+    `Posted status response`,
+  );
   return statusUpdateResponseSchema.parse(tootResponse.body).id;
 }
 

@@ -70,7 +70,9 @@ describe("server process - images", () => {
     let checkImage = await Image.findById(testImageId);
     expect(checkImage).not.toBeNull();
 
-    await request.delete(`/api/v1/images/${testImageId}`).expect(200);
+    await request
+      .delete(`/api/v1/images/${testImageId.toString()}`)
+      .expect(200);
 
     checkImage = await Image.findById(testImageId);
     expect(checkImage).toBeNull();
@@ -95,7 +97,9 @@ describe("server process - images", () => {
     expect(checkPost?.image).toBeDefined();
 
     // delete the image
-    await request.delete(`/api/v1/images/${testImageId}`).expect(200);
+    await request
+      .delete(`/api/v1/images/${testImageId.toString()}`)
+      .expect(200);
 
     // image should not exist
     checkImage = await Image.findById(testImageId);
@@ -113,7 +117,7 @@ describe("server process - images", () => {
       description_from_exif: false,
     });
     await newImage.save();
-    return newImage.id;
+    return newImage._id.toString();
   };
 
   /** create a test post with the supplied image id */
@@ -124,6 +128,6 @@ describe("server process - images", () => {
       status: { flag: "pending" },
     });
     await newPost.save();
-    return newPost.id;
+    return newPost._id.toString();
   };
 });

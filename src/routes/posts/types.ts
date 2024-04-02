@@ -15,14 +15,14 @@ export const mapPostSchema = z.preprocess((p) => {
   let retval: Post;
   if (isDocument(post.image)) {
     retval = {
-      id: post.id,
+      id: post.id as unknown as string,
       timestamp: post.timestamp,
       imageid: post.image._id?.toString() ?? undefined,
       status,
     };
   } else {
     retval = {
-      id: post.id,
+      id: post.id as unknown as string,
       timestamp: post.timestamp,
       imageid: post.image?.toString() ?? undefined,
       status,

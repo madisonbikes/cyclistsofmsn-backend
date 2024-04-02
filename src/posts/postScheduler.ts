@@ -30,8 +30,9 @@ export const schedulePost = async ({
         logger.warn(
           {
             matchingPosts,
+            when,
           },
-          `More than one post scheduled for timestamp ${when}`,
+          "More than one post scheduled for timestamp",
         );
       }
       const firstPost = matchingPosts[0];

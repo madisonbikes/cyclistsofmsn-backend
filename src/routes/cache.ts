@@ -81,6 +81,7 @@ class Cache {
           statusCode: res.statusCode,
         });
         boundSend(body);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return body;
       };
       return next();

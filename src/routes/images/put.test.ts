@@ -63,7 +63,7 @@ describe("server process - images", () => {
     const goodImageId = await getGoodImageId();
 
     await request
-      .put(`/api/v1/images/${goodImageId}`)
+      .put(`/api/v1/images/${goodImageId?.toString()}`)
       .send({ description: "blarg" })
       .expect(200)
       .expect(/blarg/);
@@ -81,7 +81,7 @@ describe("server process - images", () => {
     const goodImageId = await getGoodImageId();
 
     await request
-      .put(`/api/v1/images/${goodImageId}`)
+      .put(`/api/v1/images/${goodImageId?.toString()}`)
       .send({ hidden: true })
       .expect(200);
 

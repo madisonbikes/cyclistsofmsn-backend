@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* istanbul ignore file */
 import { ConnectionString } from "connection-string";
 import pino, { Logger, stdSerializers, TransportTargetOptions } from "pino";
