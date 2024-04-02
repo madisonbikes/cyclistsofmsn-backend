@@ -1,5 +1,12 @@
 # Changes
 
+## [1.0.9](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.8...cyclistsofmsn-backend-v1.0.9) (2024-04-02)
+
+
+### Bug Fixes
+
+* ecosystem startup uses wrong path ([bd22a2f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/bd22a2fa0af7a1957d0e97ae7b00437c5db7e020))
+
 ## [1.0.8](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.7...cyclistsofmsn-backend-v1.0.8) (2024-04-02)
 
 
