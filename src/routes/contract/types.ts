@@ -36,6 +36,7 @@ export const postStatusSchema = z.object({
   error: z.string().optional(),
   uri: z.string().optional(),
 });
+export type PostStatus = z.infer<typeof postStatusSchema>;
 
 const mutablePostSchema = z.object({
   timestamp: z.coerce.date(),
