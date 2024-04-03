@@ -74,3 +74,8 @@ export const schedulePostOptionsSchema = z.object({
   selectImage: z.boolean().default(true).optional(),
 });
 export type SchedulePostOptions = z.infer<typeof schedulePostOptionsSchema>;
+
+export const getInfoSchema = z.object({
+  version: z.string(),
+});
+export type GetInfo = z.infer<typeof getInfoSchema>;
