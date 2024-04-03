@@ -1,4 +1,5 @@
 import { setupSuite, testRequest, TestRequest } from "../test";
+import { GetInfo } from "./contract";
 
 describe("info route", () => {
   let request: TestRequest;
@@ -14,7 +15,7 @@ describe("info route", () => {
       .get("/api/v1/info")
       .expect(200)
       .expect((res) => {
-        expect(res.body).toEqual({ version: "dev" });
+        expect(res.body).toEqual({ version: "dev" } satisfies GetInfo);
       });
   });
 });
