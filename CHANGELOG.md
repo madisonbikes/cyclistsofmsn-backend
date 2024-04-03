@@ -1,5 +1,12 @@
 # Changes
 
+## [1.1.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.9...cyclistsofmsn-backend-v1.1.0) (2024-04-03)
+
+
+### Features
+
+* add backend version number api ([4bf6790](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/4bf67908f591f18d5c9b3d663bbfb8146dfebefb))
+
 ## [1.0.9](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.8...cyclistsofmsn-backend-v1.0.9) (2024-04-02)
 
 
