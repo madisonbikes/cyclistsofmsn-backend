@@ -19,12 +19,14 @@ import {
 import { imageSelector } from "./selection/selector";
 import { imageRepositoryScanner } from "../scan";
 
-/** dispatch posts every five minutes */
+// five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;
+// five seconds
 const DISPATCH_DELAY = 5 * 1000;
 
 /**
- * The post dispatcher is responsible for orchestrating posting photos.
+ * The post dispatcher is responsible for orchestrating posting photos (runs every
+ * five minutes or so after a five second delay)
  */
 class PostDispatcher implements Lifecycle {
   private scheduled: Array<Cancellable | undefined> = [];
@@ -79,6 +81,9 @@ class PostDispatcher implements Lifecycle {
       postImage = await Image.findById(id);
     }
     if (postImage == null) {
+      logger.info("Scanning for new images");
+      await imageRepositoryScanner.scan();
+
       // or generate a new image
       const checkImage = await this.selectImage();
       if (checkImage.isOk()) {
@@ -125,10 +130,6 @@ class PostDispatcher implements Lifecycle {
   }
 
   private async selectImage(): Promise<Result<ImageDocument, PostError>> {
-    // first, scan repository for new images
-    // FIXME This doesn't do what you think it does ben
-    await imageRepositoryScanner.scan();
-
     // select image
     const retval = await imageSelector.nextImage();
     if (retval.isError()) {

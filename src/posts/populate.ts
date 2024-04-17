@@ -3,6 +3,7 @@ import now from "../utils/now";
 import { add as date_add, startOfDay } from "date-fns";
 import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
 import { schedulePost } from "./postScheduler";
+import { imageRepositoryScanner } from "../scan";
 
 /** future-populate very 6 hours */
 const POPULATE_INTERVAL = 6 * 60 * 60 * 1000;
@@ -34,7 +35,11 @@ class PostPopulate implements Lifecycle {
   }
 
   private asyncPopulate = async () => {
+    logger.info("Scanning for new images");
+    await imageRepositoryScanner.scan();
+
     logger.info(`Populating ${POPULATE_COUNT} days of posts`);
+
     const start = startOfDay(now());
     for (let i = 0; i < POPULATE_COUNT; i++) {
       const when = date_add(start, { days: i });

@@ -2,10 +2,17 @@ import { setupSuite } from "../test";
 import { error } from "../utils";
 import { createPopulate } from "./populate";
 import { schedulePost } from "./postScheduler";
+import { imageRepositoryScanner } from "../scan";
 
+// mock out the post scheduler
 jest.mock("./postScheduler");
 const mockSchedulePost = jest.mocked(schedulePost);
 mockSchedulePost.mockResolvedValue(error({ message: "mocked" }));
+
+// mock out the image scanner
+jest.mock("../scan");
+const mockScanner = jest.mocked(imageRepositoryScanner);
+mockScanner.scan.mockResolvedValue(undefined);
 
 describe("post populate component", () => {
   setupSuite({ withDatabase: true });
