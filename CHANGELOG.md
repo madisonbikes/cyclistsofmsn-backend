@@ -1,5 +1,12 @@
 # Changes
 
+## [1.1.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.1.0...cyclistsofmsn-backend-v1.1.1) (2024-04-17)
+
+
+### Bug Fixes
+
+* scan for new files when populating posts ([a922177](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a9221779b37e826c09f5c44b062d225810ce22df))
+
 ## [1.1.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.0.9...cyclistsofmsn-backend-v1.1.0) (2024-04-03)
 
 
