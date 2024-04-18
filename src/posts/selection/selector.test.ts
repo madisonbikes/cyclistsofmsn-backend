@@ -2,7 +2,7 @@ import { assertError, setupSuite } from "../../test";
 import { Image, ImageDocument, PostHistory } from "../../database";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
-import { imageSelector } from "./selector";
+import imageSelector from "./selector";
 
 jest.mock("../../utils/random");
 

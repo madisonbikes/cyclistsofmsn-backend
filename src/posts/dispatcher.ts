@@ -16,7 +16,7 @@ import {
   PostStatus,
   Image,
 } from "../database";
-import { imageSelector } from "./selection/selector";
+import imageSelector from "./selection/selector";
 import { imageRepositoryScanner } from "../scan";
 
 // five minutes

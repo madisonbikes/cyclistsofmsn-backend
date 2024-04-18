@@ -10,7 +10,7 @@ import { error, logger, ok, Result } from "../utils";
 import { randomInt } from "../utils/random";
 import now from "../utils/now";
 import { SchedulePostOptions } from "../routes/contract";
-import { imageSelector } from "./selection/selector";
+import imageSelector from "./selection/selector";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
 export type PostError = { message: string; critical?: boolean };
