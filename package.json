@@ -6,7 +6,7 @@
   "main": "src/server.ts",
   "scripts": {
     "start": "ts-node src/server.ts",
-    "build": "tsc --noEmit",
+    "compile": "tsc --noEmit",
     "dist": "tsc && npm run genversion",
     "dev": "ts-node-dev --inspect -- src/server.ts",
     "migration:imagedescription": "ts-node src/tools/updatefilemetadata.ts",
