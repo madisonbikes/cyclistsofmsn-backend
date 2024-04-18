@@ -1,5 +1,5 @@
 import { database, Image } from "../database";
-import { fsRepository } from "../fs_repository";
+import fsRepository from "../fs_repository";
 import { logger } from "../utils";
 import pLimit from "p-limit";
 
@@ -33,7 +33,7 @@ export const updateFileMetadata = async () => {
       limit(async () => {
         const base = image.filename;
         logger.debug(`Updating description for ${base}`);
-        const retval = await fsRepository.updateImageDescription(
+        const retval = await fsRepository.updatePhotoDescription(
           base,
           image.description ?? "",
         );

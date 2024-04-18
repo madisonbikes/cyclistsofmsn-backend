@@ -4,23 +4,21 @@ import { logger } from "../../utils";
 import { PutPostBody, putPostBodySchema } from "../contract";
 import { mapPostSchema } from "./types";
 
-class PostPut {
-  bodySchema = putPostBodySchema;
+const bodySchema = putPostBodySchema;
 
-  handler = async (req: Request, res: Response) => {
-    const body = req.validated as PutPostBody;
+const handler = async (req: Request, res: Response) => {
+  const body = req.validated as PutPostBody;
 
-    const { id } = req.params;
-    logger.trace({ id, body }, "put single post");
+  const { id } = req.params;
+  logger.trace({ id, body }, "put single post");
 
-    const result = await PostHistory.findByIdAndUpdate(id, body, { new: true });
-    if (result != null) {
-      res.send(mapPostSchema.parse(result));
-    } else {
-      // not found
-      res.sendStatus(404);
-    }
-  };
-}
+  const result = await PostHistory.findByIdAndUpdate(id, body, { new: true });
+  if (result != null) {
+    res.send(mapPostSchema.parse(result));
+  } else {
+    // not found
+    res.sendStatus(404);
+  }
+};
 
-export default new PostPut();
+export default { bodySchema, handler };

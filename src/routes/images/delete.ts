@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Image, PostHistory } from "../../database";
-import { fsRepository } from "../../fs_repository";
+import fsRepository from "../../fs_repository";
 import { logger } from "../../utils";
 import pLimit from "p-limit";
 
@@ -22,7 +22,7 @@ async function handler(req: Request, res: Response) {
   const { filename } = result.value;
   if (filename != null) {
     const fullPath = fsRepository.photoPath(filename);
-    await fsRepository.delete(fullPath);
+    await fsRepository.deletePhoto(fullPath);
   }
 
   const postList = await PostHistory.find({ image: id });

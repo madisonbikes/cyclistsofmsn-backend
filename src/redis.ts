@@ -1,54 +1,49 @@
 import { configuration } from "./config";
 import RedisStore from "connect-redis";
 import { createClient, RedisClientType } from "redis";
-import { logger, Lifecycle, maskUriPassword } from "./utils";
+import { logger, maskUriPassword } from "./utils";
 
-class RedisConnection implements Lifecycle {
-  private client?: RedisClientType;
-  private started = false;
+let client: RedisClientType | undefined;
+let started = false;
 
-  get isEnabled() {
-    return (
-      configuration.redisUri !== undefined && configuration.redisUri !== ""
-    );
+function isEnabled() {
+  return configuration.redisUri !== undefined && configuration.redisUri !== "";
+}
+
+async function start() {
+  if (started) {
+    throw new Error("cannot start multiple redis connection instances");
+  }
+  started = true;
+  if (!isEnabled()) {
+    logger.info("Redis disabled");
+    return;
   }
 
-  async start() {
-    if (this.started) {
-      throw new Error("cannot start multiple redis connection instances");
-    }
-    this.started = true;
-    if (!this.isEnabled) {
-      logger.info("Redis disabled");
-      return;
-    }
+  client = createClient({ url: configuration.redisUri });
+  client.on("error", (err) => logger.warn(err, "Redis Client Error"));
+  logger.info(
+    `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
+  );
+  await client.connect();
+}
 
-    this.client = createClient({ url: configuration.redisUri });
-    this.client.on("error", (err) => logger.warn(err, "Redis Client Error"));
-    logger.info(
-      `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
-    );
-    await this.client.connect();
+async function stop() {
+  if (!started) {
+    throw new Error("cannot stop a redis connection that isn't started");
   }
-
-  async stop() {
-    if (!this.started) {
-      throw new Error("cannot stop a redis connection that isn't started");
-    }
-    this.started = false;
-    if (this.client !== undefined) {
-      await this.client.disconnect();
-      this.client = undefined;
-    }
-  }
-
-  createStore() {
-    if (!this.client) {
-      throw new Error("Redis connection not started");
-    }
-    return new RedisStore({ client: this.client });
+  started = false;
+  if (client !== undefined) {
+    await client.disconnect();
+    client = undefined;
   }
 }
 
-// singleton hack because we don't have good DI
-export const redis = new RedisConnection();
+function createStore() {
+  if (!client) {
+    throw new Error("Redis connection not started");
+  }
+  return new RedisStore({ client });
+}
+
+export default { isEnabled, start, stop, createStore };

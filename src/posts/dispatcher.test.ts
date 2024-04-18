@@ -1,6 +1,6 @@
 import { setupSuite } from "../test";
 import { error } from "../utils";
-import { createDispatcher } from "./dispatcher";
+import dispatcher from "./dispatcher";
 import { schedulePost } from "./postScheduler";
 jest.mock("./postScheduler");
 const mockSchedulePost = jest.mocked(schedulePost);
@@ -18,7 +18,6 @@ describe("post dispatcher component", () => {
   });
 
   it("starts", async () => {
-    const dispatcher = createDispatcher();
     dispatcher.start();
     expect(jest.getTimerCount()).toBe(1);
 

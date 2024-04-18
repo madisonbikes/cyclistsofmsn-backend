@@ -2,15 +2,15 @@ import http, { Server } from "http";
 import cors from "cors";
 import { Lifecycle, logger } from "./utils";
 import { configuration } from "./config";
-import { imageRepositoryScanner } from "./scan";
+import imageRepositoryScanner from "./scan";
 import { database } from "./database";
-import { createDispatcher } from "./posts/dispatcher";
-import { createPopulate } from "./posts/populate";
+import dispatcher from "./posts/dispatcher";
+import populate from "./posts/populate";
 import api from "./routes";
 import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { strategies } from "./security";
-import { redis } from "./redis";
+import redis from "./redis";
 import { sessionMiddlewareConfigurator } from "./session";
 
 /** expose command-line launcher */
@@ -31,8 +31,8 @@ export class PhotoServer implements Lifecycle {
     this.components.push(database);
     this.components.push(redis);
     this.components.push(imageRepositoryScanner);
-    this.components.push(createDispatcher());
-    this.components.push(createPopulate());
+    this.components.push(dispatcher);
+    this.components.push(populate);
   }
 
   components: Lifecycle[] = [];

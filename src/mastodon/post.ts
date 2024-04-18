@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import { configuration } from "../config";
 import sharp from "sharp";
-import { fsRepository } from "../fs_repository";
+import fsRepository from "../fs_repository";
 import request from "superagent";
 import crypto from "crypto";
 import { logger } from "../utils";

@@ -5,58 +5,67 @@ import path from "path";
 import sharp from "sharp";
 import { updateImageDescription } from "../exiftool";
 
-class FilesystemRepository {
-  get baseDirectory() {
-    return configuration.photosDir;
-  }
+function baseDirectory() {
+  return configuration.photosDir;
+}
 
-  /** return list of base paths inside the fs repository. treat these as opaque tokens. */
-  async imageFiles() {
-    const files = await fs.readdir(this.baseDirectory);
-    const filteredFiles = files.filter((value) => {
-      const extension = path.parse(value).ext.toLowerCase();
-      return [".jpg", ".png"].includes(extension);
-    });
-    return filteredFiles;
-  }
+/** return list of base paths inside the fs repository. treat these as opaque tokens. */
+async function photoFiles() {
+  const files = await fs.readdir(baseDirectory());
+  const filteredFiles = files.filter((value) => {
+    const extension = path.parse(value).ext.toLowerCase();
+    return [".jpg", ".png"].includes(extension);
+  });
+  return filteredFiles;
+}
 
-  async tags(baseFilename: string) {
-    const path = this.photoPath(baseFilename);
-    const fileData = await fs.readFile(path);
-    const tags = load(fileData, { expanded: true });
-    return tags;
-  }
+async function tags(baseFilename: string) {
+  const path = photoPath(baseFilename);
+  const fileData = await fs.readFile(path);
+  const tags = load(fileData, { expanded: true });
+  return tags;
+}
 
-  async metadata(baseFilename: string) {
-    const path = this.photoPath(baseFilename);
-    const md = await sharp(path).metadata();
-    return { width: md.width, height: md.height };
-  }
+async function metadata(baseFilename: string) {
+  const path = photoPath(baseFilename);
+  const md = await sharp(path).metadata();
+  return { width: md.width, height: md.height };
+}
 
-  async timestamp(baseFilename: string) {
-    const path = this.photoPath(baseFilename);
-    const stat = await fs.stat(path);
-    return stat.mtime;
-  }
+async function timestamp(baseFilename: string) {
+  const path = photoPath(baseFilename);
+  const stat = await fs.stat(path);
+  return stat.mtime;
+}
 
-  photoPath(baseFilename: string) {
-    return `${this.baseDirectory}/${baseFilename}`;
-  }
+function photoPath(baseFilename: string) {
+  return `${baseDirectory()}/${baseFilename}`;
+}
 
-  async delete(baseFilename: string) {
-    try {
-      const path = this.photoPath(baseFilename);
-      await fs.unlink(path);
-    } catch (err) {
-      // ignore
-      return Promise.resolve();
-    }
-  }
-
-  async updateImageDescription(baseFilename: string, description: string) {
-    const originalFile = this.photoPath(baseFilename);
-    return await updateImageDescription(originalFile, description);
+async function deletePhoto(baseFilename: string) {
+  try {
+    const path = photoPath(baseFilename);
+    await fs.unlink(path);
+  } catch (err) {
+    // ignore
+    return Promise.resolve();
   }
 }
 
-export const fsRepository = new FilesystemRepository();
+async function updatePhotoDescription(
+  baseFilename: string,
+  description: string,
+) {
+  const originalFile = photoPath(baseFilename);
+  return await updateImageDescription(originalFile, description);
+}
+
+export default {
+  photoFiles,
+  photoPath,
+  tags,
+  metadata,
+  timestamp,
+  deletePhoto,
+  updatePhotoDescription,
+};

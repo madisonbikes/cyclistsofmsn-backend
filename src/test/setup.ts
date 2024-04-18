@@ -4,7 +4,7 @@ import path from "path";
 import { database } from "../database";
 import { PhotoServer } from "../server";
 import { Server } from "./request";
-import { imageRepositoryScanner } from "../scan";
+import imageRepositoryScanner from "../scan";
 import fs from "fs-extra";
 
 export let photoServer: PhotoServer | undefined;

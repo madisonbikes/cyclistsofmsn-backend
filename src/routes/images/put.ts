@@ -3,7 +3,7 @@ import { Image, ImageDocument } from "../../database";
 import { logger } from "../../utils";
 import { putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
-import { fsRepository } from "../../fs_repository";
+import fsRepository from "../../fs_repository";
 import { z } from "zod";
 
 class ImagePut {
@@ -24,7 +24,7 @@ class ImagePut {
         newValue?.description != null
       ) {
         // if the description changes, update the exif on the image
-        await fsRepository.updateImageDescription(
+        await fsRepository.updatePhotoDescription(
           oldValue.filename,
           newValue?.description,
         );

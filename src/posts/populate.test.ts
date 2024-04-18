@@ -1,8 +1,8 @@
 import { setupSuite } from "../test";
 import { error } from "../utils";
-import { createPopulate } from "./populate";
+import populate from "./populate";
 import { schedulePost } from "./postScheduler";
-import { imageRepositoryScanner } from "../scan";
+import imageRepositoryScanner from "../scan";
 
 // mock out the post scheduler
 jest.mock("./postScheduler");
@@ -26,7 +26,6 @@ describe("post populate component", () => {
   });
 
   it("starts", async () => {
-    const populate = createPopulate();
     populate.start();
     await jest.advanceTimersByTimeAsync(45000);
     expect(jest.getTimerCount()).toBe(1);

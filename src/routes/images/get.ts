@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Image } from "../../database";
-import { fsRepository } from "../../fs_repository";
+import fsRepository from "../../fs_repository";
 import { access } from "fs/promises";
 import { constants } from "fs";
 import sharp from "sharp";

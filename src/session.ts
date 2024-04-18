@@ -1,5 +1,5 @@
 import { configuration } from "./config";
-import { redis } from "./redis";
+import redis from "./redis";
 import session from "express-session";
 
 const COOKIE_MAX_AGE_DAYS = 7;
@@ -17,7 +17,7 @@ export function sessionMiddlewareConfigurator() {
       sameSite: configuration.secureCookie ? "strict" : "lax",
     },
   };
-  if (redis.isEnabled) {
+  if (redis.isEnabled()) {
     sessionOptions.store = redis.createStore();
   }
   return session(sessionOptions);
