@@ -1,5 +1,29 @@
 # Changes
 
+## [1.1.2](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.1.1...cyclistsofmsn-backend-v1.1.2) (2024-07-01)
+
+
+### Bug Fixes
+
+* bump @typegoose/typegoose from 12.2.0 to 12.4.0 ([51b3920](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/51b39206bdbbc6876dbbadf44de184cb483ab011))
+* bump @typegoose/typegoose from 12.4.0 to 12.5.0 ([e12a5c1](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e12a5c1f264ada7a92be16b1e1c628517ac26253))
+* bump exifreader from 4.21.1 to 4.22.1 ([a156d19](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a156d190016841380d5a89bf7fc5d724ed2b8887))
+* bump exifreader from 4.22.1 to 4.23.2 ([8532744](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/85327446805b1686f367b3aff0a3d2d9317e349f))
+* bump exifreader from 4.23.2 to 4.23.3 ([f058326](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/f058326f2efbbe9a81dde8974fa8366605f40296))
+* bump lru-cache from 10.2.0 to 10.2.2 ([256d7d0](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/256d7d0057fa7c1c86b06f068689ef83baeec75e))
+* bump lru-cache from 10.2.2 to 10.3.0 ([488d2a4](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/488d2a4a1380bf528fb15a0f9308012096be01a9))
+* bump pino from 8.19.0 to 9.0.0 ([5f51ea9](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5f51ea9ac25e1c1df127e48c00251223ee88ab2e))
+* bump pino from 9.0.0 to 9.1.0 ([790b1a5](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/790b1a5fe874c02015fbaa69af79c466515c2dc6))
+* bump pino from 9.1.0 to 9.2.0 ([d271c3d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d271c3d061d618fb7fcb2d9b99c627c26786fb97))
+* bump pino-pretty from 11.0.0 to 11.1.0 ([df2ed7b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/df2ed7b1fa349a67a7168ca3de01c4f8d61766fb))
+* bump pino-pretty from 11.1.0 to 11.2.1 ([5403718](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5403718e5b7c70b4e869765cfccbcf000f140bb3))
+* bump pm2 from 5.3.1 to 5.4.0 ([ff7f2c5](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ff7f2c5c040826e76f5a0865d9fa5ea9b4022f26))
+* bump pm2 from 5.4.0 to 5.4.1 ([4e7fae0](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/4e7fae080acd980eb0de40ca1a781892c4bc1c19))
+* bump redis from 4.6.13 to 4.6.14 ([11ebb48](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/11ebb4893cdbbc48feb28d1e827f17421364578b))
+* bump superagent from 8.1.2 to 9.0.2 ([ce6a76d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ce6a76d4ef4f7f59ac06e312d7e8f4a8ad75da7d))
+* bump zod from 3.22.4 to 3.23.5 ([5c0ad52](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5c0ad52c98551642bbb77fee11553816e1d6b967))
+* bump zod from 3.23.5 to 3.23.8 ([e4fa50d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e4fa50d310b45bb1de8a3f352f83f961c900c4d4))
+
 ## [1.1.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.1.0...cyclistsofmsn-backend-v1.1.1) (2024-04-17)
 
 
