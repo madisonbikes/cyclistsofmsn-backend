@@ -48,7 +48,7 @@
     "passport-local": "^1.0.0",
     "pino": "^9.3.2",
     "pino-pretty": "^11.2.2",
-    "pm2": "^5.4.1",
+    "pm2": "^5.4.2",
     "promisify-child-process": "^4.1.2",
     "readline-sync": "^1.4.10",
     "redis": "^4.7.0",
