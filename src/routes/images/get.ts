@@ -41,7 +41,7 @@ class ImageGet {
     // FIXME let's find a better pattern for this instead of tight try/catch
     try {
       await access(imageFile, constants.R_OK);
-    } catch (err) {
+    } catch (_err) {
       logger.info(
         { imageFile },
         `Requested file not found in image repository`,
