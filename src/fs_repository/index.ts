@@ -46,7 +46,7 @@ async function deletePhoto(baseFilename: string) {
   try {
     const path = photoPath(baseFilename);
     await fs.unlink(path);
-  } catch (err) {
+  } catch (_err) {
     // ignore
     return Promise.resolve();
   }
