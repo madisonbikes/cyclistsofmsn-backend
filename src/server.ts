@@ -40,7 +40,7 @@ export class PhotoServer implements Lifecycle {
 
   /** create server but don't start main listener, for testing */
   async create(): Promise<Server> {
-    for await (const c of this.components) {
+    for (const c of this.components) {
       await c.start();
     }
 
@@ -102,7 +102,7 @@ export class PhotoServer implements Lifecycle {
     this.server?.close();
 
     // shut them down in reverse order
-    for await (const c of this.components.reverse()) {
+    for (const c of this.components.reverse()) {
       await c.stop?.();
     }
   }
