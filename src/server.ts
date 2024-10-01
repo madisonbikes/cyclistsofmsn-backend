@@ -102,7 +102,7 @@ export class PhotoServer implements Lifecycle {
     this.server?.close();
 
     // shut them down in reverse order
-    for await (const c of this.components.reverse()) {
+    for (const c of this.components.reverse()) {
       await c.stop?.();
     }
   }
