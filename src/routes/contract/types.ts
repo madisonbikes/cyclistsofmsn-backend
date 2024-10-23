@@ -44,7 +44,7 @@ const mutablePostSchema = z.object({
   status: postStatusSchema,
 });
 
-export const putPostBodySchema = mutablePostSchema.deepPartial();
+export const putPostBodySchema = mutablePostSchema.partial();
 export type PutPostBody = z.infer<typeof putPostBodySchema>;
 
 export const postSchema = mutablePostSchema.extend({

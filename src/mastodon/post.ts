@@ -14,18 +14,18 @@ import {
   statusUpdateVisibilitySchema,
 } from "./types";
 
-type TootPostImageOptions = {
+interface TootPostImageOptions {
   filename: string;
   buffer: Buffer;
   description?: string;
   focus?: string;
-};
+}
 
-type TootPostOptions = {
+interface TootPostOptions {
   status: string;
   visibility?: StatusUpdateVisibility;
   image?: TootPostImageOptions;
-};
+}
 
 function isEnabled() {
   return (
@@ -62,9 +62,7 @@ async function postToot(options: TootPostOptions): Promise<string> {
     ).attach("file", options.image.buffer, options.image.filename);
 
     for (const [key, value] of Object.entries(mediaFields)) {
-      if (value !== undefined) {
-        void mediaRequest.field(key, value);
-      }
+      void mediaRequest.field(key, value);
     }
 
     const mediaResponse = await mediaRequest;
@@ -143,7 +141,7 @@ if (require.main === module) {
       .then(() => {
         return main(args);
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error(error);
       });
   }

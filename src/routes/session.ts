@@ -24,7 +24,7 @@ function routes() {
       } else {
         request.logout((err) => {
           if (err !== undefined) {
-            return next(err);
+            next(err);
           } else {
             response.send("logged out");
           }

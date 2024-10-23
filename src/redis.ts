@@ -7,7 +7,7 @@ let client: RedisClientType | undefined;
 let started = false;
 
 function isEnabled() {
-  return configuration.redisUri !== undefined && configuration.redisUri !== "";
+  return configuration.redisUri !== "";
 }
 
 async function start() {
@@ -21,7 +21,9 @@ async function start() {
   }
 
   client = createClient({ url: configuration.redisUri });
-  client.on("error", (err) => logger.warn(err, "Redis Client Error"));
+  client.on("error", (err: unknown) => {
+    logger.warn(err, "Redis Client Error");
+  });
   logger.info(
     `Connecting to redis on ${maskUriPassword(configuration.redisUri)}`,
   );

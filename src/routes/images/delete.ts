@@ -14,16 +14,14 @@ async function handler(req: Request, res: Response) {
     { _id: id },
     { includeResultMetadata: true },
   );
-  if (result?.value == null) {
+  if (result.value == null) {
     // not found
     res.sendStatus(404);
     return;
   }
   const { filename } = result.value;
-  if (filename != null) {
-    const fullPath = fsRepository.photoPath(filename);
-    await fsRepository.deletePhoto(fullPath);
-  }
+  const fullPath = fsRepository.photoPath(filename);
+  await fsRepository.deletePhoto(fullPath);
 
   const postList = await PostHistory.find({ image: id });
 

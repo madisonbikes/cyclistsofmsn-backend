@@ -51,7 +51,7 @@ export class PostHistoryClass {
 
   /** returns sorted by timestamp ascending */
   public static async findOrderedPosts(
-    this: ReturnModelType<typeof PostHistoryClass>
+    this: ReturnModelType<typeof PostHistoryClass>,
   ) {
     const posts = await this.find()
       .sort({ timestamp: 1 })
@@ -68,7 +68,7 @@ export class PostHistoryClass {
 
   public static findScheduledPost(
     this: ReturnModelType<typeof PostHistoryClass>,
-    when: Date
+    when: Date,
   ) {
     const start = startOfDay(when);
     const end = endOfDay(when);

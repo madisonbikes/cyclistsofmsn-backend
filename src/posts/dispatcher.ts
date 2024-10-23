@@ -21,7 +21,7 @@ const DISPATCH_DELAY = 5 * 1000;
  * The post dispatcher is responsible for orchestrating posting photos (runs every
  * five minutes or so after a five second delay)
  */
-const scheduled: Array<Cancellable | undefined> = [];
+const scheduled: (Cancellable | undefined)[] = [];
 
 function start(): void {
   scheduled.push(

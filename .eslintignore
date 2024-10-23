@@ -1,7 +1,0 @@
-node_modules
-output
-jest.config.js
-.eslintrc.js
-ecosystem.config.js
-coverage
-dist

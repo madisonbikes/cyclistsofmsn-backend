@@ -2,9 +2,9 @@ import { z } from "zod";
 import { logger } from "../utils";
 import { ExpressMiddleware } from "./authentication";
 
-type ValidateOptions<T extends z.ZodTypeAny> = {
+interface ValidateOptions<T extends z.ZodTypeAny> {
   schema: T;
-};
+}
 
 /** validate the request body against the supplied schema, placing validated object into the request.validated property */
 export const validateBodySchema = <T extends z.ZodTypeAny>({
