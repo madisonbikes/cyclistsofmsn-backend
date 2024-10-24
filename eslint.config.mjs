@@ -12,7 +12,6 @@ export default tseslint.config(
       "output/**",
       "coverage/**",
       "dist/**",
-      "old.eslintrc.js",
       "jest.config.js",
       "eslint.config.mjs",
       "ecosystem.config.js",
