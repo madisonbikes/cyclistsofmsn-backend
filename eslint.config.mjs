@@ -5,23 +5,52 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import pluginPromise from "eslint-plugin-promise";
 import importPlugin from "eslint-plugin-import";
 
-export default tseslint.config(
-  {
-    ignores: [
-      "node_modules/**",
-      "output/**",
-      "coverage/**",
-      "dist/**",
-      "jest.config.js",
-      "eslint.config.mjs",
-      "ecosystem.config.js",
-      "**/.*",
+const projectIgnores = {
+  ignores: [
+    "node_modules/**",
+    "output/**",
+    "coverage/**",
+    "dist/**",
+    "jest.config.js",
+    "eslint.config.mjs",
+    "ecosystem.config.js",
+    "**/.*",
+  ],
+};
+
+const projectRules = {
+  rules: {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // or error
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      },
+    ],
+    eqeqeq: ["warn", "smart"],
+    "require-await": ["warn"],
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        checksVoidReturn: false,
+      },
+    ],
+    "@typescript-eslint/strict-boolean-expressions": "warn",
+    "@typescript-eslint/restrict-template-expressions": [
+      "error",
+      { allowNumber: true },
     ],
   },
+};
+
+export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {},
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -34,31 +63,6 @@ export default tseslint.config(
   pluginPromise.configs["flat/recommended"],
   importPlugin.flatConfigs.recommended,
   importPlugin.flatConfigs.typescript,
-  {
-    rules: {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "warn", // or error
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_",
-        },
-      ],
-      eqeqeq: ["warn", "smart"],
-      "require-await": ["warn"],
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/no-misused-promises": [
-        "error",
-        {
-          checksVoidReturn: false,
-        },
-      ],
-      "@typescript-eslint/strict-boolean-expressions": "warn",
-      "@typescript-eslint/restrict-template-expressions": [
-        "error",
-        { allowNumber: true },
-      ],
-    },
-  },
+  projectIgnores,
+  projectRules,
 );
