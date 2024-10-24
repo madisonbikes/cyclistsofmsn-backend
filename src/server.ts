@@ -21,7 +21,7 @@ if (require.main === module) {
       const server = new PhotoServer();
       return server.start();
     })
-    .catch((error) => {
+    .catch((error: unknown) => {
       logger.error(error);
     });
 }

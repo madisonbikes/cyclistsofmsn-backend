@@ -4,21 +4,21 @@ import { logger } from "../utils";
 
 const CACHE_SIZE = 20 * 1024 * 1024;
 
-type Holder = {
+interface Holder {
   value: unknown;
   contentType: string | undefined;
   statusCode: number;
-};
+}
 
-type MiddlewareOptions = {
+interface MiddlewareOptions {
   callNextWhenCacheable: boolean;
-};
+}
 
 class Cache {
   private memoryCache = new LRUCache<string, Holder>({
     maxSize: CACHE_SIZE,
     sizeCalculation: (holder: Holder): number => {
-      const v = holder.value as { length: number };
+      const v = holder.value as { length: number } | undefined;
       if (v === undefined) {
         throw new Error(
           `Unable to calculate size of ${JSON.stringify(holder.value)}`,
@@ -33,7 +33,7 @@ class Cache {
       req: express.Request,
       res: express.Response,
       next: express.NextFunction,
-    ) => Promise<express.Response | void>,
+    ) => Promise<express.Response | undefined>,
   ) {
     return async (
       req: express.Request,
@@ -41,7 +41,7 @@ class Cache {
       next: express.NextFunction,
     ) => {
       if (await this.isCached(res)) return;
-      // eslint-disable-next-line promise/no-callback-in-promise
+      // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable, promise/no-callback-in-promise
       return fn(req, res, next).catch(next);
     };
   }
@@ -65,10 +65,9 @@ class Cache {
           .send(cached.value);
         logger.debug({ url: req.url }, "cache hit");
         if (options.callNextWhenCacheable) {
-          return next();
-        } else {
-          return;
+          next();
         }
+        return;
       }
 
       // override the request.send() function to fill the cache
@@ -84,7 +83,7 @@ class Cache {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return body;
       };
-      return next();
+      next();
     };
   }
 

@@ -14,7 +14,7 @@ const POPULATE_COUNT = 7;
 /**
  * The post populate class schedules posts a week in advance and runs every six hours or so.
  */
-const scheduled: Array<Cancellable | undefined> = [];
+const scheduled: (Cancellable | undefined)[] = [];
 
 function start(): void {
   scheduled.push(

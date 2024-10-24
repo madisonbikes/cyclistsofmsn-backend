@@ -99,11 +99,11 @@ describe("server process - images", () => {
     return request
       .get(`/api/v1/images/${missingImage.insertedId.toString()}`)
       .expect(200)
-      .expect((res) =>
+      .expect((res) => {
         expect(res.body).toEqual(
           expect.objectContaining({ filename: "missing.jpg" }),
-        ),
-      );
+        );
+      });
   });
 
   it("failed response to image file metadata call with missing id", () => {

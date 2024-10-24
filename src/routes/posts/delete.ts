@@ -7,7 +7,7 @@ async function handler(req: Request, res: Response) {
   logger.trace({ id }, "delete single post");
 
   const result = await PostHistory.deleteOne({ _id: id });
-  if (result != null && result.deletedCount === 1) {
+  if (result.deletedCount === 1) {
     res.sendStatus(200);
   } else {
     // not found

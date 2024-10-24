@@ -7,7 +7,7 @@ export const updateImageDescription = async (
   file: string,
   description: string,
 ) => {
-  if (fs.existsSync(file) === false) {
+  if (!fs.existsSync(file)) {
     logger.error(`File not found: ${file}`);
     return { error: "File not found" };
   }

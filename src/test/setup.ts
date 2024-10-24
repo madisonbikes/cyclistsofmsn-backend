@@ -14,7 +14,7 @@ export const testResourcesDir = () => {
   return path.resolve(__dirname, "../../test_resources");
 };
 
-export type SuiteOptions = {
+export interface SuiteOptions {
   // spin up a memory mongodb instance for testing purposes
   withDatabase: boolean;
 
@@ -30,7 +30,7 @@ export type SuiteOptions = {
 
   // clear post history after each test
   clearPostHistory: boolean;
-};
+}
 
 /** entry point that should be included first in each describe block */
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
@@ -72,12 +72,12 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   });
 
   afterEach(async () => {
-    const queries: Array<Promise<unknown>> = [];
+    const queries: Promise<unknown>[] = [];
     if (clearPostHistory || withPhotoServer) {
-      queries.push(database.collection("posts")?.deleteMany({}));
+      queries.push(database.collection("posts").deleteMany({}));
     }
     if (clearImages || withPhotoServer) {
-      queries.push(database.collection("images")?.deleteMany({}));
+      queries.push(database.collection("images").deleteMany({}));
     }
 
     if (queries.length > 0) {

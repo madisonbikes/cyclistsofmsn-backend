@@ -69,6 +69,6 @@ describe("server process - posts", () => {
 
     const checkPost = await PostHistory.findById(goodId);
     expect(checkPost).toBeDefined();
-    expect(checkPost?.status?.flag).toEqual("pending");
+    expect(checkPost?.status.flag).toEqual("pending");
   });
 });

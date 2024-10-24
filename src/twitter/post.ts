@@ -63,7 +63,7 @@ if (require.main === module) {
       .then(() => {
         return main(args);
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error(error);
       });
   }

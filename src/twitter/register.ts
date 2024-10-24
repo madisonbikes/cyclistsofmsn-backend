@@ -12,21 +12,21 @@ if (require.main === module) {
       const main = new TwitterRegisterConfiguration();
       return main.run();
     })
-    .catch((error) => {
+    .catch((error: unknown) => {
       console.error(error);
     });
 }
 
-type RequestTokenResponse = {
+interface RequestTokenResponse {
   oauth_token: string;
   oauth_token_secret: string;
   oauth_callback_confirmed: boolean;
-};
+}
 
-type AccessTokenResponse = {
+interface AccessTokenResponse {
   oauth_token: string;
   oauth_token_secret: string;
-};
+}
 
 export class TwitterRegisterConfiguration {
   async run(): Promise<void> {

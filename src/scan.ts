@@ -114,10 +114,10 @@ async function getFileMetadata(filename: string) {
     fsRepository.tags(filename),
     fsRepository.metadata(filename),
   ]);
-  const description = parseStringTag(tags?.exif?.ImageDescription);
-  const exif_createdon = parseImageDateTimeTag(tags?.exif?.DateTime);
-  const width = metadata?.width;
-  const height = metadata?.height;
+  const description = parseStringTag(tags.exif?.ImageDescription);
+  const exif_createdon = parseImageDateTimeTag(tags.exif?.DateTime);
+  const width = metadata.width;
+  const height = metadata.height;
 
   const retval: Partial<ImageDocument> = {
     fs_timestamp,

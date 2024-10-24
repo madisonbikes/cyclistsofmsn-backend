@@ -17,7 +17,7 @@ export const mapPostSchema = z.preprocess((p) => {
     retval = {
       id: post.id as unknown as string,
       timestamp: post.timestamp,
-      imageid: post.image._id?.toString() ?? undefined,
+      imageid: post.image._id.toString(),
       status,
     };
   } else {

@@ -6,7 +6,7 @@ export const databaseUserSchema = authenticatedUserSchema
     admin: z.boolean().default(false),
   })
   .transform((u) => {
-    if (u.roles.find((r) => r === "admin") !== null) {
+    if (u.roles.find((r) => r === "admin") !== undefined) {
       u.admin = true;
     }
     return u;

@@ -26,7 +26,7 @@ class ImagePut {
         // if the description changes, update the exif on the image
         await fsRepository.updatePhotoDescription(
           oldValue.filename,
-          newValue?.description,
+          newValue.description,
         );
         await newValue.save();
       }

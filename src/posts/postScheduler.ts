@@ -13,7 +13,11 @@ import { SchedulePostOptions } from "../routes/contract";
 import imageSelector from "./selection/selector";
 
 export type PostResult = Result<PostHistoryDocument, PostError>;
-export type PostError = { message: string; critical?: boolean };
+
+export interface PostError {
+  message: string;
+  critical?: boolean;
+}
 
 let suppressDuplicateLogMessage: number | undefined;
 

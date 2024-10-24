@@ -13,7 +13,7 @@ if (require.main === module) {
 
       return database.stop();
     })
-    .catch((error) => {
+    .catch((error: unknown) => {
       console.log(error);
     });
 }

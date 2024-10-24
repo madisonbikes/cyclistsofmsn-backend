@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* istanbul ignore file */
 import { ConnectionString } from "connection-string";
-import pino, { Logger, stdSerializers, TransportTargetOptions } from "pino";
+import pino, {
+  DestinationStream,
+  Logger,
+  stdSerializers,
+  TransportTargetOptions,
+} from "pino";
 import { initEnv } from "./env";
 import fs from "fs-extra";
 
@@ -26,6 +28,7 @@ const serializers = {
 
 let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const transport = pino.transport({
     targets: [
       {
@@ -35,6 +38,7 @@ if (process.env.NODE_ENV === "test") {
       },
     ],
   });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   newLogger = pino({ level: testLogLevel, serializers }, transport);
 } else {
   fs.ensureFileSync(logFile); // ensure log file/directory exists before creating logger
@@ -51,7 +55,8 @@ if (process.env.NODE_ENV === "test") {
     },
   ];
 
-  const transport = pino.transport({
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const transport: DestinationStream = pino.transport({
     targets,
   });
 
