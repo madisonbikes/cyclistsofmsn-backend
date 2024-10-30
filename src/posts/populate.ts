@@ -1,39 +1,18 @@
-import { logger, safeAsyncWrapper } from "../utils";
+import { logger } from "../utils";
 import now from "../utils/now";
 import { add as date_add, startOfDay } from "date-fns";
-import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
 import { schedulePost } from "./postScheduler";
 import imageRepositoryScanner from "../scan";
 
-/** future-populate very 6 hours */
+/** future-populate every 6 hours */
 const POPULATE_INTERVAL = 6 * 60 * 60 * 1000;
-const POPULATE_DELAY = 30 * 1000;
-
 const POPULATE_COUNT = 7;
 
 /**
  * The post populate class schedules posts a week in advance and runs every six hours or so.
  */
-const scheduled: (Cancellable | undefined)[] = [];
 
-function start(): void {
-  scheduled.push(
-    scheduleRepeat(
-      safeAsyncWrapper("populate", asyncPopulate),
-      POPULATE_INTERVAL,
-      POPULATE_DELAY,
-    ),
-  );
-}
-
-function stop(): void {
-  scheduled.forEach((v, ndx, array) => {
-    v?.cancel();
-    array[ndx] = undefined;
-  });
-}
-
-const asyncPopulate = async () => {
+export const populatePostsOnSchedule = async () => {
   logger.info("Scanning for new images");
   await imageRepositoryScanner.scan();
 
@@ -48,5 +27,3 @@ const asyncPopulate = async () => {
     });
   }
 };
-
-export default { start, stop };

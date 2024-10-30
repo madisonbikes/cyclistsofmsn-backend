@@ -1,6 +1,5 @@
-import { error, logger, ok, Result, safeAsyncWrapper } from "../utils";
+import { error, logger, ok, Result } from "../utils";
 import now from "../utils/now";
-import { Cancellable, scheduleRepeat } from "../utils/simple_scheduler";
 import { PostError, schedulePost } from "./postScheduler";
 import postExecutor from "./postExecutor";
 import {
@@ -14,34 +13,12 @@ import imageRepositoryScanner from "../scan";
 
 // five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;
-// five seconds
-const DISPATCH_DELAY = 5 * 1000;
 
 /**
- * The post dispatcher is responsible for orchestrating posting photos (runs every
- * five minutes or so after a five second delay)
+ * The post dispatcher is responsible for orchestrating posting photos. It should be run every five minutes or so.
  */
-const scheduled: (Cancellable | undefined)[] = [];
 
-function start(): void {
-  scheduled.push(
-    scheduleRepeat(
-      safeAsyncWrapper("dispatch", asyncDispatch),
-      DISPATCH_INTERVAL,
-      DISPATCH_DELAY,
-    ),
-  );
-}
-
-function stop(): void {
-  scheduled.forEach((v, ndx, array) => {
-    v?.cancel();
-    array[ndx] = undefined;
-  });
-}
-
-// arrow function to preserve calling context
-const asyncDispatch = async () => {
+export const dispatchPostOnSchedule = async () => {
   const scheduledResult = await schedulePost({
     when: new Date(now()),
     selectImage: true,
@@ -121,7 +98,7 @@ function isTimeToPost(post: PostHistoryDocument) {
   return true;
 }
 
-async function selectImage(): Promise<Result<ImageDocument, PostError>> {
+export async function selectImage(): Promise<Result<ImageDocument, PostError>> {
   // select image
   const retval = await imageSelector.nextImage();
   if (retval.isError()) {
@@ -131,5 +108,3 @@ async function selectImage(): Promise<Result<ImageDocument, PostError>> {
     return ok(retval.value);
   }
 }
-
-export default { start, stop, selectImage };

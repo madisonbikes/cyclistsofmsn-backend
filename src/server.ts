@@ -4,8 +4,6 @@ import { Lifecycle, logger } from "./utils";
 import { configuration } from "./config";
 import imageRepositoryScanner from "./scan";
 import { database } from "./database";
-import dispatcher from "./posts/dispatcher";
-import populate from "./posts/populate";
 import api from "./routes";
 import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
@@ -31,8 +29,6 @@ export class PhotoServer implements Lifecycle {
     this.components.push(database);
     this.components.push(redis);
     this.components.push(imageRepositoryScanner);
-    this.components.push(dispatcher);
-    this.components.push(populate);
   }
 
   components: Lifecycle[] = [];
