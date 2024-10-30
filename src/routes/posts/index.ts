@@ -1,5 +1,4 @@
 import express from "express";
-import { asyncWrapper } from "../async";
 import {
   Roles,
   validateAdmin,
@@ -22,17 +21,17 @@ function routes() {
       .Router()
 
       // all posts
-      .get("/", asyncWrapper(postGet.postListHandler))
+      .get("/", postGet.postListHandler)
 
       // current post
-      .get("/current", asyncWrapper(postGet.currentPostHandler))
+      .get("/current", postGet.currentPostHandler)
 
       // specific post
       .get(
         "/:id",
         validateAuthenticated(),
         validateId(),
-        asyncWrapper(postGet.singlePostHandler),
+        postGet.singlePostHandler,
       )
 
       .put(
@@ -40,15 +39,10 @@ function routes() {
         validateBodySchema({ schema: singlePostPut.bodySchema }),
         validateEditor(),
         validateId(),
-        asyncWrapper(singlePostPut.handler),
+        singlePostPut.handler,
       )
 
-      .delete(
-        "/:id",
-        validateAdmin(),
-        validateId(),
-        asyncWrapper(singlePostDelete.handler),
-      )
+      .delete("/:id", validateAdmin(), validateId(), singlePostDelete.handler)
 
       // post create operation is secured by editor role
       .post("/create", validateEditor(), (_req, res) => {

@@ -5,11 +5,11 @@ import { schedulePost } from "./postScheduler";
 import imageRepositoryScanner from "../scan";
 
 /** future-populate every 6 hours */
-const POPULATE_INTERVAL = 6 * 60 * 60 * 1000;
+//const POPULATE_INTERVAL = 6 * 60 * 60 * 1000;
 const POPULATE_COUNT = 7;
 
 /**
- * The post populate class schedules posts a week in advance and runs every six hours or so.
+ * The post populate class schedules posts a week in advance and should be run every six hours or so.
  */
 
 export const populatePostsOnSchedule = async () => {

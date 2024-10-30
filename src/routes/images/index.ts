@@ -8,7 +8,6 @@ import {
   validateId,
   validateAdmin,
 } from "../../security";
-import { asyncWrapper } from "../async";
 import imageGet from "./get";
 import singleImageDelete from "./delete";
 import cache from "../cache";
@@ -20,25 +19,20 @@ function routes() {
       .Router()
 
       // all images
-      .get("/", validateAuthenticated(), asyncWrapper(imageGet.listHandler))
+      .get("/", validateAuthenticated(), imageGet.listHandler)
 
       .put(
         "/:id",
         validateBodySchema({ schema: imagePut.bodySchema }),
         validateRole({ role: Roles.EDITOR }),
         validateId(),
-        asyncWrapper(imagePut.handler),
+        imagePut.handler,
       )
 
       // single image metadata
-      .get("/:id", validateId(), asyncWrapper(imageGet.metadata))
+      .get("/:id", validateId(), imageGet.metadata)
 
-      .delete(
-        "/:id",
-        validateAdmin(),
-        validateId(),
-        asyncWrapper(singleImageDelete.handler),
-      )
+      .delete("/:id", validateAdmin(), validateId(), singleImageDelete.handler)
 
       // single image, cached
       .get(
@@ -46,7 +40,7 @@ function routes() {
         cache.middleware({ callNextWhenCacheable: false }),
         validateId(),
         validateQuerySchema({ schema: imageGet.querySchema }),
-        asyncWrapper(imageGet.binary),
+        imageGet.binary,
       )
   );
 }
