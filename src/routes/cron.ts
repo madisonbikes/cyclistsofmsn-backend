@@ -9,9 +9,9 @@ function routes() {
   return (
     express
       .Router()
-      // */5 * * * * curl -X POST http://localhost:3000/ap1/v1/cron/schedulePost -H "Authorization: Bearer $CRON_AUTHORIZATION_API_KEY"
+      // */5 * * * * curl -X POST http://localhost:3000/ap1/v1/cron/dispatchPost -H "Authorization: Bearer $CRON_AUTHORIZATION_API_KEY"
       .post(
-        "/schedulePost",
+        "/dispatchPost",
         validateCronAuthorization(),
         async (_, response) => {
           await dispatchPostOnSchedule();

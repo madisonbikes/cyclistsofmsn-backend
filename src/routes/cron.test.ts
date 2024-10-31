@@ -22,10 +22,10 @@ describe("Cron Routes", () => {
     jest.clearAllMocks();
   });
 
-  describe("POST /schedulePost", () => {
+  describe("POST /dispatchPost", () => {
     it("should return 204 when authorized", async () => {
       const response = await testRequest()
-        .post("/api/v1/cron/schedulePost")
+        .post("/api/v1/cron/dispatchPost")
         .set("Authorization", `Bearer ${cronAuthorizationApiKey}`);
 
       expect(response.status).toBe(204);
@@ -34,15 +34,15 @@ describe("Cron Routes", () => {
 
     it("should return 401 when unauthorized", async () => {
       const response = await testRequest()
-        .post("/api/v1/cron/schedulePost")
+        .post("/api/v1/cron/dispatchPost")
         .set("Authorization", "Bearer wrong-api-key");
 
       expect(response.status).toBe(401);
       expect(dispatchPostOnScheduleMock).not.toHaveBeenCalled();
     });
 
-    it("should return 401 when unauthorized", async () => {
-      const response = await testRequest().post("/api/v1/cron/schedulePost");
+    it("should return 401 when unauthorized (no auth provided)", async () => {
+      const response = await testRequest().post("/api/v1/cron/dispatchPost");
 
       expect(response.status).toBe(401);
       expect(dispatchPostOnScheduleMock).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe("Cron Routes", () => {
       expect(populatePostsOnScheduleMock).not.toHaveBeenCalled();
     });
 
-    it("should return 401 when unauthorized", async () => {
+    it("should return 401 when unauthorized (no auth provided)", async () => {
       const response = await testRequest().post("/api/v1/cron/populatePosts");
 
       expect(response.status).toBe(401);
