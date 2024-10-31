@@ -7,6 +7,7 @@ import sharp from "sharp";
 import { logger } from "../../utils";
 import { getImageQuerySchema, GetImageQuery } from "../contract";
 import { lenientImageSchema } from "./localTypes";
+import fs_cache from "../../utils/fs_cache";
 
 class ImageGet {
   readonly querySchema = getImageQuerySchema;
@@ -25,6 +26,16 @@ class ImageGet {
 
     const { id } = req.params;
     logger.debug(`loading image ${id}`);
+
+    const cachedBuffer = await this.loadFromCache(id, query);
+    if (cachedBuffer !== undefined) {
+      return res
+        .type("jpeg")
+        .set("Cache-Control", "max-age=3600, s-max-age=36000")
+        .set("x-cached-response", "HIT")
+        .send(cachedBuffer);
+    }
+
     const filename = (await Image.findById(id).and([{ deleted: false }]))
       ?.filename;
     if (filename === undefined) {
@@ -55,6 +66,8 @@ class ImageGet {
       .toFormat("jpeg")
       .toBuffer();
 
+    await this.storeToCache(id, query, buffer);
+
     return res
       .type("jpeg")
       .set("Cache-Control", "max-age=3600, s-max-age=36000")
@@ -65,6 +78,24 @@ class ImageGet {
     const images = await Image.find({ deleted: false });
     const retval = lenientImageSchema.array().parse(images);
     res.send(retval);
+  };
+
+  private loadFromCache = async (id: string, query: GetImageQuery) => {
+    const cacheKey = this.getCacheKey(id, query);
+    return await fs_cache.get(cacheKey);
+  };
+
+  private storeToCache = async (
+    id: string,
+    query: GetImageQuery,
+    buffer: Buffer,
+  ) => {
+    const cacheKey = this.getCacheKey(id, query);
+    await fs_cache.put(cacheKey, buffer);
+  };
+
+  private getCacheKey = (id: string, query: GetImageQuery) => {
+    return `image-${id}-{query.width}-${query.height}`;
   };
 }
 

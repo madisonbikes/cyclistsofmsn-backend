@@ -9,7 +9,7 @@ function routes() {
   return (
     express
       .Router()
-      // */5 * * * * curl -X POST http://localhost:3000/ap1/v1/cron/dispatchPost -H "Authorization: Bearer $CRON_AUTHORIZATION_API_KEY"
+      // */5 * * * * curl -X POST http://localhost:3000/api/v1/cron/dispatchPost -H "Authorization: Bearer $CRON_AUTHORIZATION_API_KEY"
       .post(
         "/dispatchPost",
         validateCronAuthorization(),
@@ -18,7 +18,7 @@ function routes() {
           response.sendStatus(204);
         },
       )
-      // 5 */6 * * * curl -X POST http://localhost:3000/ap1/v1/cron/populatePosts -H "Authorization: Bearer $CRON_AUTHORIZATION_API_KEY"
+      // 5 */6 * * * curl -X POST http://localhost:3000/api/v1/cron/populatePosts -H "Authorization: Bearer $CRON_AUTHORIZATION_API_KEY"
       .post(
         "/populatePosts",
         validateCronAuthorization(),

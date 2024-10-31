@@ -7,7 +7,7 @@ import {
 import { imageListSchema } from "../contract";
 import { createTestUser } from "../../test/data";
 import { database } from "../../database";
-import cache from "../cache";
+import fs_cache from "../../utils/fs_cache";
 
 describe("server process - images", () => {
   let request: TestRequest;
@@ -18,8 +18,9 @@ describe("server process - images", () => {
     await createTestUser();
   });
 
-  beforeEach(() => {
-    cache.clear();
+  beforeEach(async () => {
+    await fs_cache.clear();
+
     request = testRequest();
   });
 

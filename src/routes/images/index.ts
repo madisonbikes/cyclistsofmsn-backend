@@ -10,7 +10,6 @@ import {
 } from "../../security";
 import imageGet from "./get";
 import singleImageDelete from "./delete";
-import cache from "../cache";
 import imagePut from "./put";
 
 function routes() {
@@ -34,10 +33,9 @@ function routes() {
 
       .delete("/:id", validateAdmin(), validateId(), singleImageDelete.handler)
 
-      // single image, cached
+      // single image
       .get(
         "/:id/binary",
-        cache.middleware({ callNextWhenCacheable: false }),
         validateId(),
         validateQuerySchema({ schema: imageGet.querySchema }),
         imageGet.binary,

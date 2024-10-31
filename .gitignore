@@ -4,3 +4,4 @@ output
 coverage
 .env
 .eslintcache
+.fs_cache.sqlite
