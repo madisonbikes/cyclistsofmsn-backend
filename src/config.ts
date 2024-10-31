@@ -68,6 +68,7 @@ const defaultConfiguration = {
   secureCookie: parseBooleanWithDefault(process.env.SECURE_COOKIE, !isDev),
   trustProxy: parseBooleanWithDefault(process.env.TRUST_PROXY, false),
   enableCors: parseBooleanWithDefault(process.env.ENABLE_CORS, false),
+  cronAuthorizationApiKey: process.env.CRON_AUTHORIZATION_APIKEY ?? "",
 };
 
 export const configuration = { ...defaultConfiguration } as const;

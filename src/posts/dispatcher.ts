@@ -98,7 +98,7 @@ function isTimeToPost(post: PostHistoryDocument) {
   return true;
 }
 
-export async function selectImage(): Promise<Result<ImageDocument, PostError>> {
+async function selectImage(): Promise<Result<ImageDocument, PostError>> {
   // select image
   const retval = await imageSelector.nextImage();
   if (retval.isError()) {
