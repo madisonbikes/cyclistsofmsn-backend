@@ -1,5 +1,12 @@
 # Changes
 
+## [2.0.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.0...cyclistsofmsn-backend-v2.0.1) (2024-10-31)
+
+
+### Bug Fixes
+
+* use memory in dev mode for cache, valkey instead of sqlite in production ([91795f8](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/91795f85cb195767f086da192dfa2613e254b80d))
+
 ## [2.0.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.1.1...cyclistsofmsn-backend-v2.0.0) (2024-10-31)
 
 
