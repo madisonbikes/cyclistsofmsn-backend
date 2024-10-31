@@ -1,6 +1,7 @@
 import { configuration } from "./config";
-import redis from "./redis";
+import redis from "./session_redis";
 import session from "express-session";
+import { logger } from "./utils";
 
 const COOKIE_MAX_AGE_DAYS = 7;
 
@@ -19,6 +20,8 @@ export function sessionMiddlewareConfigurator() {
   };
   if (redis.isEnabled()) {
     sessionOptions.store = redis.createStore();
+  } else {
+    logger.warn("Redis session store is disabled");
   }
   return session(sessionOptions);
 }

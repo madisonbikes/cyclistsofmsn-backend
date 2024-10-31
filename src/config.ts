@@ -63,7 +63,9 @@ const defaultConfiguration = {
   mastodonUri: process.env.MASTODON_URI ?? "",
   mastodonAccessToken: process.env.MASTODON_ACCESS_TOKEN ?? "",
   mastodonStatusVisibility: process.env.MASTODON_STATUS_VISIBILITY,
-  redisUri: process.env.REDIS_URI ?? "",
+  // used for session store
+  redisSessionUri: process.env.REDIS_SESSION_URI ?? "",
+  redisCacheUri: process.env.REDIS_CACHE_URI ?? "",
   sessionStoreSecret: process.env.SESSION ?? "notverysecret",
   secureCookie: parseBooleanWithDefault(process.env.SECURE_COOKIE, !isDev),
   trustProxy: parseBooleanWithDefault(process.env.TRUST_PROXY, false),

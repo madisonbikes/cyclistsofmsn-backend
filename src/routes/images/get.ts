@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { logger } from "../../utils";
 import { getImageQuerySchema, GetImageQuery } from "../contract";
 import { lenientImageSchema } from "./localTypes";
-import fs_cache from "../../utils/fs_cache";
+import fs_cache from "../../utils/persistent_cache";
 
 class ImageGet {
   readonly querySchema = getImageQuerySchema;

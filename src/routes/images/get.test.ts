@@ -7,7 +7,7 @@ import {
 import { imageListSchema } from "../contract";
 import { createTestUser } from "../../test/data";
 import { database } from "../../database";
-import fs_cache from "../../utils/fs_cache";
+import fs_cache from "../../utils/persistent_cache";
 
 describe("server process - images", () => {
   let request: TestRequest;

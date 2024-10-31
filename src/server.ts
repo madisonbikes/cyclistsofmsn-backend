@@ -8,8 +8,9 @@ import api from "./routes";
 import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import { strategies } from "./security";
-import redis from "./redis";
+import redis from "./session_redis";
 import { sessionMiddlewareConfigurator } from "./session";
+import persistent_cache from "./utils/persistent_cache";
 
 /** expose command-line launcher */
 if (require.main === module) {
@@ -29,6 +30,7 @@ export class PhotoServer implements Lifecycle {
     this.components.push(database);
     this.components.push(redis);
     this.components.push(imageRepositoryScanner);
+    this.components.push(persistent_cache);
   }
 
   components: Lifecycle[] = [];

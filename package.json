@@ -29,7 +29,7 @@
     "node": ">=20.x"
   },
   "dependencies": {
-    "@keyv/sqlite": "^4.0.1",
+    "@keyv/valkey": "^1.0.0",
     "@typegoose/typegoose": "^12.8.0",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^7.1.1",

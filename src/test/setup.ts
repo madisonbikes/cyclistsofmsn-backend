@@ -45,8 +45,11 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   beforeAll(async () => {
     testConfiguration.reset();
     testConfiguration.add({
-      // disable redis for testing
-      redisUri: "",
+      // disable redis session for testing
+      redisSessionUri: "",
+
+      // disable redis cache for testing
+      redisCacheUri: "",
 
       // tests don't use SSL
       secureCookie: false,
