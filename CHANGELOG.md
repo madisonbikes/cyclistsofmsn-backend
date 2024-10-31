@@ -1,5 +1,66 @@
 # Changes
 
+## [2.0.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.1.1...cyclistsofmsn-backend-v2.0.0) (2024-10-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove internal scheduling, instead rely on external cron w/exposed endpoints in API
+
+### Features
+
+* production build archived with release ([ebe1a7d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ebe1a7d62c3a6a533f7531092568859d1173c9f9))
+* remove internal scheduling, instead rely on external cron w/exposed endpoints in API ([14f2b85](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/14f2b8533cba88901ae7c794675a59a3cc5667bf))
+
+
+### Bug Fixes
+
+* add coverage to eslint exclusions ([98bf904](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/98bf9048c736d29c394b6bb27b9731226fcff107))
+* bump @typegoose/typegoose from 12.2.0 to 12.4.0 ([51b3920](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/51b39206bdbbc6876dbbadf44de184cb483ab011))
+* bump @typegoose/typegoose from 12.4.0 to 12.5.0 ([e12a5c1](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e12a5c1f264ada7a92be16b1e1c628517ac26253))
+* bump @typegoose/typegoose from 12.5.0 to 12.6.0 ([bb01825](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/bb01825cf1b8570ddf5b1cff34d2ee06ae1fc527))
+* bump @typegoose/typegoose from 12.6.0 to 12.7.0 ([b2f73b3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/b2f73b36331b6329034ad13f92c1fa7faac2f185))
+* bump @typegoose/typegoose from 12.7.0 to 12.8.0 ([6eff40a](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6eff40afb89086b9f8c13070dfc2e21a1ad59c6d))
+* bump date-fns from 3.6.0 to 4.1.0 ([c060b73](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/c060b737a5bf3bf1fa58876c9450f8a2c908444c))
+* bump exifreader from 4.21.1 to 4.22.1 ([a156d19](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a156d190016841380d5a89bf7fc5d724ed2b8887))
+* bump exifreader from 4.22.1 to 4.23.2 ([8532744](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/85327446805b1686f367b3aff0a3d2d9317e349f))
+* bump exifreader from 4.23.2 to 4.23.3 ([f058326](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/f058326f2efbbe9a81dde8974fa8366605f40296))
+* bump exifreader from 4.23.3 to 4.23.5 ([7c7384e](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/7c7384e23acabf295b7997a7dca84c8c753aa768))
+* bump helmet from 7.1.0 to 8.0.0 ([3e2293e](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3e2293ea1797ba3b92d0345849525c49c806525b))
+* bump lru-cache from 10.2.0 to 10.2.2 ([256d7d0](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/256d7d0057fa7c1c86b06f068689ef83baeec75e))
+* bump lru-cache from 10.2.2 to 10.3.0 ([488d2a4](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/488d2a4a1380bf528fb15a0f9308012096be01a9))
+* bump lru-cache from 10.3.0 to 11.0.0 ([ac90d17](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ac90d171578e175521aa323db3bff83c86b0c5c9))
+* bump lru-cache from 11.0.0 to 11.0.1 ([e19224a](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e19224afd31ea021bc962a018759b1c91e6059f6))
+* bump pino from 8.19.0 to 9.0.0 ([5f51ea9](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5f51ea9ac25e1c1df127e48c00251223ee88ab2e))
+* bump pino from 9.0.0 to 9.1.0 ([790b1a5](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/790b1a5fe874c02015fbaa69af79c466515c2dc6))
+* bump pino from 9.1.0 to 9.2.0 ([d271c3d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d271c3d061d618fb7fcb2d9b99c627c26786fb97))
+* bump pino from 9.2.0 to 9.3.2 ([b276e6d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/b276e6d1c69947d39c08d81009206ee70290dbce))
+* bump pino from 9.3.2 to 9.4.0 ([a45850b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a45850bc2c8511fd6b3ae7834dd76ea38ac42296))
+* bump pino-pretty from 11.0.0 to 11.1.0 ([df2ed7b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/df2ed7b1fa349a67a7168ca3de01c4f8d61766fb))
+* bump pino-pretty from 11.1.0 to 11.2.1 ([5403718](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5403718e5b7c70b4e869765cfccbcf000f140bb3))
+* bump pino-pretty from 11.2.1 to 11.2.2 ([336075b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/336075bb001fcbbfbd8de2486f95ce6222504b13))
+* bump pm2 from 5.3.1 to 5.4.0 ([ff7f2c5](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ff7f2c5c040826e76f5a0865d9fa5ea9b4022f26))
+* bump pm2 from 5.4.0 to 5.4.1 ([4e7fae0](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/4e7fae080acd980eb0de40ca1a781892c4bc1c19))
+* bump pm2 from 5.4.1 to 5.4.2 ([0b3ccc3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/0b3ccc34264157f682f06b4c0c5ce60740c9a047))
+* bump redis from 4.6.13 to 4.6.14 ([11ebb48](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/11ebb4893cdbbc48feb28d1e827f17421364578b))
+* bump redis from 4.6.14 to 4.7.0 ([a5029f2](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a5029f26383901ee0f91ac4bf0dc25bb20bbde56))
+* bump superagent from 8.1.2 to 9.0.2 ([ce6a76d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ce6a76d4ef4f7f59ac06e312d7e8f4a8ad75da7d))
+* bump superagent from 9.0.2 to 10.1.0 ([378b7e3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/378b7e3aa70ae89199de58063d9b49f69385baa0))
+* bump zod from 3.22.4 to 3.23.5 ([5c0ad52](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5c0ad52c98551642bbb77fee11553816e1d6b967))
+* bump zod from 3.23.5 to 3.23.8 ([e4fa50d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e4fa50d310b45bb1de8a3f352f83f961c900c4d4))
+* cron routes weren't working properly, add test cases ([ee0abcb](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ee0abcb03c9765e1f4693616d230a56c39ace509))
+* incorrect use of for await () of ([e801777](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e80177738188ab0ba013406b78ee8b0f4db39b0b))
+* lint errors ([7b4af58](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/7b4af58135132f933c30a9c8a29bf71691292bab))
+* migrate to eslint 9 and flat file config ([c7c0968](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/c7c0968dbe2c31cf59f238201b20f3b2392f806e))
+* remove incorrect use of "for await" loop in server shutdown ([3b51dbc](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3b51dbc3a377eda90b17d21ddddbff583fe95ff2))
+* remove pm2 as dependency ([a4bc9ce](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a4bc9ce81110aa1e2f000af996188c1072ef1a19))
+* remove scheduling component, use external cron on server instead ([d22c0d7](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d22c0d747fcfb5b8fc785c168d4f0c8425ca6801))
+* rename cron endpoint to dispatchPost ([32db633](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/32db6338b5c0e05bf78ccd8b8cf9619595c9666b))
+* update to express 5.0.1 ([bb6a18d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/bb6a18d27887fe86065b023bb34407a7498fc9a2))
+* updated eslint config ([6450d1c](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6450d1c09e01365c03e191cb19c154b97d195a8d))
+* use fs_cache w/sqlite for caching images ([d537fa1](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/d537fa15f2de7d7a87d88067f6c2f52ba2a7f42a))
+* use new husky script reqs ([0ecbb7c](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/0ecbb7c7a26a330581d97eff2e0fca65fae3e025))
+
 ## [1.1.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v1.1.0...cyclistsofmsn-backend-v1.1.1) (2024-04-17)
 
 
