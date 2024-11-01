@@ -1,16 +1,23 @@
 import { error, ok, Result, arrayShuffle } from "../../utils";
 import { Image, ImageDocument } from "../../database";
-import { PostError } from "../postScheduler";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
 } from "./criteria";
+
 const repostCriteria = new RepostCriteria();
 const seasonalityCriteria = new SeasonalityCriteria();
 const unpostedCriteria = new UnpostedCriteria();
 
-async function nextImage(): Promise<Result<ImageDocument, PostError>> {
+interface ImageSelectionError {
+  message: string;
+  critical?: boolean;
+}
+
+async function nextImage(): Promise<
+  Result<ImageDocument, ImageSelectionError>
+> {
   const allImages = await Image.find({
     deleted: false,
     hidden: false,

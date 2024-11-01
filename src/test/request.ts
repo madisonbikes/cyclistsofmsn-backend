@@ -1,7 +1,7 @@
 import supertest from "supertest";
-import { runningPhotoServer, Server } from ".";
 import TestAgent from "supertest/lib/agent";
-export { Server } from "http";
+import { Server } from "http";
+import { runningPhotoServer } from "./setup";
 
 /** helper type alias for supertest request object */
 export type TestRequest = TestAgent;

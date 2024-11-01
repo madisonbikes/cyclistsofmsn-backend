@@ -42,6 +42,7 @@ const projectRules = {
       "error",
       { allowNumber: true },
     ],
+    "import/no-cycle": "error",
   },
 };
 

@@ -3,7 +3,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import path from "path";
 import { database } from "../database";
 import { PhotoServer } from "../server";
-import { Server } from "./request";
+import { Server } from "http";
 import imageRepositoryScanner from "../scan";
 import fs from "fs-extra";
 
