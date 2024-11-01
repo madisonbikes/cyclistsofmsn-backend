@@ -1,5 +1,17 @@
 # Changes
 
+## [2.0.2](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.1...cyclistsofmsn-backend-v2.0.2) (2024-11-01)
+
+
+### Bug Fixes
+
+* bump exifreader from 4.23.5 to 4.25.0 ([594480f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/594480f3ea12c8156ae727e8e25f2370d1f0e9cf))
+* bump pino from 9.4.0 to 9.5.0 ([17cf993](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/17cf9934f50399abb4c0a6369511efc8160fe8fd))
+* bump pino-pretty from 11.2.2 to 11.3.0 ([6bce9d0](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6bce9d038b0f14afe8c0b5a92a521a40632473ea))
+* enforce no circular dependencies in lint ([5be7e66](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5be7e660b5cf46b76ecd8491cc494fd598f67d9a))
+* invalid cache key generation ([03a7432](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/03a7432def9ca7e8bc20aa17a99716100726e0a5))
+* should mask mongodb password in uri ([3aae230](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3aae2301ff5ae91728d4f2fe26b044b03ccf0da2))
+
 ## [2.0.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.0...cyclistsofmsn-backend-v2.0.1) (2024-10-31)
 
 
