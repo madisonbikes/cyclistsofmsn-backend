@@ -10,6 +10,7 @@ import { lenientImageSchema } from "./localTypes";
 import fs_cache from "../../utils/persistent_cache";
 
 class ImageGet {
+  // expose for validation
   readonly querySchema = getImageQuerySchema;
 
   metadata = async (req: Request, res: Response) => {
