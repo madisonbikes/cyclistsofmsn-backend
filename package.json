@@ -1,6 +1,6 @@
 {
   "name": "cyclistsofmsn-backend",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Cyclists of Madison Backend",
   "private": true,
   "main": "src/server.ts",
