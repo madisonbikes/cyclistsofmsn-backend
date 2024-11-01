@@ -25,7 +25,7 @@ async function start() {
     logger.warn(err, "Redis Client Error");
   });
   logger.info(
-    `Connecting to redis on ${maskUriPassword(configuration.redisSessionUri)}`,
+    `Using Redis session store on ${maskUriPassword(configuration.redisSessionUri)}`,
   );
   await client.connect();
 }
