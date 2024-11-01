@@ -25,7 +25,7 @@ jobs:
       - name: Prepare production archive of package.json, package-lock.json and dist directory
         run: |
           mkdir -p output
-          tar -czvf output/build.tar.gz package.json package-lock.json dist
+          tar -czvf output/build.tar.gz package.json package-lock.json ecosystem.config.js dist
 
       - uses: googleapis/release-please-action@v4
         id: release
