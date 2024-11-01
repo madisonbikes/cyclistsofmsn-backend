@@ -1,6 +1,6 @@
 import { configuration } from "../config";
 import mongoose, { Mongoose } from "mongoose";
-import { logger } from "../utils";
+import { logger, maskUriPassword } from "../utils";
 import { Version } from "./version";
 import { Image } from "./images";
 
@@ -31,7 +31,7 @@ async function start(): Promise<boolean> {
     logger.debug({ url: uri }, `Already connected to MongoDB`);
     return false;
   }
-  logger.info(`Connecting to MongoDB on ${uri}`);
+  logger.info(`Connecting to MongoDB on ${maskUriPassword(uri)}`);
 
   // this is the default value from mongoose 7 forward, be explicit to avoid deprecation notice
   mongoose.set("strictQuery", false);
