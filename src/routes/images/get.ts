@@ -95,7 +95,7 @@ class ImageGet {
   };
 
   private getCacheKey = (id: string, query: GetImageQuery) => {
-    return `image-${id}-{query.width}-${query.height}`;
+    return `image-${id}-${query.width}-${query.height}`;
   };
 }
 
