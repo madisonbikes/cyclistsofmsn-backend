@@ -48,7 +48,7 @@
     "p-limit": "~3.1.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "pino": "^9.4.0",
+    "pino": "^9.5.0",
     "pino-pretty": "^11.2.2",
     "promisify-child-process": "^4.1.2",
     "readline-sync": "^1.4.10",
