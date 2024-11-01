@@ -2,20 +2,23 @@ import { Keyv, KeyvStoreAdapter } from "keyv";
 import KeyvValkey from "@keyv/valkey";
 import { Lifecycle } from "./lifecycle";
 import { configuration } from "../config";
-import { logger } from "./logger";
+import { logger, maskUriPassword } from "./logger";
 
 /**
  * A class that provides a cache using Keyv with either Redis (preferred) or SQLite as the storage backend.
  */
 class PersistentCache implements Lifecycle {
+  private cache: Keyv<string> | undefined;
+
   /**
    * Initializes the cache with a TTL (time-to-live) of 3600 seconds and SQLite or Redis storage.
    */
-  private cache: Keyv<string> | undefined;
-
   start() {
     let store: KeyvStoreAdapter | Map<unknown, unknown>;
     if (configuration.redisCacheUri !== "") {
+      logger.info(
+        `Using Redis cache with URI ${maskUriPassword(configuration.redisCacheUri)}`,
+      );
       store = new KeyvValkey(configuration.redisCacheUri);
     } else {
       logger.warn(
