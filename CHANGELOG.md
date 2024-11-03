@@ -1,5 +1,12 @@
 # Changes
 
+## [2.0.3](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.2...cyclistsofmsn-backend-v2.0.3) (2024-11-03)
+
+
+### Bug Fixes
+
+* issue posting due to null focus and/or description fields ([f68c19e](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/f68c19e33a4bcc243b92f56299e713fc0e2b8869))
+
 ## [2.0.2](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.1...cyclistsofmsn-backend-v2.0.2) (2024-11-01)
 
 
