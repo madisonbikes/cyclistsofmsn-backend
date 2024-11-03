@@ -9,7 +9,6 @@ import {
   mediaUploadResponseSchema,
   StatusUpdateRequest,
   statusUpdateResponseSchema,
-  MediaUploadRequest,
   StatusUpdateVisibility,
   statusUpdateVisibilitySchema,
 } from "./types";
@@ -52,17 +51,16 @@ async function post(filename: string, description?: string): Promise<string> {
 
 async function postToot(options: TootPostOptions): Promise<string> {
   let mediaId: string[] = [];
-  if (options.image !== undefined) {
-    const mediaFields: MediaUploadRequest = {
-      focus: options.image.focus,
-      description: options.image.description,
-    };
+  if (options.image != null) {
     const mediaRequest = buildAuthorizedMastodonPostRequest(
       "/api/v2/media",
     ).attach("file", options.image.buffer, options.image.filename);
 
-    for (const [key, value] of Object.entries(mediaFields)) {
-      void mediaRequest.field(key, value);
+    if (options.image.focus != null) {
+      mediaRequest.field("focus", options.image.focus);
+    }
+    if (options.image.description != null) {
+      mediaRequest.field("description", options.image.description);
     }
 
     const mediaResponse = await mediaRequest;
