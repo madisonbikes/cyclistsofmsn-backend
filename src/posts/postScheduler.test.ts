@@ -195,7 +195,7 @@ describe("test schedule component", () => {
       await newPost.save();
     });
 
-    it.failing("should do nothing", async () => {
+    it("should do nothing", async () => {
       // set current time to 8:15 AM
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       const newPost = await getOkPostResult({ when: now });
