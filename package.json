@@ -19,6 +19,7 @@
     "register_twitter": "ts-node src/twitter/register.ts",
     "test_tweet": "ts-node src/twitter/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
     "test_toot": "ts-node src/mastodon/post.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
+    "test_bsky": "ts-node src/bsky/index.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
     "check-package-updates": "npx npm-check-updates -x p-limit -x tempfile",
     "prepare": "husky",
     "genversion": "genversion -f -u dist/src/backend-version.js"
@@ -29,6 +30,7 @@
     "node": ">=20.x"
   },
   "dependencies": {
+    "@atproto/api": "^0.13.18",
     "@keyv/valkey": "^1.0.0",
     "@typegoose/typegoose": "^12.8.0",
     "bcryptjs": "^2.4.3",

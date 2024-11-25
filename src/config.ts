@@ -71,6 +71,8 @@ const defaultConfiguration = {
   trustProxy: parseBooleanWithDefault(process.env.TRUST_PROXY, false),
   enableCors: parseBooleanWithDefault(process.env.ENABLE_CORS, false),
   cronAuthorizationApiKey: process.env.CRON_AUTHORIZATION_APIKEY ?? "",
+  atProtoUsername: process.env.ATPROTO_USERNAME ?? "",
+  atProtoPassword: process.env.ATPROTO_PASSWORD ?? "",
 };
 
 export const configuration = { ...defaultConfiguration } as const;

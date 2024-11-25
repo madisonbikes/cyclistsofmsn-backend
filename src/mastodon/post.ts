@@ -124,7 +124,7 @@ const main = async (args: string[]) => {
       filename: args[1],
       buffer: fileBuffer,
       description: "useful alt tag description",
-      focus: "(0.25,0.25)",
+      focus: undefined,
     },
   });
 };
