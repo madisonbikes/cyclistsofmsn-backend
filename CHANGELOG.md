@@ -1,5 +1,12 @@
 # Changes
 
+## [2.1.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.3...cyclistsofmsn-backend-v2.1.0) (2024-11-25)
+
+
+### Features
+
+* add atproto support ([4bde062](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/4bde0626c5027d470fdcd629da97e53a69e8a278))
+
 ## [2.0.3](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.2...cyclistsofmsn-backend-v2.0.3) (2024-11-03)
 
 
