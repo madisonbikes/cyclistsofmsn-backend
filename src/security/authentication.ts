@@ -1,12 +1,9 @@
-import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { User, UserDocument } from "../database";
 import { logger } from "../utils";
 import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
-
-export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 
 export enum Roles {
   ADMIN = "admin",
@@ -19,10 +16,6 @@ const BCRYPT_HASH_SIZE = 10;
 export const userHasRole = (user: AuthenticatedUser, role: string) => {
   return user.roles.find((r) => r === role) !== undefined;
 };
-
-export const localMiddleware = passport.authenticate("local", {
-  session: true,
-}) as unknown;
 
 export type ExpressMiddleware = (
   request: Request,
@@ -67,7 +60,7 @@ class Strategies {
   }
 }
 
-export const generateHashedPassword = (password: string) => {
+const generateHashedPassword = (password: string) => {
   return bcrypt.hash(password, BCRYPT_HASH_SIZE);
 };
 

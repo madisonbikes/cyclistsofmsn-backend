@@ -77,4 +77,4 @@ const defaultConfiguration = {
 
 export const configuration = { ...defaultConfiguration } as const;
 
-export type ServerConfiguration = typeof defaultConfiguration;
+type ServerConfiguration = typeof defaultConfiguration;

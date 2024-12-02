@@ -11,10 +11,10 @@ export const statusUpdateVisibilitySchema = z.enum([
 export type StatusUpdateVisibility = z.infer<
   typeof statusUpdateVisibilitySchema
 >;
-export const statusUpdateRequestSchema = z.object({
+const _statusUpdateRequestSchema = z.object({
   status: z.string(),
   visibility: statusUpdateVisibilitySchema.optional(),
   media_ids: z.string().array(),
 });
-export type StatusUpdateRequest = z.infer<typeof statusUpdateRequestSchema>;
+export type StatusUpdateRequest = z.infer<typeof _statusUpdateRequestSchema>;
 export const statusUpdateResponseSchema = z.object({ id: z.string() });

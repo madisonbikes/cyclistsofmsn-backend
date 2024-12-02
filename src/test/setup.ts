@@ -7,14 +7,14 @@ import { Server } from "http";
 import imageRepositoryScanner from "../scan";
 import fs from "fs-extra";
 
-export let photoServer: PhotoServer | undefined;
+let photoServer: PhotoServer | undefined;
 export let runningPhotoServer: Server | undefined;
 
 export const testResourcesDir = () => {
   return path.resolve(__dirname, "../../test_resources");
 };
 
-export interface SuiteOptions {
+interface SuiteOptions {
   // spin up a memory mongodb instance for testing purposes
   withDatabase: boolean;
 

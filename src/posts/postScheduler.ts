@@ -12,7 +12,7 @@ import now from "../utils/now";
 import { SchedulePostOptions } from "../routes/contract";
 import imageSelector from "./selection/selector";
 
-export type PostResult = Result<PostHistoryDocument, PostError>;
+type PostResult = Result<PostHistoryDocument, PostError>;
 
 export interface PostError {
   message: string;

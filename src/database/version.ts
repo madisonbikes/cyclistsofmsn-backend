@@ -10,10 +10,10 @@ import {
  * Used to allow for rescans of image metadata or other migration, when necessary.
  */
 @modelOptions({ schemaOptions: { collection: "schema_version" } })
-export class VersionClass {
+class VersionClass {
   @prop({ required: true, unique: true })
   public version!: number;
 }
 
-export type VersionDocument = DocumentType<VersionClass>;
+type _VersionDocument = DocumentType<VersionClass>;
 export const Version = getModelForClass(VersionClass);

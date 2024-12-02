@@ -10,7 +10,7 @@ import {
  * Holds users, typically admin but allows for others.
  */
 @modelOptions({ schemaOptions: { collection: "users" } })
-export class UserClass {
+class UserClass {
   @prop({ required: true, unique: true, index: true })
   public username!: string;
 
