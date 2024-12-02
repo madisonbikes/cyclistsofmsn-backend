@@ -7,6 +7,7 @@ import pino, {
 } from "pino";
 import { initEnv } from "./env";
 import fs from "fs-extra";
+import { PinoPretty } from "pino-pretty";
 
 initEnv();
 
@@ -34,7 +35,7 @@ if (process.env.NODE_ENV === "test") {
       {
         level: testLogLevel,
         target: "pino-pretty",
-        options: { destination: 1 }, // stdout
+        options: { destination: 1 } satisfies PinoPretty.PrettyOptions,
       },
     ],
   });
@@ -46,12 +47,15 @@ if (process.env.NODE_ENV === "test") {
     {
       level: consoleLogLevel,
       target: "pino-pretty",
-      options: { destination: 1 }, // stdout
+      options: { destination: 1 } satisfies PinoPretty.PrettyOptions,
     },
     {
       level: logLevel,
       target: "pino-pretty",
-      options: { colorize: false, destination: logFile },
+      options: {
+        colorize: false,
+        destination: logFile,
+      } satisfies PinoPretty.PrettyOptions,
     },
   ];
 
