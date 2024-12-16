@@ -76,6 +76,13 @@ export class PhotoServer implements Lifecycle {
 
     app.use("/api/v1", api.routes());
 
+    // in production mode, redirect any unknown routes to the root in case of weird bookmarks etc
+    if (configuration.reactStaticRootDir) {
+      app.get("*", (_req, res) => {
+        res.redirect("/");
+      });
+    }
+
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
       res.sendStatus(500);
