@@ -1,5 +1,16 @@
 # Changes
 
+## [2.1.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.1.0...cyclistsofmsn-backend-v2.1.1) (2024-12-16)
+
+
+### Bug Fixes
+
+* add redirect to root for server react spa ([2903ada](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/2903adabe9396f0e211aa4b0e8daccf8d1447fac))
+* bump @keyv/valkey from 1.0.0 to 1.0.1 ([32e1528](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/32e152826d2e8ab21bda0ffab644a6ae32e38f36))
+* bump @typegoose/typegoose from 12.8.0 to 12.9.1 ([3e0f18f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3e0f18fb6a8467645ca73d6e72b4168e9077cda4))
+* bump keyv from 5.1.2 to 5.2.1 ([96c11f3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/96c11f3419b31bfc514902e123d9c58c934eb3e2))
+* bump pino-pretty from 11.3.0 to 13.0.0 ([6fad480](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6fad4805c3c1dabffabd9d9c076d921f01aeea2f))
+
 ## [2.1.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.3...cyclistsofmsn-backend-v2.1.0) (2024-11-25)
 
 
