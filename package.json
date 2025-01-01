@@ -44,7 +44,7 @@
     "express": "^5.0.1",
     "express-session": "^1.18.1",
     "fs-extra": "^11.2.0",
-    "keyv": "^5.2.1",
+    "keyv": "^5.2.3",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.4",
     "oauth-1.0a": "^2.2.6",
