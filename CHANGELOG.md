@@ -1,5 +1,24 @@
 # Changes
 
+## [2.1.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.1.0...cyclistsofmsn-backend-v2.1.1) (2025-01-01)
+
+
+### Bug Fixes
+
+* add redirect to root for server react spa ([2903ada](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/2903adabe9396f0e211aa4b0e8daccf8d1447fac))
+* bump @atproto/api from 0.13.18 to 0.13.24 ([33f6586](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/33f65863e4276546518475d0d02d1634b0f6969a))
+* bump @keyv/valkey from 1.0.0 to 1.0.1 ([32e1528](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/32e152826d2e8ab21bda0ffab644a6ae32e38f36))
+* bump @typegoose/typegoose from 12.8.0 to 12.9.1 ([3e0f18f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3e0f18fb6a8467645ca73d6e72b4168e9077cda4))
+* bump @typegoose/typegoose from 12.9.1 to 12.10.1 ([8741064](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/8741064a79bef22917507d17da326f9e32027425))
+* bump dotenv from 16.4.5 to 16.4.7 ([503aa3d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/503aa3dc4d4646499fdab7a569617601b5a0d825))
+* bump exifreader from 4.25.0 to 4.26.0 ([316ece8](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/316ece871e2d3cf75e7fc9e46d70e3112b9d3df8))
+* bump keyv from 5.1.2 to 5.2.1 ([96c11f3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/96c11f3419b31bfc514902e123d9c58c934eb3e2))
+* bump keyv from 5.2.1 to 5.2.3 ([50fc73e](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/50fc73e491c1375f8d3bbf3f0d934f7974d44c65))
+* bump mongoose from 8.8.3 to 8.8.4 ([f5cea24](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/f5cea242776d0efb133eccf88c3f7f0b6bee2a01))
+* bump pino from 9.5.0 to 9.6.0 ([42fda4b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/42fda4baa28d905a10b1db022ede38f6b1296849))
+* bump pino-pretty from 11.3.0 to 13.0.0 ([6fad480](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6fad4805c3c1dabffabd9d9c076d921f01aeea2f))
+* bump zod from 3.23.8 to 3.24.1 ([b54cc92](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/b54cc92334ab0399e7258b4d827218741182bad0))
+
 ## [2.1.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.3...cyclistsofmsn-backend-v2.1.0) (2024-11-25)
 
 
