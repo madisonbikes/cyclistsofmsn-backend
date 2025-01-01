@@ -39,7 +39,7 @@
     "connection-string": "^4.4.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "exifreader": "^4.26.0",
     "express": "^5.0.1",
     "express-session": "^1.18.1",
