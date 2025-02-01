@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.32",
-    "@keyv/valkey": "^1.0.1",
+    "@keyv/valkey": "^1.0.2",
     "@typegoose/typegoose": "^12.10.1",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^7.1.1",
