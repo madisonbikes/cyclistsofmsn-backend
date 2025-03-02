@@ -1,5 +1,36 @@
 # Changes
 
+## [2.1.1](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.1.0...cyclistsofmsn-backend-v2.1.1) (2025-03-02)
+
+
+### Bug Fixes
+
+* add redirect to root for server react spa ([2903ada](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/2903adabe9396f0e211aa4b0e8daccf8d1447fac))
+* bump @atproto/api from 0.13.18 to 0.13.24 ([33f6586](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/33f65863e4276546518475d0d02d1634b0f6969a))
+* bump @atproto/api from 0.13.24 to 0.13.32 ([6da8a69](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6da8a69d738e95955f9fa2461cb0cb6c1a5d48af))
+* bump @keyv/valkey from 1.0.0 to 1.0.1 ([32e1528](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/32e152826d2e8ab21bda0ffab644a6ae32e38f36))
+* bump @keyv/valkey from 1.0.1 to 1.0.2 ([ccc54ff](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ccc54ffbf78b48c3a0f9b640976a3f80ff6fe38b))
+* bump @keyv/valkey from 1.0.2 to 1.0.3 ([8888ec5](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/8888ec5c9adb216eabd15d0e58e125f22cd64ea4))
+* bump @typegoose/typegoose from 12.10.1 to 12.12.0 ([b0c4906](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/b0c4906b4960225a7076f94f3959a3d0f00e0da4))
+* bump @typegoose/typegoose from 12.8.0 to 12.9.1 ([3e0f18f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3e0f18fb6a8467645ca73d6e72b4168e9077cda4))
+* bump @typegoose/typegoose from 12.9.1 to 12.10.1 ([8741064](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/8741064a79bef22917507d17da326f9e32027425))
+* bump bcryptjs from 2.4.3 to 3.0.2 ([e6a2431](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e6a24316e488957a3f6dde0192661c0df400261a))
+* bump dotenv from 16.4.5 to 16.4.7 ([503aa3d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/503aa3dc4d4646499fdab7a569617601b5a0d825))
+* bump exifreader from 4.25.0 to 4.26.0 ([316ece8](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/316ece871e2d3cf75e7fc9e46d70e3112b9d3df8))
+* bump exifreader from 4.26.0 to 4.26.1 ([a0fb1d3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/a0fb1d347b23f062983bd1e42e47390036cf982f))
+* bump fs-extra from 11.2.0 to 11.3.0 ([01bafcc](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/01bafcc7cdc05c0916d4730b9b52ec030af70c47))
+* bump keyv from 5.1.2 to 5.2.1 ([96c11f3](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/96c11f3419b31bfc514902e123d9c58c934eb3e2))
+* bump keyv from 5.2.1 to 5.2.3 ([50fc73e](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/50fc73e491c1375f8d3bbf3f0d934f7974d44c65))
+* bump mongodb from 6.12.0 to 6.13.0 ([3b386be](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/3b386beaf9363208ebf79043d949cad717dc4599))
+* bump mongodb from 6.13.0 to 6.14.0 ([5e4532d](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/5e4532dc7caa4baeb95098d8e04d0054d118090d))
+* bump mongoose from 8.8.3 to 8.8.4 ([f5cea24](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/f5cea242776d0efb133eccf88c3f7f0b6bee2a01))
+* bump mongoose from 8.9.3 to 8.9.6 ([ccab94f](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/ccab94f26a3ec38d76e10a6ec783c5df247b9bb9))
+* bump pino from 9.5.0 to 9.6.0 ([42fda4b](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/42fda4baa28d905a10b1db022ede38f6b1296849))
+* bump pino-pretty from 11.3.0 to 13.0.0 ([6fad480](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/6fad4805c3c1dabffabd9d9c076d921f01aeea2f))
+* bump zod from 3.23.8 to 3.24.1 ([b54cc92](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/b54cc92334ab0399e7258b4d827218741182bad0))
+* bump zod from 3.24.1 to 3.24.2 ([f2cb514](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/f2cb514f3a24c839fcda28e1309325022e1b3668))
+* remove unnecessary bcryptjs types ([e7c9f4c](https://github.com/madisonbikes/cyclistsofmsn-backend/commit/e7c9f4ce62fa1f13d06f4b1704dc87b7b5813780))
+
 ## [2.1.0](https://github.com/madisonbikes/cyclistsofmsn-backend/compare/cyclistsofmsn-backend-v2.0.3...cyclistsofmsn-backend-v2.1.0) (2024-11-25)
 
 
