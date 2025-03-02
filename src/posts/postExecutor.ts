@@ -27,7 +27,10 @@ async function post(image: ImageDocument) {
   if (atproto.isEnabled()) {
     try {
       logger.debug("ATProto enabled");
-      const result = await atproto.post(image.filename, image.description);
+      const result = await atproto.post(
+        image.filename,
+        image.description ?? "",
+      );
       logger.info({ result }, `Posted new ATProto post`);
     } catch (e) {
       logger.error(e, "Error posting to ATProto");
