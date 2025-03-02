@@ -10,7 +10,7 @@ function isEnabled() {
   );
 }
 
-async function post(filename: string, description?: string) {
+async function post(filename: string, description: string) {
   const photoFilename = fsRepository.photoPath(filename);
   const buffer = await sharp(photoFilename)
     .resize({ width: 1600, withoutEnlargement: true })
@@ -26,7 +26,7 @@ async function post(filename: string, description?: string) {
 interface PostOptions {
   status: string;
   image: Buffer;
-  imageAltText?: string;
+  imageAltText: string;
 }
 
 const atPost = async ({ status, image, imageAltText }: PostOptions) => {
