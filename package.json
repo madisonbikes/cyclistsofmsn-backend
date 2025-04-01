@@ -40,7 +40,7 @@
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
-    "exifreader": "^4.26.1",
+    "exifreader": "^4.27.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "fs-extra": "^11.3.0",
