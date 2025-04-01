@@ -65,7 +65,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
-    "@eslint/js": "^9.19.0",
+    "@eslint/js": "^9.23.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/cors": "^2.8.17",
     "@types/express-session": "^1.18.1",
