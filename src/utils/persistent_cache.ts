@@ -5,13 +5,13 @@ import { configuration } from "../config";
 import { logger, maskUriPassword } from "./logger";
 
 /**
- * A class that provides a cache using Keyv with either Valkey (preferred) or SQLite as the storage backend.
+ * A class that provides a cache using Keyv with either Valkey (preferred) or in-memory as the storage backend.
  */
 class PersistentCache implements Lifecycle {
   private cache: Keyv<string> | undefined;
 
   /**
-   * Initializes the cache with a TTL (time-to-live) of 3600 seconds and SQLite or Valkey storage.
+   * Initializes the cache with a TTL (time-to-live) of 3600 seconds and in-memory or Valkey storage.
    */
   start() {
     let store: KeyvStoreAdapter | Map<unknown, unknown>;
