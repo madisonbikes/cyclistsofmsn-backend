@@ -1,10 +1,10 @@
 import { configuration } from "./config";
 import RedisStore from "connect-redis";
 import { logger, maskUriPassword } from "./utils";
-import { GlideClient, GlideClientConfiguration } from "@valkey/valkey-glide";
+import Valkey from "iovalkey";
 import { z } from "zod";
 
-let client: GlideClient | undefined;
+let client: Valkey | undefined;
 let started = false;
 
 class ValkeySessionStore {
@@ -25,10 +25,11 @@ class ValkeySessionStore {
       return;
     }
 
-    client = await GlideClient.createClient(
-      urlToValkeyGlideClientConfiguration(this.url),
-    );
+    const config = urlToValkeyConfiguration(this.url);
+
+    client = new Valkey({ ...config, lazyConnect: true });
     logger.info(`Using Valkey session store on ${maskUriPassword(this.url)}`);
+    await client.connect();
   }
 
   stop() {
@@ -37,7 +38,7 @@ class ValkeySessionStore {
     }
     started = false;
     if (client !== undefined) {
-      client.close();
+      client.disconnect();
       client = undefined;
     }
   }
@@ -52,9 +53,13 @@ class ValkeySessionStore {
 
 export const valkeySessionStore = new ValkeySessionStore();
 
-export const urlToValkeyGlideClientConfiguration = (
-  url: string,
-): GlideClientConfiguration => {
+export interface ValkeyConfiguration {
+  db?: number;
+  host: string;
+  port: number;
+}
+
+export const urlToValkeyConfiguration = (url: string): ValkeyConfiguration => {
   const parsedUrl = new URL(url);
   if (parsedUrl.protocol !== "valkey:" && parsedUrl.protocol !== "redis:") {
     throw new Error(`Invalid valkey session URI: ${url}`);
@@ -68,16 +73,17 @@ export const urlToValkeyGlideClientConfiguration = (
   if (!successPort) {
     throw new Error(`Invalid port in valkey session URI: ${url}`);
   }
-  const { success: successDatabaseId, data: databaseId } = z.coerce
+  const { success: successDatabaseId, data: db } = z.coerce
     .number()
-    .min(0)
-    .default(0)
+    .nonnegative()
+    .optional()
     .safeParse(parsedUrl.pathname.substring(1));
   if (!successDatabaseId) {
     throw new Error(`Invalid database ID in valkey session URI: ${url}`);
   }
   return {
-    databaseId,
-    addresses: [{ host: parsedUrl.hostname, port }],
+    db,
+    host: parsedUrl.hostname,
+    port,
   };
 };
