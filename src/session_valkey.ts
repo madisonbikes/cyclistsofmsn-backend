@@ -53,7 +53,7 @@ class ValkeySessionStore {
 
 export const valkeySessionStore = new ValkeySessionStore();
 
-export interface ValkeyConfiguration {
+interface ValkeyConfiguration {
   db?: number;
   host: string;
   port: number;
