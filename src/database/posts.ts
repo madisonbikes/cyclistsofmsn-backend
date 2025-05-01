@@ -4,9 +4,9 @@ import {
   isDocument,
   modelOptions,
   prop,
-  Ref,
   ReturnModelType,
 } from "@typegoose/typegoose";
+import type { Ref } from "@typegoose/typegoose";
 import { endOfDay, startOfDay } from "date-fns";
 import { ImageClass } from "./images";
 

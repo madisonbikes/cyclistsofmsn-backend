@@ -5,24 +5,24 @@ import { configuration } from "../config";
 import { logger, maskUriPassword } from "./logger";
 
 /**
- * A class that provides a cache using Keyv with either Redis (preferred) or SQLite as the storage backend.
+ * A class that provides a cache using Keyv with either Valkey (preferred) or SQLite as the storage backend.
  */
 class PersistentCache implements Lifecycle {
   private cache: Keyv<string> | undefined;
 
   /**
-   * Initializes the cache with a TTL (time-to-live) of 3600 seconds and SQLite or Redis storage.
+   * Initializes the cache with a TTL (time-to-live) of 3600 seconds and SQLite or Valkey storage.
    */
   start() {
     let store: KeyvStoreAdapter | Map<unknown, unknown>;
-    if (configuration.redisCacheUri !== "") {
+    if (configuration.valkeyCacheUri !== "") {
       logger.info(
-        `Using Redis cache with URI ${maskUriPassword(configuration.redisCacheUri)}`,
+        `Using Valkey cache with URI ${maskUriPassword(configuration.valkeyCacheUri)}`,
       );
-      store = new KeyvValkey(configuration.redisCacheUri);
+      store = new KeyvValkey(configuration.valkeyCacheUri);
     } else {
       logger.warn(
-        "No Redis cache URI provided. Using in-memory cache with no upper bounds.",
+        "No Valkey cache URI provided. Using in-memory cache with no upper bounds.",
       );
       store = new Map();
     }

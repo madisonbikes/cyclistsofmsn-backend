@@ -1,5 +1,5 @@
 import { configuration } from "./config";
-import redis from "./session_redis";
+import { valkeySessionStore } from "./session_valkey";
 import session from "express-session";
 import { logger } from "./utils";
 
@@ -18,10 +18,10 @@ export function sessionMiddlewareConfigurator() {
       sameSite: configuration.secureCookie ? "strict" : "lax",
     },
   };
-  if (redis.isEnabled()) {
-    sessionOptions.store = redis.createStore();
+  if (valkeySessionStore.isEnabled) {
+    sessionOptions.store = valkeySessionStore.createStore();
   } else {
-    logger.warn("Redis session store is disabled");
+    logger.warn("Valkey session store is disabled");
   }
   return session(sessionOptions);
 }
