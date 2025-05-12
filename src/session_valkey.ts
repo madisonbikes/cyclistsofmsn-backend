@@ -53,11 +53,12 @@ class ValkeySessionStore {
 
 export const valkeySessionStore = new ValkeySessionStore();
 
-interface ValkeyConfiguration {
+type ValkeyConfiguration = {
   db?: number;
   host: string;
   port: number;
-}
+  password?: string;
+};
 
 export const urlToValkeyConfiguration = (url: string): ValkeyConfiguration => {
   const parsedUrl = new URL(url);
@@ -81,9 +82,15 @@ export const urlToValkeyConfiguration = (url: string): ValkeyConfiguration => {
   if (!successDatabaseId) {
     throw new Error(`Invalid database ID in valkey session URI: ${url}`);
   }
+
+  let password: string | undefined = parsedUrl.password;
+  if (password === "") {
+    password = undefined;
+  }
   return {
     db,
     host: parsedUrl.hostname,
+    password,
     port,
   };
 };

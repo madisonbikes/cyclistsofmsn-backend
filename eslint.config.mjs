@@ -43,6 +43,8 @@ const projectRules = {
       { allowNumber: true },
     ],
     "import/no-cycle": "error",
+
+    "@typescript-eslint/consistent-type-definitions": "off",
   },
 };
 

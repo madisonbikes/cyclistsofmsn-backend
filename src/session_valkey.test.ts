@@ -31,6 +31,17 @@ describe("urlToValkeyGlideClientConfiguration", () => {
     });
   });
 
+  it("should parse a valid valkey URL with a password", () => {
+    const url = "valkey://:password@localhost:6379/";
+    const config = urlToValkeyConfiguration(url);
+    expect(config).toEqual({
+      db: 0,
+      host: "localhost",
+      port: 6379,
+      password: "password",
+    });
+  });
+
   it("should parse a valid valkey URL without database (form 2)", () => {
     const url = "valkey://localhost:6379";
     const config = urlToValkeyConfiguration(url);
