@@ -1,5 +1,5 @@
 import { configuration } from "./config";
-import ValkeyStore from "connect-redis";
+import { RedisStore as ValkeyStore } from "connect-redis";
 import { logger, maskUriPassword } from "./utils";
 import Valkey from "iovalkey";
 import { z } from "zod";
