@@ -1,5 +1,5 @@
 import { configuration } from "./config";
-import RedisStore from "connect-redis";
+import ValkeyStore from "connect-redis";
 import { logger, maskUriPassword } from "./utils";
 import Valkey from "iovalkey";
 import { z } from "zod";
@@ -47,7 +47,7 @@ class ValkeySessionStore {
     if (!client) {
       throw new Error("Valkey connection not started");
     }
-    return new RedisStore({ client });
+    return new ValkeyStore({ client });
   }
 }
 
