@@ -1,20 +1,11 @@
 import { ConnectionString } from "connection-string";
-import pino, {
-  DestinationStream,
-  Logger,
-  stdSerializers,
-  TransportTargetOptions,
-} from "pino";
+import pino, { stdSerializers } from "pino";
 import { initEnv } from "./env";
-import fs from "fs-extra";
-import { PinoPretty } from "pino-pretty";
 
 initEnv();
 
-const logFile = process.env.LOG_FILE ?? "output/backend.log";
-const logLevel = process.env.LOG_LEVEL ?? "info";
-const consoleLogLevel = process.env.CONSOLE_LOG_LEVEL ?? "info";
-const testLogLevel = process.env.TEST_LOG_LEVEL ?? "silent";
+const TEST_LOG_LEVEL = process.env.TEST_LOG_LEVEL ?? "fatal";
+const LOG_LEVEL = process.env.LOG_LEVEL;
 
 const serializers = {
   err: stdSerializers.err,
@@ -26,51 +17,25 @@ const serializers = {
     }
   },
 };
+const usePinoPretty = Boolean(process.env.PINO_PRETTY);
+const options: pino.LoggerOptions = { serializers, level: LOG_LEVEL };
 
-let newLogger: Logger;
 if (process.env.NODE_ENV === "test") {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const transport = pino.transport({
-    targets: [
-      {
-        level: testLogLevel,
-        target: "pino-pretty",
-        options: { destination: 1 } satisfies PinoPretty.PrettyOptions,
-      },
-    ],
-  });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  newLogger = pino({ level: testLogLevel, serializers }, transport);
+  options.level = TEST_LOG_LEVEL;
+} else if (process.env.NODE_ENV === "development") {
+  options.level = LOG_LEVEL ?? "info";
 } else {
-  fs.ensureFileSync(logFile); // ensure log file/directory exists before creating logger
-  const targets: TransportTargetOptions[] = [
-    {
-      level: consoleLogLevel,
-      target: "pino-pretty",
-      options: { destination: 1 } satisfies PinoPretty.PrettyOptions,
-    },
-    {
-      level: logLevel,
-      target: "pino-pretty",
-      options: {
-        colorize: false,
-        destination: logFile,
-      } satisfies PinoPretty.PrettyOptions,
-    },
-  ];
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const transport: DestinationStream = pino.transport({
-    targets,
-  });
-
-  // ensure pino base logger level is set to minimum of the transports
-  const levels = [consoleLogLevel, logLevel].map((l) => pino.levels.values[l]);
-  const minLevel = Math.min(...levels);
-  const level = pino.levels.labels[minLevel];
-  newLogger = pino({ level, serializers }, transport);
+  // production
+  options.level = LOG_LEVEL ?? "warn";
 }
-export const logger = newLogger;
+
+if (usePinoPretty) {
+  options.transport = {
+    target: "pino-pretty",
+  };
+}
+
+export const logger = pino(options);
 
 export const maskUriPassword = (uri: string) => {
   try {
