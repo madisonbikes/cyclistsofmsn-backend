@@ -17,8 +17,8 @@ const serializers = {
     }
   },
 };
-const usePinoPretty = Boolean(process.env.PINO_PRETTY);
-const options: pino.LoggerOptions = { serializers, level: LOG_LEVEL };
+
+const options: pino.LoggerOptions = { serializers };
 
 if (process.env.NODE_ENV === "test") {
   options.level = TEST_LOG_LEVEL;
@@ -29,6 +29,7 @@ if (process.env.NODE_ENV === "test") {
   options.level = LOG_LEVEL ?? "warn";
 }
 
+const usePinoPretty = Boolean(process.env.PINO_PRETTY);
 if (usePinoPretty) {
   options.transport = {
     target: "pino-pretty",
