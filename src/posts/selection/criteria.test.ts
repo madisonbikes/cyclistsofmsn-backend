@@ -8,6 +8,7 @@ import {
   UnpostedCriteria,
 } from "./criteria";
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
+import { describe, it, expect } from "vitest";
 
 describe("test criteria components", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });

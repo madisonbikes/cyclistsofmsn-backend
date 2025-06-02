@@ -12,6 +12,7 @@ import {
   createTestEditorUser,
   createTestUser,
 } from "../../test/data";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("server process - images", () => {
   let request: TestRequest;

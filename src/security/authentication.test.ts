@@ -1,5 +1,6 @@
 import { AuthenticatedUser } from "../routes/contract";
 import { Roles, userHasRole } from "./authentication";
+import { describe, it, expect } from "vitest";
 
 describe("authentication", () => {
   it("plain user lacks role", () => {

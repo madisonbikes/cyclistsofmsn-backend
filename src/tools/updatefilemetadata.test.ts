@@ -2,6 +2,7 @@ import { setupSuite } from "../test";
 import { Image } from "../database";
 import { getGoodImageId } from "../test/data";
 import { updateFileMetadata } from "./updatefilemetadata";
+import { describe, it, expect } from "vitest";
 
 describe("updateFileMetadata", () => {
   setupSuite({

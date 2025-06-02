@@ -1,5 +1,6 @@
 import { setupSuite, testRequest, TestRequest } from "../test";
 import { GetInfo } from "./contract";
+import { describe, it, expect, beforeEach } from "vitest";
 
 describe("info route", () => {
   let request: TestRequest;

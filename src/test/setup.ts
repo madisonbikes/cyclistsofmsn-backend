@@ -6,7 +6,9 @@ import { PhotoServer } from "../server";
 import { Server } from "http";
 import imageRepositoryScanner from "../scan";
 import fs from "fs-extra";
+import { beforeAll, afterEach, afterAll } from "vitest";
 
+// This file sets up the test environment for the application, including
 let photoServer: PhotoServer | undefined;
 export let runningPhotoServer: Server | undefined;
 

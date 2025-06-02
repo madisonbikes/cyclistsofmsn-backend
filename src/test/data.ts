@@ -1,4 +1,5 @@
 import { Image, database } from "../database";
+import { expect } from "vitest";
 
 /** returns array of inserted post id's */
 export const createTestPosts = async () => {

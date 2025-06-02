@@ -3,8 +3,9 @@ import { Image, ImageDocument, PostHistory } from "../../database";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
 import imageSelector from "./selector";
+import { vi, describe, it, expect } from "vitest";
 
-jest.mock("../../utils/random");
+vi.mock("../../utils/random");
 
 describe("test post image selector components", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });

@@ -11,6 +11,7 @@ import {
 } from "./contract";
 import { startOfTomorrow } from "date-fns";
 import { createTestAdminUser } from "../test/data";
+import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 
 describe("server process - tasks", () => {
   let request: TestRequest;

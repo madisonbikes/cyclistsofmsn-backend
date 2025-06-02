@@ -1,6 +1,7 @@
 import { setupSuite } from "../test";
 import { createTestPosts } from "../test/data";
 import { Image } from "./images";
+import { describe, it, expect } from "vitest";
 
 describe("database - posts", () => {
   setupSuite({ withDatabase: true });

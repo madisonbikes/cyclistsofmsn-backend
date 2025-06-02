@@ -4,18 +4,19 @@ import postExecutor from "./postExecutor";
 import photoTooter from "../mastodon/post";
 import photoTweeter from "../twitter/post";
 import atproto from "../atproto";
+import { vi, describe, it, expect } from "vitest";
 
-jest.mock("../mastodon/post");
-jest.mock("../twitter/post");
-jest.mock("../atproto");
+vi.mock("../mastodon/post");
+vi.mock("../twitter/post");
+vi.mock("../atproto");
 
-const mockPhotoTooter = jest.mocked(photoTooter);
+const mockPhotoTooter = vi.mocked(photoTooter);
 mockPhotoTooter.isEnabled.mockReturnValue(true);
 
-const mockPhotoTweeter = jest.mocked(photoTweeter);
+const mockPhotoTweeter = vi.mocked(photoTweeter);
 mockPhotoTweeter.isEnabled.mockReturnValue(true);
 
-const mockAtproto = jest.mocked(atproto);
+const mockAtproto = vi.mocked(atproto);
 mockAtproto.isEnabled.mockReturnValue(true);
 
 describe("test executor component", () => {

@@ -17,10 +17,11 @@ import { configuration } from "../config";
 import { SchedulePostOptions } from "../routes/contract";
 import now from "../utils/now";
 import { ObjectId } from "mongodb";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 
-jest.mock("../utils/random");
-jest.mock("../utils/now");
-const mockNow = jest.mocked(now);
+vi.mock("../utils/random");
+vi.mock("../utils/now");
+const mockNow = vi.mocked(now);
 
 const RANDOM_VALUE = 50;
 

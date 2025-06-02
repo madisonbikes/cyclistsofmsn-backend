@@ -1,4 +1,5 @@
 import { getAuthenticateUrl } from "./register";
+import { describe, it, expect } from "vitest";
 
 describe("registration configuration", () => {
   it("test url", () => {
