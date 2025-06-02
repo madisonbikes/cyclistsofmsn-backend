@@ -1,6 +1,6 @@
 import { ConnectionString } from "connection-string";
-import pino, { stdSerializers } from "pino";
-import { initEnv } from "./env";
+import { stdSerializers, pino } from "pino";
+import { initEnv } from "./env.js";
 
 initEnv();
 

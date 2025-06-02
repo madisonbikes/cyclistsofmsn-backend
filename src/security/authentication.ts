@@ -1,8 +1,11 @@
 import { Strategy as LocalStrategy } from "passport-local";
-import { User, UserDocument } from "../database";
-import { logger } from "../utils";
-import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
-import { Request, Response, NextFunction } from "express";
+import { User, type UserDocument } from "../database/index.js";
+import { logger } from "../utils/index.js";
+import {
+  type AuthenticatedUser,
+  authenticatedUserSchema,
+} from "../routes/contract/index.js";
+import type { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 
 export enum Roles {

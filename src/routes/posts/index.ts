@@ -6,10 +6,10 @@ import {
   validateBodySchema,
   validateId,
   validateRole,
-} from "../../security";
-import singlePostPut from "./put";
-import singlePostDelete from "./delete";
-import postGet from "./get";
+} from "../../security/index.js";
+import singlePostPut from "./put.js";
+import singlePostDelete from "./delete.js";
+import postGet from "./get.js";
 
 function validateEditor() {
   return validateRole({ role: Roles.EDITOR });

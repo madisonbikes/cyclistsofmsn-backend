@@ -1,8 +1,8 @@
-import { database, Image, ImageDocument } from "./database";
-import fsRepository from "./fs_repository";
-import { StringArrayTag } from "exifreader";
+import { database, Image, type ImageDocument } from "./database/index.js";
+import fsRepository from "./fs_repository/index.js";
+import { type StringArrayTag } from "exifreader";
 import { parse } from "date-fns/parse";
-import { logger } from "./utils";
+import { logger } from "./utils/index.js";
 import pLimit from "p-limit";
 
 /** expose scanning operation.  requires database connection to be established */

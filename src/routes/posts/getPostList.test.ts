@@ -2,10 +2,10 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
-} from "../../test";
-import { postListSchema } from "../contract";
-import { createTestPosts, createTestUser } from "../../test/data";
+  type TestRequest,
+} from "../../test/index.js";
+import { postListSchema } from "../contract/index.js";
+import { createTestPosts, createTestUser } from "../../test/data.js";
 
 describe("server process - posts", () => {
   let request: TestRequest;

@@ -4,15 +4,15 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
-} from "../../test";
-import { Image } from "../../database";
+  type TestRequest,
+} from "../../test/index.js";
+import { Image } from "../../database/index.js";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
   getGoodImageId,
-} from "../../test/data";
+} from "../../test/data.js";
 
 describe("server process - images", () => {
   let request: TestRequest;

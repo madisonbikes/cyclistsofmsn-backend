@@ -1,7 +1,7 @@
 import { execFile } from "promisify-child-process";
 import fs from "fs-extra";
 import tempfile from "tempfile";
-import { logger } from "./utils";
+import { logger } from "./utils/index.js";
 
 export const updateImageDescription = async (
   file: string,

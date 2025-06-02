@@ -1,9 +1,9 @@
-import { setupSuite } from "../test";
-import { Image } from "../database";
-import postExecutor from "./postExecutor";
-import photoTooter from "../mastodon/post";
-import photoTweeter from "../twitter/post";
-import atproto from "../atproto";
+import { setupSuite } from "../test/index.js";
+import { Image } from "../database/index.js";
+import postExecutor from "./postExecutor.js";
+import photoTooter from "../mastodon/post.js";
+import photoTweeter from "../twitter/post.js";
+import atproto from "../atproto/index.js";
 
 jest.mock("../mastodon/post");
 jest.mock("../twitter/post");

@@ -1,4 +1,4 @@
-import { urlToValkeyConfiguration } from "./session_valkey";
+import { urlToValkeyConfiguration } from "./session_valkey.js";
 
 describe("urlToValkeyGlideClientConfiguration", () => {
   it("should parse a valid valkey URL", () => {

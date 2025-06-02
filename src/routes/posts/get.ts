@@ -1,7 +1,7 @@
-import { PostHistory } from "../../database";
-import { mapPostSchema } from "./types";
-import { Request, Response } from "express";
-import { logger } from "../../utils";
+import { PostHistory } from "../../database/index.js";
+import { mapPostSchema } from "./types.js";
+import type { Request, Response } from "express";
+import { logger } from "../../utils/index.js";
 
 const currentPostHandler = async (_req: Request, res: Response) => {
   const post = await PostHistory.findLatestPost();

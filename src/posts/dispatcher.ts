@@ -1,15 +1,15 @@
-import { error, logger, ok, Result } from "../utils";
-import now from "../utils/now";
-import { PostError, schedulePost } from "./postScheduler";
-import postExecutor from "./postExecutor";
+import { error, logger, ok, type Result } from "../utils/index.js";
+import now from "../utils/now.js";
+import { type PostError, schedulePost } from "./postScheduler.js";
+import postExecutor from "./postExecutor.js";
 import {
-  ImageDocument,
-  PostHistoryDocument,
+  type ImageDocument,
+  type PostHistoryDocument,
   PostStatus,
   Image,
-} from "../database";
-import imageSelector from "./selection/selector";
-import imageRepositoryScanner from "../scan";
+} from "../database/index.js";
+import imageSelector from "./selection/selector.js";
+import imageRepositoryScanner from "../scan.js";
 
 // five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;

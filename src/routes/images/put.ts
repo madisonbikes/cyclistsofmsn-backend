@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
-import { Image, ImageDocument } from "../../database";
-import { logger } from "../../utils";
-import { putImageBodySchema } from "../contract";
-import { lenientImageSchema } from "./localTypes";
-import fsRepository from "../../fs_repository";
+import type { Request, Response } from "express";
+import { Image, type ImageDocument } from "../../database/index.js";
+import { logger } from "../../utils/index.js";
+import { putImageBodySchema } from "../contract/index.js";
+import { lenientImageSchema } from "./localTypes.js";
+import fsRepository from "../../fs_repository/index.js";
 import { z } from "zod";
 
 class ImagePut {

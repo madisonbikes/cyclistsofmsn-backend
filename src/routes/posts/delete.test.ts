@@ -4,14 +4,14 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
-} from "../../test";
-import { database, PostHistory } from "../../database";
+  type TestRequest,
+} from "../../test/index.js";
+import { database, PostHistory } from "../../database/index.js";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
-} from "../../test/data";
+} from "../../test/data.js";
 
 describe("server process - posts", () => {
   let request: TestRequest;

@@ -1,7 +1,7 @@
-import { setupSuite } from "../test";
-import { Image } from "../database";
-import { getGoodImageId } from "../test/data";
-import { updateFileMetadata } from "./updatefilemetadata";
+import { setupSuite } from "../test/index.js";
+import { Image } from "../database/index.js";
+import { getGoodImageId } from "../test/data.js";
+import { updateFileMetadata } from "./updatefilemetadata.js";
 
 describe("updateFileMetadata", () => {
   setupSuite({

@@ -1,5 +1,5 @@
-import { setupSuite, testRequest, TestRequest } from "../test";
-import { createTestUser } from "../test/data";
+import { setupSuite, testRequest, type TestRequest } from "../test/index.js";
+import { createTestUser } from "../test/data.js";
 
 describe("login route", () => {
   let request: TestRequest;

@@ -1,4 +1,4 @@
-import { getAuthenticateUrl } from "./register";
+import { getAuthenticateUrl } from "./register.js";
 
 describe("registration configuration", () => {
   it("test url", () => {

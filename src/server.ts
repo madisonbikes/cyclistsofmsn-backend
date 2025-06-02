@@ -1,16 +1,20 @@
 import http, { Server } from "http";
 import cors from "cors";
-import { Lifecycle, logger } from "./utils";
-import { configuration } from "./config";
-import imageRepositoryScanner from "./scan";
-import { database } from "./database";
-import api from "./routes";
-import express, { NextFunction, Request, Response } from "express";
+import { type Lifecycle, logger } from "./utils/index.js";
+import { configuration } from "./config.js";
+import imageRepositoryScanner from "./scan.js";
+import { database } from "./database/index.js";
+import api from "./routes/index.js";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import passport from "passport";
-import { strategies } from "./security";
-import { valkeySessionStore } from "./session_valkey";
-import { sessionMiddlewareConfigurator } from "./session";
-import persistent_cache from "./utils/persistent_cache";
+import { strategies } from "./security/index.js";
+import { valkeySessionStore } from "./session_valkey.js";
+import { sessionMiddlewareConfigurator } from "./session.js";
+import persistent_cache from "./utils/persistent_cache.js";
 
 /** expose command-line launcher */
 if (require.main === module) {

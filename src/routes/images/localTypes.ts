@@ -1,4 +1,4 @@
-import { imageSchema } from "../contract";
+import { imageSchema } from "../contract/index.js";
 import { z } from "zod";
 
 // database could, in theory, not have fs_timestamp defined

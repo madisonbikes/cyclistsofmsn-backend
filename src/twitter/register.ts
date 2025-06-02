@@ -1,8 +1,8 @@
 import superagent from "superagent";
-import { oauth_signer } from "./oauth";
+import { oauth_signer } from "./oauth.js";
 import qs from "querystring";
 import readlinesync from "readline-sync";
-import { configuration } from "../config";
+import { configuration } from "../config.js";
 
 /** expose command-line launcher */
 if (require.main === module) {

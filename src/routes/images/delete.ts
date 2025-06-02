@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { Image, PostHistory } from "../../database";
-import fsRepository from "../../fs_repository";
-import { logger } from "../../utils";
+import type { Request, Response } from "express";
+import fsRepository from "../../fs_repository/index.js";
+import { logger } from "../../utils/index.js";
 import pLimit from "p-limit";
+import { Image, PostHistory } from "../../database/index.js";
 
 async function handler(req: Request, res: Response) {
   const id = req.params.id;

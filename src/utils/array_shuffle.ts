@@ -1,4 +1,4 @@
-import { randomInt } from "./random";
+import { randomInt } from "./random.js";
 
 /**
  * Adapted from https://github.com/sindresorhus/array-shuffle/blob/main/index.js

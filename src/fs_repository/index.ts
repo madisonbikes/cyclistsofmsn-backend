@@ -1,9 +1,9 @@
 import { load } from "exifreader";
-import { configuration } from "../config";
+import { configuration } from "../config.js";
 import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
-import { updateImageDescription } from "../exiftool";
+import { updateImageDescription } from "../exiftool.js";
 
 function baseDirectory() {
   return configuration.photosDir;

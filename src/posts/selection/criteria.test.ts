@@ -1,12 +1,16 @@
 // noinspection JSUnusedLocalSymbols
 
-import { setupSuite } from "../../test";
-import { Image, ImageDocument, PostHistory } from "../../database";
+import { setupSuite } from "../../test/index.js";
+import {
+  Image,
+  type ImageDocument,
+  PostHistory,
+} from "../../database/index.js";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
-} from "./criteria";
+} from "./criteria.js";
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
 
 describe("test criteria components", () => {

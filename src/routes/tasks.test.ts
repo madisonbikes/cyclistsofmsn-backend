@@ -2,15 +2,15 @@ import {
   loginTestAdminUser,
   setupSuite,
   testRequest,
-  TestRequest,
-} from "../test";
+  type TestRequest,
+} from "../test/index.js";
 import {
   postSchema,
   postStatusFlagSchema,
-  SchedulePostOptions,
-} from "./contract";
+  type SchedulePostOptions,
+} from "./contract/index.js";
 import { startOfTomorrow } from "date-fns";
-import { createTestAdminUser } from "../test/data";
+import { createTestAdminUser } from "../test/data.js";
 
 describe("server process - tasks", () => {
   let request: TestRequest;

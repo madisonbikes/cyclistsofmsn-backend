@@ -1,10 +1,10 @@
-import { configuration, testConfiguration } from "../config";
+import { configuration, testConfiguration } from "../config.js";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import path from "path";
-import { database } from "../database";
-import { PhotoServer } from "../server";
+import { database } from "../database/index.js";
+import { PhotoServer } from "../server.js";
 import { Server } from "http";
-import imageRepositoryScanner from "../scan";
+import imageRepositoryScanner from "../scan.js";
 import fs from "fs-extra";
 
 let photoServer: PhotoServer | undefined;

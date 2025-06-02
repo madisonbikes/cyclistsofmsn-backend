@@ -7,10 +7,10 @@ import {
   validateRole,
   validateId,
   validateAdmin,
-} from "../../security";
-import imageGet from "./get";
-import singleImageDelete from "./delete";
-import imagePut from "./put";
+} from "../../security/index.js";
+import imageGet from "./get.js";
+import singleImageDelete from "./delete.js";
+import imagePut from "./put.js";
 
 function routes() {
   return (

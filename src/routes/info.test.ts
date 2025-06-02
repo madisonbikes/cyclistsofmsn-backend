@@ -1,5 +1,5 @@
-import { setupSuite, testRequest, TestRequest } from "../test";
-import { GetInfo } from "./contract";
+import { setupSuite, testRequest, type TestRequest } from "../test/index.js";
+import { type GetInfo } from "./contract/index.js";
 
 describe("info route", () => {
   let request: TestRequest;

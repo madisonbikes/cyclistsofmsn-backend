@@ -1,6 +1,6 @@
-import { ImageDocument, PostHistory } from "../../database";
+import { type ImageDocument, PostHistory } from "../../database/index.js";
 import { getDayOfYear, startOfDay, subDays } from "date-fns";
-import now from "../../utils/now";
+import now from "../../utils/now.js";
 
 const MINIMUM_REPOST_INTERVAL_IN_DAYS = 180;
 const SEASONALITY_WINDOW = 45;

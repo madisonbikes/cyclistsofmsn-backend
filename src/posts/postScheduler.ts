@@ -1,16 +1,20 @@
-import { PostHistory, PostHistoryDocument, PostStatus } from "../database";
+import {
+  PostHistory,
+  type PostHistoryDocument,
+  PostStatus,
+} from "../database/index.js";
 import {
   differenceInMinutes,
   startOfDay,
   set as date_set,
   add as date_add,
 } from "date-fns";
-import { configuration } from "../config";
-import { error, logger, ok, Result } from "../utils";
-import { randomInt } from "../utils/random";
-import now from "../utils/now";
-import { SchedulePostOptions } from "../routes/contract";
-import imageSelector from "./selection/selector";
+import { configuration } from "../config.js";
+import { error, logger, ok, type Result } from "../utils/index.js";
+import { randomInt } from "../utils/random.js";
+import now from "../utils/now.js";
+import { type SchedulePostOptions } from "../routes/contract/index.js";
+import imageSelector from "./selection/selector.js";
 
 type PostResult = Result<PostHistoryDocument, PostError>;
 

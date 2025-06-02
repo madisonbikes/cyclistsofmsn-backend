@@ -1,4 +1,4 @@
-import { Image, database } from "../database";
+import { Image, database } from "../database/index.js";
 
 /** returns array of inserted post id's */
 export const createTestPosts = async () => {

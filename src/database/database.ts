@@ -1,8 +1,8 @@
-import { configuration } from "../config";
+import { configuration } from "../config.js";
 import mongoose, { Mongoose } from "mongoose";
-import { logger, maskUriPassword } from "../utils";
-import { Version } from "./version";
-import { Image } from "./images";
+import { logger, maskUriPassword } from "../utils/index.js";
+import { Version } from "./version.js";
+import { Image } from "./images.js";
 
 /** make sure you update switch statement below when bumping db version */
 const CURRENT_DATABASE_VERSION = 3;

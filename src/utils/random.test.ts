@@ -1,4 +1,4 @@
-import { randomInt } from "./random";
+import { randomInt } from "./random.js";
 
 jest.mock("./random");
 

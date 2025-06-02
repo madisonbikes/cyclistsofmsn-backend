@@ -1,10 +1,10 @@
-import { configuration } from "./config";
+import { configuration } from "./config.js";
 import { RedisStore as ValkeyStore } from "connect-redis";
-import { logger, maskUriPassword } from "./utils";
-import Valkey from "iovalkey";
+import { logger, maskUriPassword } from "./utils/index.js";
+import { Redis as ValKey } from "iovalkey";
 import { z } from "zod";
 
-let client: Valkey | undefined;
+let client: ValKey | undefined;
 let started = false;
 
 class ValkeySessionStore {
@@ -27,7 +27,7 @@ class ValkeySessionStore {
 
     const config = urlToValkeyConfiguration(this.url);
 
-    client = new Valkey({ ...config, lazyConnect: true });
+    client = new ValKey({ ...config, lazyConnect: true });
     logger.info(`Using Valkey session store on ${maskUriPassword(this.url)}`);
     await client.connect();
   }

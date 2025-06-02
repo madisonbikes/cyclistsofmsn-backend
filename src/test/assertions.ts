@@ -1,6 +1,6 @@
 /** custom assertions that do a nicer job of type narrowing */
 
-import { Error, Ok, Result } from "../utils";
+import { Error, Ok, type Result } from "../utils/index.js";
 
 export function assertOk<T1, T2>(
   result: Result<T1, T2>,

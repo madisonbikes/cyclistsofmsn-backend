@@ -1,8 +1,11 @@
 import express from "express";
-import { schedulePost } from "../posts/postScheduler";
-import { validateAdmin, validateBodySchema } from "../security";
-import { SchedulePostOptions, schedulePostOptionsSchema } from "./contract";
-import { mapPostSchema } from "./posts/types";
+import { schedulePost } from "../posts/postScheduler.js";
+import { validateAdmin, validateBodySchema } from "../security/index.js";
+import {
+  type SchedulePostOptions,
+  schedulePostOptionsSchema,
+} from "./contract/index.js";
+import { mapPostSchema } from "./posts/types.js";
 
 function routes() {
   return express

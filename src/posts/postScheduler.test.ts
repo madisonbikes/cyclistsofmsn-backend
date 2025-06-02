@@ -1,5 +1,10 @@
-import { assertError, assertInstanceOf, assertOk, setupSuite } from "../test";
-import { PostError, schedulePost } from "./postScheduler";
+import {
+  assertError,
+  assertInstanceOf,
+  assertOk,
+  setupSuite,
+} from "../test/index.js";
+import { type PostError, schedulePost } from "./postScheduler.js";
 import {
   add as date_add,
   set as date_set,
@@ -10,12 +15,12 @@ import {
 import {
   Image,
   PostHistory,
-  PostHistoryDocument,
+  type PostHistoryDocument,
   PostStatus,
-} from "../database";
-import { configuration } from "../config";
-import { SchedulePostOptions } from "../routes/contract";
-import now from "../utils/now";
+} from "../database/index.js";
+import { configuration } from "../config.js";
+import { type SchedulePostOptions } from "../routes/contract/index.js";
+import now from "../utils/now.js";
 import { ObjectId } from "mongodb";
 
 jest.mock("../utils/random");

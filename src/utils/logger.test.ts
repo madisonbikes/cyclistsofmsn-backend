@@ -1,4 +1,4 @@
-import { maskUriPassword } from "./logger";
+import { maskUriPassword } from "./logger.js";
 
 describe("tests masking of uris with password", () => {
   it("mask a uri with password", () => {

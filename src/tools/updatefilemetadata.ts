@@ -1,6 +1,6 @@
-import { database, Image } from "../database";
-import fsRepository from "../fs_repository";
-import { logger } from "../utils";
+import { database, Image } from "../database/index.js";
+import fsRepository from "../fs_repository/index.js";
+import { logger } from "../utils/index.js";
 import pLimit from "p-limit";
 
 if (require.main === module) {

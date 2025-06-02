@@ -1,9 +1,9 @@
 import fs from "fs-extra";
 import path from "path";
-import { updateImageDescription } from "./exiftool";
+import { updateImageDescription } from "./exiftool.js";
 import { load } from "exifreader";
 import tempfile from "tempfile";
-import { testResourcesDir } from "./test";
+import { testResourcesDir } from "./test/index.js";
 
 describe("exiftool", () => {
   const testImageFile = path.resolve(

@@ -1,6 +1,6 @@
-import { setupSuite } from "../test";
-import { createTestPosts } from "../test/data";
-import { Image } from "./images";
+import { setupSuite } from "../test/index.js";
+import { createTestPosts } from "../test/data.js";
+import { Image } from "./images.js";
 
 describe("database - posts", () => {
   setupSuite({ withDatabase: true });

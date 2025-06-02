@@ -1,5 +1,5 @@
-import { Post, postSchema, postStatusSchema } from "../contract";
-import { PostHistoryDocument } from "../../database";
+import { type Post, postSchema, postStatusSchema } from "../contract/index.js";
+import { type PostHistoryDocument } from "../../database/index.js";
 import { isDocument } from "@typegoose/typegoose";
 
 import { z } from "zod";

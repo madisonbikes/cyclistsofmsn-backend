@@ -1,10 +1,10 @@
-import { error, ok, Result, arrayShuffle } from "../../utils";
-import { Image, ImageDocument } from "../../database";
+import { error, ok, type Result, arrayShuffle } from "../../utils/index.js";
+import { Image, type ImageDocument } from "../../database/index.js";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
-} from "./criteria";
+} from "./criteria.js";
 
 const repostCriteria = new RepostCriteria();
 const seasonalityCriteria = new SeasonalityCriteria();

@@ -1,7 +1,7 @@
-import { dispatchPostOnSchedule } from "../posts/dispatcher";
-import { populatePostsOnSchedule } from "../posts/populate";
-import { testConfiguration } from "../config";
-import { setupSuite, testRequest } from "../test";
+import { dispatchPostOnSchedule } from "../posts/dispatcher.js";
+import { populatePostsOnSchedule } from "../posts/populate.js";
+import { testConfiguration } from "../config.js";
+import { setupSuite, testRequest } from "../test/index.js";
 
 jest.mock("../posts/dispatcher");
 jest.mock("../posts/populate");

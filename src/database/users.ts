@@ -1,5 +1,5 @@
 import {
-  DocumentType,
+  type DocumentType,
   getModelForClass,
   modelOptions,
   mongoose,

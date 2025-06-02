@@ -1,5 +1,5 @@
-import { AuthenticatedUser } from "../routes/contract";
-import { Roles, userHasRole } from "./authentication";
+import { type AuthenticatedUser } from "../routes/contract/index.js";
+import { Roles, userHasRole } from "./authentication.js";
 
 describe("authentication", () => {
   it("plain user lacks role", () => {

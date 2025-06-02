@@ -1,8 +1,12 @@
-import { assertError, setupSuite } from "../../test";
-import { Image, ImageDocument, PostHistory } from "../../database";
+import { assertError, setupSuite } from "../../test/index.js";
+import {
+  Image,
+  type ImageDocument,
+  PostHistory,
+} from "../../database/index.js";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
-import imageSelector from "./selector";
+import imageSelector from "./selector.js";
 
 jest.mock("../../utils/random");
 

@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { PostHistory } from "../../database";
-import { logger } from "../../utils";
+import type { Request, Response } from "express";
+import { PostHistory } from "../../database/index.js";
+import { logger } from "../../utils/index.js";
 
 async function handler(req: Request, res: Response) {
   const { id } = req.params;

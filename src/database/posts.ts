@@ -1,14 +1,14 @@
 import {
-  DocumentType,
+  type DocumentType,
   getModelForClass,
   isDocument,
   modelOptions,
   prop,
-  ReturnModelType,
+  type ReturnModelType,
+  type Ref,
 } from "@typegoose/typegoose";
-import type { Ref } from "@typegoose/typegoose";
 import { endOfDay, startOfDay } from "date-fns";
-import { ImageClass } from "./images";
+import { ImageClass } from "./images.js";
 
 export enum PostStatus {
   PENDING = "pending",

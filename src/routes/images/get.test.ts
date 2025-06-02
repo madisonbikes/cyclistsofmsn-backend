@@ -2,12 +2,12 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
-} from "../../test";
-import { imageListSchema } from "../contract";
-import { createTestUser } from "../../test/data";
-import { database } from "../../database";
-import fs_cache from "../../utils/persistent_cache";
+  type TestRequest,
+} from "../../test/index.js";
+import { imageListSchema } from "../contract/index.js";
+import { createTestUser } from "../../test/data.js";
+import { database } from "../../database/index.js";
+import fs_cache from "../../utils/persistent_cache.js";
 
 describe("server process - images", () => {
   let request: TestRequest;

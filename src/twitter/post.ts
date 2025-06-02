@@ -1,9 +1,9 @@
 import { TwitterClient } from "twitter-api-client";
 import { readFile } from "fs/promises";
-import { configuration } from "../config";
+import { configuration } from "../config.js";
 import sharp from "sharp";
-import fsRepository from "../fs_repository";
-import { logger } from "../utils";
+import fsRepository from "../fs_repository/index.js";
+import { logger } from "../utils/index.js";
 
 export default { isEnabled, post };
 
