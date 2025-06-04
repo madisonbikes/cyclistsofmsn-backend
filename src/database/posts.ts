@@ -1,87 +1,86 @@
-import {
-  DocumentType,
-  getModelForClass,
-  isDocument,
-  modelOptions,
-  prop,
-  ReturnModelType,
-} from "@typegoose/typegoose";
-import type { Ref } from "@typegoose/typegoose";
+import { Schema, model, InferSchemaType } from "mongoose";
+import { ObjectId } from "mongodb";
 import { endOfDay, startOfDay } from "date-fns";
-import { ImageClass } from "./images";
+import { ImageDocument } from "./images";
 
-export enum PostStatus {
-  PENDING = "pending",
-  FAILED = "failed",
-  COMPLETE = "complete",
-}
+const postStatusNames = ["pending", "failed", "complete"] as const;
+//type PostStatus = (typeof postStatusNames)[number];
 
-export class PostHistoryStatus {
-  @prop({
-    enum: [PostStatus.PENDING, PostStatus.FAILED, PostStatus.COMPLETE],
+const postHistoryStatusSchema = new Schema({
+  flag: {
+    type: String,
+    enum: postStatusNames,
     required: true,
-    default: PostStatus.PENDING,
-  })
-  public flag!: string;
+    default: "pending",
+  },
+  error: { type: String },
+  uri: { type: String },
+});
 
-  @prop()
-  public error?: string;
+type PostHistoryStatusDocument = InferSchemaType<
+  typeof postHistoryStatusSchema
+>;
 
-  @prop()
-  public uri?: string;
-}
+const postHistorySchema = new Schema(
+  {
+    _id: { type: Schema.Types.ObjectId, auto: true, required: true },
+    image: { type: Schema.Types.ObjectId, ref: "images" },
+    timestamp: { type: Date, required: true, default: Date.now, index: true },
+    status: {
+      type: postHistoryStatusSchema,
+      required: true,
+      default: { flag: "pending" },
+      _id: false,
+    },
+  },
+  {
+    statics: {
+      findLatestPost() {
+        return this.findOne()
+          .where({ "status.flag": "complete" })
+          .sort({ timestamp: -1 })
+          .populate<{ image: ImageDocument | null }>({
+            path: "image",
+            select: ["deleted"],
+          });
+      },
 
-@modelOptions({ schemaOptions: { collection: "posts" } })
-export class PostHistoryClass {
-  @prop({ ref: () => ImageClass })
-  public image?: Ref<ImageClass>;
+      async findOrderedPosts() {
+        const posts = await this.find()
+          .sort({ timestamp: 1 })
+          .populate<{ image: ImageDocument | null }>({
+            path: "image",
+            select: ["deleted"],
+          });
 
-  @prop({ required: true, default: Date.now, index: true })
-  public timestamp!: Date;
+        return posts.flatMap((post) => {
+          if (post.image?.deleted === true) {
+            post.image = null;
+          }
+          return post;
+        });
+      },
 
-  @prop({ default: new PostHistoryStatus(), required: true, _id: false })
-  public status!: PostHistoryStatus;
+      findScheduledPost(when: Date) {
+        const start = startOfDay(when);
+        const end = endOfDay(when);
 
-  public static findLatestPost(this: ReturnModelType<typeof PostHistoryClass>) {
-    return this.findOne()
-      .where({ "status.flag": PostStatus.COMPLETE })
-      .sort({ timestamp: -1 })
-      .populate({ path: "image", select: ["deleted"] });
-  }
+        return this.find()
+          .where({
+            "status.flag": { $eq: "pending" },
+            timestamp: { $gte: start, $lte: end },
+          })
+          .populate<{ image: ImageDocument | null }>("image")
+          .sort({ timestamp: -1 });
+      },
 
-  /** returns sorted by timestamp ascending */
-  public static async findOrderedPosts(
-    this: ReturnModelType<typeof PostHistoryClass>,
-  ) {
-    const posts = await this.find()
-      .sort({ timestamp: 1 })
-      .populate({ path: "image", select: ["deleted"] });
+      updatePostStatus(postId: ObjectId, status: PostHistoryStatusDocument) {
+        return this.updateOne({ _id: postId }, { $set: status });
+      },
+    },
+  },
+);
 
-    return posts.flatMap((post) => {
-      const retval = post;
-      if (isDocument(post.image) && post.image.deleted) {
-        retval.image = undefined;
-      }
-      return retval;
-    });
-  }
+export type PostHistoryDocument = InferSchemaType<typeof postHistorySchema>;
 
-  public static findScheduledPost(
-    this: ReturnModelType<typeof PostHistoryClass>,
-    when: Date,
-  ) {
-    const start = startOfDay(when);
-    const end = endOfDay(when);
-
-    return this.find()
-      .where({
-        "status.flag": PostStatus.PENDING,
-        timestamp: { $gte: start, $lte: end },
-      })
-      .populate("image")
-      .sort({ timestamp: -1 });
-  }
-}
-
-export type PostHistoryDocument = DocumentType<PostHistoryClass>;
-export const PostHistory = getModelForClass(PostHistoryClass);
+export const PostHistory = model("posts", postHistorySchema);

@@ -18,7 +18,10 @@ async function post(image: ImageDocument) {
   if (photoTooter.isEnabled()) {
     try {
       logger.debug("Mastodon enabled");
-      const result = await photoTooter.post(image.filename, image.description);
+      const result = await photoTooter.post(
+        image.filename,
+        image.description ?? undefined,
+      );
       logger.info({ id: result }, `Posted new Mastodon post`);
     } catch (e) {
       logger.error(e, "Error posting to Mastodon");

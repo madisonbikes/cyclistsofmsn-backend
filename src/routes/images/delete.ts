@@ -8,18 +8,13 @@ async function handler(req: Request, res: Response) {
   const id = req.params.id;
   logger.trace({ id }, "delete single image");
 
-  // FIXME we don't really need includeResultMetadata here but it seems to be a bug in the
-  // typegoose typings that it is required
-  const result = await Image.findOneAndDelete(
-    { _id: id },
-    { includeResultMetadata: true },
-  );
-  if (result.value == null) {
+  const result = await Image.findOneAndDelete({ _id: id });
+  if (result == null) {
     // not found
     res.sendStatus(404);
     return;
   }
-  const { filename } = result.value;
+  const { filename } = result;
   const fullPath = fsRepository.photoPath(filename);
   await fsRepository.deletePhoto(fullPath);
 

@@ -6,7 +6,7 @@ import { describe, it, expect } from "vitest";
 describe("database - posts", () => {
   setupSuite({ withDatabase: true });
 
-  it("check that typegoose layer returns default value for hidden", async () => {
+  it("check that database layer returns default value for hidden", async () => {
     const { insertedImageId } = await createTestPosts();
     const image = await Image.findById(insertedImageId);
     expect(image).toBeDefined();

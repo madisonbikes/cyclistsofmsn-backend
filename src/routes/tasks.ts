@@ -15,7 +15,7 @@ function routes() {
         const postOptions = request.validated as SchedulePostOptions;
         const result = await schedulePost(postOptions);
         if (result.isOk()) {
-          const mapped = mapPostSchema.parse(result.value);
+          const mapped = mapPostSchema(result.value);
           response.send(mapped);
         } else {
           response.status(400).send(result.value);

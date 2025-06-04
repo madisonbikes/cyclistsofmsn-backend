@@ -155,7 +155,7 @@ describe("test criteria components", () => {
 
   const createPost = (image: ImageDocument, postDate: Date) => {
     const post = new PostHistory();
-    post.image = image;
+    post.image = image._id;
     post.timestamp = postDate;
     return post.save();
   };

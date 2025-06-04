@@ -23,7 +23,7 @@ describe("test post image selector components", () => {
       const post = await imageSelector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
-      expect(post.value.id).toEqual(image.id);
+      expect(post.value._id).toEqual(image._id);
     });
 
     it("pick unused image over a single used one", async () => {
@@ -35,7 +35,7 @@ describe("test post image selector components", () => {
       const post = await imageSelector.nextImage();
       expect(post.isOk()).toBeTruthy();
       assert(post.isOk());
-      expect(post.value.id).toEqual(newImage.id);
+      expect(post.value._id).toEqual(newImage._id);
     });
 
     it("pick seasonal repost over non-seasonal unposted", async () => {
@@ -50,7 +50,7 @@ describe("test post image selector components", () => {
       const image = await imageSelector.nextImage();
       expect(image.isOk()).toBeTruthy();
       assert(image.isOk());
-      expect(image.value.id).toEqual(seasonalImage.id);
+      expect(image.value._id).toEqual(seasonalImage._id);
     });
 
     it("fail with only hidden image", async () => {
@@ -74,7 +74,7 @@ describe("test post image selector components", () => {
 
       expect(image.isOk()).toBeTruthy();
       assert(image.isOk());
-      expect(image.value.id).toEqual(normalImage.id);
+      expect(image.value._id).toEqual(normalImage._id);
     });
   });
 
@@ -90,7 +90,7 @@ describe("test post image selector components", () => {
 
   const createPost = (image: ImageDocument, postDate: Date) => {
     const post = new PostHistory();
-    post.image = image;
+    post.image = image._id;
     post.timestamp = postDate;
     return post.save();
   };

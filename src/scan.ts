@@ -66,9 +66,11 @@ async function updateMatchedFile(image: ImageDocument) {
   ) {
     logger.debug(`updating existing image ${filename}`);
     const metadata = await getFileMetadata(filename);
-    Object.assign(image, metadata);
-    image.deleted = false;
-    await image.save();
+    const newImageData = { ...image, ...metadata, deleted: false };
+    return Image.updateOne({ _id: image._id }, { $set: newImageData });
+  } else {
+    // no changes, nothing to do
+    return Promise.resolve();
   }
 }
 
@@ -85,11 +87,13 @@ async function addNewFile(filename: string) {
 }
 
 /** mark a file removed that used to exist */
-async function markFileRemoved(image: ImageDocument) {
+function markFileRemoved(image: ImageDocument) {
   logger.debug(`marking cruft db image ${image.filename}`);
-  image.deleted = true;
-  image.fs_timestamp = undefined;
-  await image.save();
+
+  return Image.updateOne(
+    { _id: image._id },
+    { $set: { deleted: true, fs_timestamp: undefined } },
+  );
 }
 
 function parseImageDateTimeTag(

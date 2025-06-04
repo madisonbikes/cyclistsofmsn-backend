@@ -1,25 +1,14 @@
-import {
-  DocumentType,
-  getModelForClass,
-  modelOptions,
-  mongoose,
-  prop,
-} from "@typegoose/typegoose";
+import { Schema, model, InferSchemaType } from "mongoose";
 
 /**
  * Holds users, typically admin but allows for others.
  */
-@modelOptions({ schemaOptions: { collection: "users" } })
-class UserClass {
-  @prop({ required: true, unique: true, index: true })
-  public username!: string;
+const userSchema = new Schema({
+  _id: { type: Schema.Types.ObjectId, auto: true, required: true },
+  username: { type: String, required: true, unique: true, index: true },
+  hashed_password: { type: String, required: true },
+  roles: { type: [String], required: true, default: [] },
+});
 
-  @prop({ required: true })
-  public hashed_password!: string;
-
-  @prop({ type: String, required: true, default: [] })
-  public roles!: mongoose.Types.Array<string>;
-}
-
-export type UserDocument = DocumentType<UserClass>;
-export const User = getModelForClass(UserClass);
+export type UserDocument = InferSchemaType<typeof userSchema>;
+export const User = model("users", userSchema);

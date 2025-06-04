@@ -1,4 +1,4 @@
-import { PostHistory, PostHistoryDocument, PostStatus } from "../database";
+import { ImageDocument, PostHistory, PostHistoryDocument } from "../database";
 import {
   differenceInMinutes,
   startOfDay,
@@ -12,7 +12,10 @@ import now from "../utils/now";
 import { SchedulePostOptions } from "../routes/contract";
 import imageSelector from "./selection/selector";
 
-type PostResult = Result<PostHistoryDocument, PostError>;
+type PostResult = Result<
+  Omit<PostHistoryDocument, "image"> & { populatedImage: ImageDocument | null },
+  PostError
+>;
 
 export interface PostError {
   message: string;
@@ -48,7 +51,13 @@ export const schedulePost = async ({
         );
         suppressDuplicateLogMessage = firstPost.timestamp.getTime();
       }
-      return ok(firstPost);
+      // shouldn't use spread operator here because firstPost is a class instance, not a plain object
+      return ok({
+        _id: firstPost._id,
+        status: firstPost.status,
+        timestamp: firstPost.timestamp,
+        populatedImage: firstPost.image,
+      });
     }
     await Promise.all(matchingPosts.map((p) => p.deleteOne()));
   }
@@ -72,16 +81,24 @@ const createNewScheduledPost = async (
     return error(selectedTime.value);
   }
   newPost.timestamp = selectedTime.value;
-  newPost.status.flag = PostStatus.PENDING;
+  newPost.status.flag = "pending";
+  let image: ImageDocument | null = null;
   if (selectImage) {
     const newImage = await imageSelector.nextImage();
     if (newImage.isOk()) {
-      newPost.image = newImage.value;
+      newPost.image = newImage.value._id;
+      image = newImage.value;
     } else {
       return error(newImage.value);
     }
   }
-  return ok(await newPost.save());
+  await newPost.save();
+  return ok({
+    _id: newPost._id,
+    status: newPost.status,
+    timestamp: newPost.timestamp,
+    populatedImage: image,
+  });
 };
 
 const selectNextTime = (

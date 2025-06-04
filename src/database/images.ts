@@ -1,50 +1,29 @@
-import {
-  DocumentType,
-  getModelForClass,
-  modelOptions,
-  prop,
-} from "@typegoose/typegoose";
+import { Schema, model, InferSchemaType } from "mongoose";
 
-@modelOptions({ schemaOptions: { collection: "images" } })
-export class ImageClass {
-  @prop({ required: true, unique: true, index: true })
-  public filename!: string;
-
-  @prop()
-  public fs_timestamp?: Date;
-
-  @prop()
-  public exif_createdon?: Date;
-
-  @prop()
-  public width?: number;
-
-  @prop()
-  public height?: number;
-
-  @prop()
-  public description?: string;
-
+const imageSchema = new Schema({
+  _id: { type: Schema.Types.ObjectId, auto: true, required: true },
+  filename: { type: String, required: true, unique: true, index: true },
+  fs_timestamp: { type: Date },
+  exif_createdon: { type: Date },
+  width: { type: Number },
+  height: { type: Number },
+  description: { type: String },
   /**
    * this is unused now except for migration, but it used to be used to determine if the description
    * had been modified in the database but not in the image file.
    */
-  @prop({ default: true, required: true })
-  public description_from_exif!: boolean;
-
+  description_from_exif: { type: Boolean, default: true, required: true },
   /**
    * If a file is deleted from the filesystem, set this to true but don't remove record, to
    * preserve referential integrity for posts.
    */
-  @prop({ default: false, required: true })
-  public deleted!: boolean;
-
+  deleted: { type: Boolean, default: false, required: true },
   /**
    * If a file is hidden, it will not be used for future posts.
    */
-  @prop({ default: false, required: true })
-  public hidden!: boolean;
-}
+  hidden: { type: Boolean, default: false, required: true },
+});
 
-export type ImageDocument = DocumentType<ImageClass>;
-export const Image = getModelForClass(ImageClass);
+export type ImageDocument = InferSchemaType<typeof imageSchema>;
+
+export const Image = model("images", imageSchema);

@@ -1,4 +1,4 @@
-import { assertError, assertInstanceOf, assertOk, setupSuite } from "../test";
+import { assertError, assertOk, setupSuite } from "../test";
 import { PostError, schedulePost } from "./postScheduler";
 import {
   add as date_add,
@@ -7,12 +7,7 @@ import {
   startOfTomorrow,
   startOfYesterday,
 } from "date-fns";
-import {
-  Image,
-  PostHistory,
-  PostHistoryDocument,
-  PostStatus,
-} from "../database";
+import { Image, PostHistory, PostHistoryDocument } from "../database";
 import { configuration } from "../config";
 import { SchedulePostOptions } from "../routes/contract";
 import now from "../utils/now";
@@ -92,7 +87,7 @@ describe("test schedule component", () => {
 
       const newPost = new PostHistory();
       newPost.image = newImage._id;
-      newPost.status.flag = PostStatus.COMPLETE;
+      newPost.status.flag = "complete";
       newPost.timestamp = date_set(startOfYesterday(), { hours: 10 });
       await newPost.save();
     });
@@ -137,7 +132,7 @@ describe("test schedule component", () => {
 
       const newPost = new PostHistory();
       newPost.image = newImage._id;
-      newPost.status.flag = PostStatus.COMPLETE;
+      newPost.status = { flag: "complete" };
       newPost.timestamp = date_set(startOfToday(), {
         hours: configuration.firstPostHour,
         minutes: 15,
@@ -191,7 +186,7 @@ describe("test schedule component", () => {
 
       const newPost = new PostHistory();
       newPost.image = newImage._id;
-      newPost.status.flag = PostStatus.PENDING;
+      newPost.status = { flag: "pending" };
       newPost.timestamp = date_set(startOfToday(), { hours: 10, minutes: 15 });
       await newPost.save();
     });
@@ -203,7 +198,7 @@ describe("test schedule component", () => {
 
       const expected = date_add(startOfToday(), { hours: 10, minutes: 15 });
       expect(newPost.timestamp).toEqual(expected);
-      expect(newPost.status.flag).toEqual(PostStatus.PENDING);
+      expect(newPost.status.flag).toEqual("pending");
     });
 
     it("should do nothing at 8:15, then at 10:30 it should generate the next post", async () => {
@@ -213,13 +208,23 @@ describe("test schedule component", () => {
 
       let result = await schedulePost({ when: now_815 });
       assertOk(result);
-      let { value: newPost } = result;
-      assertInstanceOf(newPost, PostHistory);
-      expect(newPost.status.flag).toEqual(PostStatus.PENDING);
+      const { value: newlyScheduledPost } = result;
+      expect(newlyScheduledPost).toMatchObject({
+        status: { flag: "pending" },
+        populatedImage: {
+          deleted: false,
+          description_from_exif: true,
+          filename: "blarg",
+          hidden: false,
+        },
+      });
+      expect(newlyScheduledPost._id).toBeDefined();
 
       // do the post
-      newPost.status.flag = PostStatus.COMPLETE;
-      await newPost.save();
+      await PostHistory.updateOne(
+        { _id: newlyScheduledPost._id },
+        { $set: { status: { flag: "complete" } } },
+      );
 
       const now_1015 = date_add(startOfToday(), {
         hours: 10,
@@ -245,9 +250,8 @@ describe("test schedule component", () => {
       result = await schedulePost({ when: tomorrow });
       assertOk(result);
 
-      newPost = result.value;
-      assertInstanceOf(newPost, PostHistory);
-      expect(newPost.status.flag).toEqual(PostStatus.PENDING);
+      const { value: secondScheduledPost } = result;
+      expect(secondScheduledPost.status.flag).toEqual("pending");
     });
   });
 
@@ -272,7 +276,7 @@ describe("test schedule component", () => {
         selectImage: true,
       });
       assertOk(result);
-      const id = result.value.image?._id;
+      const id = result.value.populatedImage?._id;
       expect(id).toEqual(imageId);
     });
 
@@ -286,7 +290,7 @@ describe("test schedule component", () => {
         selectImage: false,
       });
       assertOk(result);
-      expect(result.value.image).not.toBeDefined();
+      expect(result.value.populatedImage).toBeNull();
     });
   });
 
@@ -312,14 +316,14 @@ describe("test schedule component", () => {
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       const result1 = await getOkPostResult({ when: now });
       const result2 = await getOkPostResult({ when: now });
-      expect(result1.id).toEqual(result2.id);
+      expect(result1._id).toEqual(result2._id);
     });
 
     it("will overwrite", async () => {
       const now = date_set(startOfToday(), { hours: 8, minutes: 15 });
       const result1 = await getOkPostResult({ when: now });
       const result2 = await getOkPostResult({ when: now, overwrite: true });
-      expect(result1.id).not.toEqual(result2.id);
+      expect(result1._id).not.toEqual(result2._id);
     });
   });
 
@@ -330,7 +334,6 @@ describe("test schedule component", () => {
     const result = await schedulePost(options);
     assertOk(result);
     const newPost = result.value;
-    assertInstanceOf(newPost, PostHistory);
     return newPost;
   };
 
