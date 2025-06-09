@@ -52,7 +52,7 @@ export class PostHistoryModel {
   async findOrderedPosts() {
     const posts = await this.collection
       .aggregate([
-        { $sort: { timestamp: -1 } },
+        { $sort: { timestamp: 1 } },
         // populate the populatedImage field with the image document
         {
           $lookup: {
@@ -141,7 +141,7 @@ export class PostHistoryModel {
     return { _id: insertedRecord.insertedId, ...insertedData };
   }
 
-  /** returns old document */
+  /** returns new document */
   updateOne(id: PostId, data: Partial<Omit<DbPostHistory, "_id">>) {
     return this.collection.findOneAndUpdate(
       { _id: new ObjectId(id) },

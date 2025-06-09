@@ -20,7 +20,7 @@ if (require.main === module) {
 
 export const updateFileMetadata = async () => {
   logger.info("Looking for images with description_from_exif set to false");
-  const images = await imageModel.findAll();
+  const images = await imageModel.findAll({ filterDeleted: true });
   logger.info(`Found %d images`, images.length);
 
   let modCount = 0;
@@ -28,7 +28,6 @@ export const updateFileMetadata = async () => {
   const limit = pLimit(4);
 
   const promises = images
-    .filter((image) => !image.deleted)
     .filter((image) => !image.description_from_exif)
     .filter((image) => image.description != null && image.description !== "")
     .map((image) =>

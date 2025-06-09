@@ -75,9 +75,15 @@ class ImageGet {
   };
 
   listHandler = async (_req: Request, res: Response) => {
-    const images = await imageModel.findAll();
+    const images = await imageModel.findAll({ filterDeleted: true });
     logger.trace(images, "Found %d images in the database", images.length);
-    const retval = lenientImageSchema.array().parse(images);
+
+    // map image _id to id
+    const mappedimageList = images.map((image) => {
+      const { _id: id, deleted: _deleted, ...rest } = image;
+      return { id, ...rest };
+    });
+    const retval = lenientImageSchema.strict().array().parse(mappedimageList);
     res.send(retval);
   };
 

@@ -14,7 +14,11 @@ const handler = async (req: Request, res: Response) => {
 
   const result = await postHistoryModel.updateOne(id, body);
   if (result != null) {
-    res.send(mapPostSchema(result) satisfies Post);
+    const newValue = await postHistoryModel.findById(id);
+    if (newValue == null) {
+      throw new Error("unexpected missing post");
+    }
+    res.send(mapPostSchema(newValue) satisfies Post);
   } else {
     // not found
     res.sendStatus(404);
