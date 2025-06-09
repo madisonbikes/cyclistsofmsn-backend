@@ -1,4 +1,4 @@
-import { database, Image } from "../database";
+import { database, imageModel } from "../database";
 import fsRepository from "../fs_repository";
 import { logger } from "../utils";
 import pLimit from "p-limit";
@@ -20,8 +20,10 @@ if (require.main === module) {
 
 export const updateFileMetadata = async () => {
   logger.info("Looking for images with description_from_exif set to false");
-  const images = await Image.find();
-  logger.info(`Found ${images.length} images`);
+  const images = await imageModel.findAll();
+  logger.info(`Found %d images`, images.length);
+
+  let modCount = 0;
 
   const limit = pLimit(4);
 
@@ -31,8 +33,9 @@ export const updateFileMetadata = async () => {
     .filter((image) => image.description != null && image.description !== "")
     .map((image) =>
       limit(async () => {
+        modCount++;
         const base = image.filename;
-        logger.debug(`Updating description for ${base}`);
+        logger.debug("Updating description for %s", base);
         const retval = await fsRepository.updatePhotoDescription(
           base,
           image.description ?? "",
@@ -40,12 +43,11 @@ export const updateFileMetadata = async () => {
         if (retval.error != null) {
           return retval;
         }
-        image.description_from_exif = true;
-        await image.save();
+        await imageModel.updateOne(image._id, { description_from_exif: true });
         return {};
       }),
     );
 
   await Promise.all(promises);
-  return promises.length;
+  return modCount;
 };

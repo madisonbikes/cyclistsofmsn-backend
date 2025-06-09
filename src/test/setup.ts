@@ -79,10 +79,10 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterEach(async () => {
     const queries: Promise<unknown>[] = [];
     if (clearPostHistory || withPhotoServer) {
-      queries.push(database.collection("posts").deleteMany({}));
+      queries.push(database.posts.deleteMany({}));
     }
     if (clearImages || withPhotoServer) {
-      queries.push(database.collection("images").deleteMany({}));
+      queries.push(database.images.deleteMany({}));
     }
 
     if (queries.length > 0) {

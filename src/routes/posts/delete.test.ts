@@ -6,7 +6,7 @@ import {
   testRequest,
   TestRequest,
 } from "../../test";
-import { database, PostHistory } from "../../database";
+import { database, postHistoryModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
@@ -61,17 +61,20 @@ describe("server process - posts", () => {
   it("responds to post delete api call", async () => {
     await loginTestAdminUser(request);
 
-    let checkPost = await PostHistory.findById(testPostId);
+    let checkPost = await postHistoryModel.findById(testPostId);
     expect(checkPost).not.toBeNull();
 
     await request.delete(`/api/v1/posts/${testPostId}`).expect(200);
 
-    checkPost = await PostHistory.findById(testPostId);
+    checkPost = await postHistoryModel.findById(testPostId);
     expect(checkPost).toBeNull();
   });
 
   const createTestPost = async () => {
-    const retval = await database.collection("posts").insertOne({});
+    const retval = await database.posts.insertOne({
+      timestamp: new Date(),
+      status: { flag: "pending" },
+    });
     return retval.insertedId.toHexString();
   };
 });

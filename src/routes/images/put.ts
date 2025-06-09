@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { Image, ImageDocument } from "../../database";
+import { imageModel } from "../../database";
 import { logger } from "../../utils";
 import { putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 import fsRepository from "../../fs_repository";
 import { z } from "zod";
+import { DbImage } from "../../database/types";
 
 class ImagePut {
   bodySchema = putImageBodySchema;
@@ -15,10 +16,10 @@ class ImagePut {
     const { id } = req.params;
     logger.trace({ id, body }, "put single image");
 
-    const modified: Partial<ImageDocument> = { ...body };
-    const oldValue = await Image.findByIdAndUpdate(id, modified);
+    const modified: Partial<DbImage> = { ...body };
+    const oldValue = await imageModel.updateOne(id, modified);
     if (oldValue != null) {
-      const newValue = await Image.findById(id);
+      const newValue = await imageModel.findById(id);
       if (
         oldValue.description !== newValue?.description &&
         newValue?.description != null
@@ -28,7 +29,6 @@ class ImagePut {
           oldValue.filename,
           newValue.description,
         );
-        await newValue.save();
       }
       res.send(lenientImageSchema.parse(newValue));
     } else {

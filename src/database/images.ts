@@ -1,29 +1,74 @@
-import { Schema, model, InferSchemaType } from "mongoose";
+import { Collection, ObjectId } from "mongodb";
+import { DbImage, dbImageSchema } from "./types";
+import { logger } from "../utils";
 
-const imageSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, auto: true, required: true },
-  filename: { type: String, required: true, unique: true, index: true },
-  fs_timestamp: { type: Date },
-  exif_createdon: { type: Date },
-  width: { type: Number },
-  height: { type: Number },
-  description: { type: String },
-  /**
-   * this is unused now except for migration, but it used to be used to determine if the description
-   * had been modified in the database but not in the image file.
-   */
-  description_from_exif: { type: Boolean, default: true, required: true },
-  /**
-   * If a file is deleted from the filesystem, set this to true but don't remove record, to
-   * preserve referential integrity for posts.
-   */
-  deleted: { type: Boolean, default: false, required: true },
-  /**
-   * If a file is hidden, it will not be used for future posts.
-   */
-  hidden: { type: Boolean, default: false, required: true },
-});
+export type ImageModelCollectionType = Collection<Omit<DbImage, "_id">>;
 
-export type ImageDocument = InferSchemaType<typeof imageSchema>;
+type FilterProps = {
+  filterDeleted?: boolean;
+  filterHidden?: boolean;
+};
 
-export const Image = model("images", imageSchema);
+export type ImageId = string | ObjectId;
+
+export class ImageModel {
+  constructor(private collection: ImageModelCollectionType) {}
+
+  findById(id: ImageId, filter?: FilterProps) {
+    const objectId = new ObjectId(id);
+    return this.collection.findOne({
+      _id: objectId,
+      ...this.buildFilterArgs(filter),
+    });
+  }
+
+  findByFilename(filename: string) {
+    return this.collection.findOne({
+      filename,
+    });
+  }
+
+  async findAll(filter?: FilterProps) {
+    const images = await this.collection
+      .find(this.buildFilterArgs(filter))
+      .toArray();
+    logger.trace(images, "findAllImages");
+    return images;
+  }
+
+  findByIdAndDelete(id: ImageId) {
+    const objectId = new ObjectId(id);
+    return this.collection.findOneAndDelete({ _id: objectId });
+  }
+
+  async insertOne(data: Partial<DbImage>): Promise<DbImage> {
+    const insertedData = dbImageSchema.omit({ _id: true }).strict().parse(data);
+    const inserted = await this.collection.insertOne(insertedData);
+    logger.trace(
+      insertedData,
+      "Inserted image with id %s",
+      inserted.insertedId,
+    );
+    return { _id: inserted.insertedId, ...insertedData };
+  }
+
+  /** returns old document */
+  updateOne(id: ImageId, data: Partial<Omit<DbImage, "_id">>) {
+    logger.trace(data, "Updating image with id %s", id);
+    return this.collection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: data },
+    );
+  }
+
+  private buildFilterArgs(filter?: FilterProps) {
+    const args: Record<string, boolean> = {};
+    if (filter?.filterDeleted ?? false) {
+      args.deleted = false;
+    }
+    if (filter?.filterHidden ?? false) {
+      args.hidden = false;
+    }
+    return args;
+  }
+}

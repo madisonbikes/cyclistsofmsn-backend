@@ -8,7 +8,7 @@ export const updateImageDescription = async (
   description: string,
 ) => {
   if (!fs.existsSync(file)) {
-    logger.error(`File not found: ${file}`);
+    logger.error("File not found: %s", file);
     return { error: "File not found" };
   }
 
@@ -20,7 +20,7 @@ export const updateImageDescription = async (
     errorOnExist: true,
     preserveTimestamps: true,
   });
-  logger.info(`Updating ${newFile} with description: ${description}`);
+  logger.info("Updating %s with description: %s", newFile, description);
   const { stdout, stderr } = await execFile(
     "exiftool",
     ["-overwrite_original", `-mwg:Description<=${argFile}`, newFile],

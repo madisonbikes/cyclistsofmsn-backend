@@ -1,5 +1,6 @@
 import { ConnectionString } from "connection-string";
 import pino, { stdSerializers } from "pino";
+import pretty from "pino-pretty";
 import { initEnv } from "./env";
 
 initEnv();
@@ -8,7 +9,7 @@ const TEST_LOG_LEVEL = process.env.TEST_LOG_LEVEL ?? "fatal";
 const LOG_LEVEL = process.env.LOG_LEVEL;
 
 const serializers = {
-  err: stdSerializers.err,
+  err: stdSerializers.errWithCause,
   when: (date: unknown) => {
     if (date instanceof Date) {
       return date.toLocaleString();
@@ -18,9 +19,12 @@ const serializers = {
   },
 };
 
+let sync = false;
+
 const options: pino.LoggerOptions = { serializers };
 
 if (process.env.NODE_ENV === "test") {
+  sync = true;
   options.level = TEST_LOG_LEVEL;
 } else if (process.env.NODE_ENV === "development") {
   options.level = LOG_LEVEL ?? "info";
@@ -29,14 +33,14 @@ if (process.env.NODE_ENV === "test") {
   options.level = LOG_LEVEL ?? "warn";
 }
 
+let stream: pino.DestinationStream = pino.destination({ dest: 1, sync });
+
 const usePinoPretty = Boolean(process.env.PINO_PRETTY);
 if (usePinoPretty) {
-  options.transport = {
-    target: "pino-pretty",
-  };
+  stream = pretty({ colorize: true, sync });
 }
 
-export const logger = pino(options);
+export const logger = pino(options, stream);
 
 export const maskUriPassword = (uri: string) => {
   try {

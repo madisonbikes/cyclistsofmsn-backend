@@ -7,12 +7,13 @@ import {
   startOfTomorrow,
   startOfYesterday,
 } from "date-fns";
-import { Image, PostHistory, PostHistoryDocument } from "../database";
 import { configuration } from "../config";
 import { SchedulePostOptions } from "../routes/contract";
 import now from "../utils/now";
 import { ObjectId } from "mongodb";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import { DbPostHistory } from "../database/types";
+import { database, imageModel, postHistoryModel } from "../database";
 
 vi.mock("../utils/random");
 vi.mock("../utils/now");
@@ -40,10 +41,7 @@ describe("test schedule component", () => {
 
   describe("with no posts", () => {
     beforeEach(async () => {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
+      await imageModel.insertOne({ filename: "blarg" });
     });
 
     it("should schedule a post today", async () => {
@@ -80,16 +78,13 @@ describe("test schedule component", () => {
 
   describe("with existing post yesterday at 10:00 AM", () => {
     beforeEach(async () => {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
+      const newImage = await imageModel.insertOne({ filename: "blarg" });
 
-      const newPost = new PostHistory();
-      newPost.image = newImage._id;
-      newPost.status.flag = "complete";
-      newPost.timestamp = date_set(startOfYesterday(), { hours: 10 });
-      await newPost.save();
+      await postHistoryModel.insertOne({
+        status: { flag: "complete" },
+        timestamp: date_set(startOfYesterday(), { hours: 10 }),
+        image: newImage._id,
+      });
     });
 
     it("should schedule a post today", async () => {
@@ -125,19 +120,16 @@ describe("test schedule component", () => {
 
   describe("with existing post today at 8:15", () => {
     beforeEach(async () => {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
+      const newImage = await imageModel.insertOne({ filename: "blarg" });
 
-      const newPost = new PostHistory();
-      newPost.image = newImage._id;
-      newPost.status = { flag: "complete" };
-      newPost.timestamp = date_set(startOfToday(), {
-        hours: configuration.firstPostHour,
-        minutes: 15,
+      await postHistoryModel.insertOne({
+        status: { flag: "complete" },
+        timestamp: date_set(startOfToday(), {
+          hours: configuration.firstPostHour,
+          minutes: 15,
+        }),
+        image: newImage._id,
       });
-      await newPost.save();
     });
 
     it("should schedule a post tomorrow", async () => {
@@ -179,16 +171,13 @@ describe("test schedule component", () => {
 
   describe("with pending post today at 10:15", () => {
     beforeEach(async () => {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
+      const newImage = await imageModel.insertOne({ filename: "blarg" });
 
-      const newPost = new PostHistory();
-      newPost.image = newImage._id;
-      newPost.status = { flag: "pending" };
-      newPost.timestamp = date_set(startOfToday(), { hours: 10, minutes: 15 });
-      await newPost.save();
+      await postHistoryModel.insertOne({
+        status: { flag: "pending" },
+        timestamp: date_set(startOfToday(), { hours: 10, minutes: 15 }),
+        image: newImage._id,
+      });
     });
 
     it("should do nothing", async () => {
@@ -221,7 +210,7 @@ describe("test schedule component", () => {
       expect(newlyScheduledPost._id).toBeDefined();
 
       // do the post
-      await PostHistory.updateOne(
+      await database.posts.updateOne(
         { _id: newlyScheduledPost._id },
         { $set: { status: { flag: "complete" } } },
       );
@@ -259,11 +248,10 @@ describe("test schedule component", () => {
     let imageId: ObjectId;
 
     beforeEach(async () => {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
-      imageId = newImage._id;
+      const inserted = await imageModel.insertOne({
+        filename: "blarg",
+      });
+      imageId = inserted._id;
     });
 
     it("successfully select image", async () => {
@@ -290,7 +278,7 @@ describe("test schedule component", () => {
         selectImage: false,
       });
       assertOk(result);
-      expect(result.value.populatedImage).toBeNull();
+      expect(result.value.populatedImage).toBeUndefined();
     });
   });
 
@@ -329,7 +317,7 @@ describe("test schedule component", () => {
 
   const getOkPostResult = async (
     options: SchedulePostOptions,
-  ): Promise<PostHistoryDocument> => {
+  ): Promise<DbPostHistory> => {
     mockNow.mockReturnValue(options.when.getTime());
     const result = await schedulePost(options);
     assertOk(result);

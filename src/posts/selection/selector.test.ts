@@ -1,9 +1,10 @@
 import { assertError, setupSuite } from "../../test";
-import { Image, ImageDocument, PostHistory } from "../../database";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
 import imageSelector from "./selector";
 import { vi, describe, it, expect } from "vitest";
+import { imageModel, postHistoryModel } from "../../database";
+import { DbImage } from "../../database/types";
 
 vi.mock("../../utils/random");
 
@@ -21,7 +22,7 @@ describe("test post image selector components", () => {
       const image = await createImage();
 
       const post = await imageSelector.nextImage();
-      expect(post.isOk()).toBeTruthy();
+      expect(post.isOk()).toEqual(true);
       assert(post.isOk());
       expect(post.value._id).toEqual(image._id);
     });
@@ -33,30 +34,27 @@ describe("test post image selector components", () => {
       const newImage = await createImage("newImage");
 
       const post = await imageSelector.nextImage();
-      expect(post.isOk()).toBeTruthy();
+      expect(post.isOk()).toEqual(true);
       assert(post.isOk());
       expect(post.value._id).toEqual(newImage._id);
     });
 
     it("pick seasonal repost over non-seasonal unposted", async () => {
-      const _nonSeasonalImage = await createImage(
-        "nonSeasonalImage",
-        subDays(startOfToday(), 60),
-      );
+      const _nonSeasonalImage = await createImage("nonSeasonalImage", {
+        exif_createdon: subDays(startOfToday(), 60),
+      });
 
       const seasonalImage = await createImage("seasonalImage");
       await createPost(seasonalImage, subDays(startOfToday(), 190));
 
       const image = await imageSelector.nextImage();
-      expect(image.isOk()).toBeTruthy();
+      expect(image.isOk()).toEqual(true);
       assert(image.isOk());
       expect(image.value._id).toEqual(seasonalImage._id);
     });
 
     it("fail with only hidden image", async () => {
-      const hidden = await createImage("hiddenImage");
-      hidden.hidden = true;
-      await hidden.save();
+      const _hidden = await createImage("hiddenImage", { hidden: true });
 
       const image = await imageSelector.nextImage();
       assertError(image);
@@ -64,15 +62,13 @@ describe("test post image selector components", () => {
     });
 
     it("succeed with a hidden and non-hidden image", async () => {
-      const hidden = await createImage("hiddenImage");
-      hidden.hidden = true;
-      await hidden.save();
+      const _hidden = await createImage("hiddenImage", { hidden: true });
 
       const normalImage = await createImage("normal");
 
       const image = await imageSelector.nextImage();
 
-      expect(image.isOk()).toBeTruthy();
+      expect(image.isOk()).toEqual(true);
       assert(image.isOk());
       expect(image.value._id).toEqual(normalImage._id);
     });
@@ -80,18 +76,19 @@ describe("test post image selector components", () => {
 
   const createImage = (
     name = "testImage",
-    exif_createdon: Date | undefined = startOfToday(),
+    extra: Partial<DbImage> = { exif_createdon: startOfToday() },
   ) => {
-    const image = new Image();
-    image.filename = name;
-    image.exif_createdon = exif_createdon;
-    return image.save();
+    return imageModel.insertOne({
+      filename: name,
+      ...extra,
+    });
   };
 
-  const createPost = (image: ImageDocument, postDate: Date) => {
-    const post = new PostHistory();
-    post.image = image._id;
-    post.timestamp = postDate;
-    return post.save();
+  const createPost = (image: DbImage, postDate: Date) => {
+    return postHistoryModel.insertOne({
+      image: image._id,
+      timestamp: postDate,
+      status: { flag: "pending" },
+    });
   };
 });

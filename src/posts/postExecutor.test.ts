@@ -1,10 +1,10 @@
 import { setupSuite } from "../test";
-import { Image } from "../database";
 import postExecutor from "./postExecutor";
 import photoTooter from "../mastodon/post";
 import photoTweeter from "../twitter/post";
 import atproto from "../atproto";
 import { vi, describe, it, expect } from "vitest";
+import { imageModel } from "../database";
 
 vi.mock("../mastodon/post");
 vi.mock("../twitter/post");
@@ -24,10 +24,15 @@ describe("test executor component", () => {
 
   describe("with images", () => {
     it("should succeed if an image in the repository", async function () {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
+      const insertedImage = await imageModel.insertOne({
+        filename: "blarg",
+      });
+
+      const newImage = await imageModel.findById(insertedImage._id);
+      expect(newImage).toBeDefined();
+      if (newImage === null) {
+        throw new Error("Image not found");
+      }
 
       await postExecutor.post(newImage);
 

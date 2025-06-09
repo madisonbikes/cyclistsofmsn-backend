@@ -1,20 +1,15 @@
+import { DbPopulatedPostHistory } from "../../database/types";
 import { Post, postSchema } from "../contract";
-import { ImageDocument, PostHistoryDocument } from "../../database";
 
-function mapPostSchema(
-  p:
-    | PostHistoryDocument
-    | (Omit<PostHistoryDocument, "image"> & { image: ImageDocument | null }),
-): Post {
+function mapPostSchema(p: DbPopulatedPostHistory): Post {
   let post: Post;
-  if (typeof p.image?._id === "object") {
-    const { _id: id, status, image } = p;
+  if (p.populatedImage != null && typeof p.populatedImage === "object") {
+    const { _id: id, status } = p;
     const idAsString = id.toString();
-    const imageid = image._id.toString();
     post = {
       id: idAsString,
       timestamp: p.timestamp,
-      imageid,
+      imageid: p.populatedImage._id.toString(),
       status: {
         flag: status.flag,
         error: status.error ?? undefined,

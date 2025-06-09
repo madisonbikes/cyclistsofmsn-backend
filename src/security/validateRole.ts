@@ -8,7 +8,7 @@ interface ValidateOptions {
 
 export const validateRole = ({ role }: ValidateOptions): ExpressMiddleware => {
   return (request, response, next) => {
-    logger.trace(request.user, `validating role "${role}"`);
+    logger.trace(request.user, `validating role "%s"`, role);
     const user = request.user as AuthenticatedUser | undefined;
     if (user === undefined || !userHasRole(user, role)) {
       response.status(401).send(`requires role "${role}"`);

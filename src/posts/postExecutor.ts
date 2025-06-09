@@ -1,11 +1,11 @@
-import { ImageDocument } from "../database";
 import photoTooter from "../mastodon/post";
 import photoTweeter from "../twitter/post";
 import atproto from "../atproto";
 import { logger } from "../utils";
+import { DbImage } from "../database/types";
 
 /** responsible for actually posting photos */
-async function post(image: ImageDocument) {
+async function post(image: DbImage) {
   if (photoTweeter.isEnabled()) {
     try {
       logger.debug("Twitter enabled");

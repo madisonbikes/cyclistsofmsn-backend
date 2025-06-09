@@ -2,9 +2,10 @@ import { error, logger, ok, Result } from "../utils";
 import now from "../utils/now";
 import { PostError, schedulePost } from "./postScheduler";
 import postExecutor from "./postExecutor";
-import { ImageDocument, PostHistoryDocument, PostHistory } from "../database";
 import imageSelector from "./selection/selector";
 import imageRepositoryScanner from "../scan";
+import { postHistoryModel } from "../database";
+import { DbImage, DbPostHistory } from "../database/types";
 
 // five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;
@@ -41,7 +42,7 @@ export const dispatchPostOnSchedule = async () => {
   if (nextScheduledPost.populatedImage != null) {
     // use existing selected image, if it exists
     await postExecutor.post(nextScheduledPost.populatedImage);
-    await PostHistory.updatePostStatus(nextScheduledPost._id, {
+    await postHistoryModel.updatePostStatus(nextScheduledPost._id, {
       flag: "complete",
     });
   } else {
@@ -54,11 +55,11 @@ export const dispatchPostOnSchedule = async () => {
     if (checkImage.isOk()) {
       // execute the post and then if it's sucessful, update the post status
       await postExecutor.post(checkImage.value);
-      await PostHistory.updatePostStatus(nextScheduledPost._id, {
+      await postHistoryModel.updatePostStatus(nextScheduledPost._id, {
         flag: "complete",
       });
     } else {
-      await PostHistory.updatePostStatus(nextScheduledPost._id, {
+      await postHistoryModel.updatePostStatus(nextScheduledPost._id, {
         flag: "failed",
         error: checkImage.value.message,
       });
@@ -67,7 +68,7 @@ export const dispatchPostOnSchedule = async () => {
 };
 
 /** returns true if it's time to execute this post, false if it's in the future */
-function isTimeToPost(post: PostHistoryDocument) {
+function isTimeToPost(post: DbPostHistory) {
   const when = now() - post.timestamp.getTime();
   if (post.status.flag !== "pending") {
     logger.warn({ post }, "isTimeToPost expects PENDING posts only");
@@ -91,7 +92,7 @@ function isTimeToPost(post: PostHistoryDocument) {
   return true;
 }
 
-async function selectImage(): Promise<Result<ImageDocument, PostError>> {
+async function selectImage(): Promise<Result<DbImage, PostError>> {
   // select image
   const retval = await imageSelector.nextImage();
   if (retval.isError()) {
