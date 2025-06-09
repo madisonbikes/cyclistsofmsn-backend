@@ -52,12 +52,19 @@ export class ImageModel {
     return { _id: inserted.insertedId, ...insertedData };
   }
 
-  /** returns old document */
-  updateOne(id: ImageId, data: Partial<Omit<DbImage, "_id">>) {
+  /** returns old document by default */
+  updateOne(
+    id: ImageId,
+    data: Partial<Omit<DbImage, "_id">>,
+    { returnDocument }: { returnDocument: "after" | "before" } = {
+      returnDocument: "before",
+    },
+  ) {
     logger.trace(data, "Updating image with id %s", id);
     return this.collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: data },
+      { returnDocument },
     );
   }
 

@@ -12,13 +12,11 @@ const handler = async (req: Request, res: Response) => {
   const { id } = req.params;
   logger.trace({ id, body }, "put single post");
 
-  const result = await postHistoryModel.updateOne(id, body);
+  const result = await postHistoryModel.updateOne(id, body, {
+    returnDocument: "after",
+  });
   if (result != null) {
-    const newValue = await postHistoryModel.findById(id);
-    if (newValue == null) {
-      throw new Error("unexpected missing post");
-    }
-    res.send(mapPostSchema(newValue) satisfies Post);
+    res.send(mapPostSchema(result) satisfies Post);
   } else {
     // not found
     res.sendStatus(404);

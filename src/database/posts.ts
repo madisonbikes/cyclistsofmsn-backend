@@ -141,11 +141,18 @@ export class PostHistoryModel {
     return { _id: insertedRecord.insertedId, ...insertedData };
   }
 
-  /** returns new document */
-  updateOne(id: PostId, data: Partial<Omit<DbPostHistory, "_id">>) {
+  /** returns old document by default */
+  updateOne(
+    id: PostId,
+    data: Partial<Omit<DbPostHistory, "_id">>,
+    { returnDocument }: { returnDocument: "after" | "before" } = {
+      returnDocument: "before",
+    },
+  ) {
     return this.collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: data },
+      { returnDocument },
     );
   }
 
