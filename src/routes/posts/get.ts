@@ -1,12 +1,13 @@
-import { PostHistory } from "../../database";
+import { postHistoryModel } from "../../database";
 import { mapPostSchema } from "./types";
 import { Request, Response } from "express";
 import { logger } from "../../utils";
+import { Post, PostList } from "../contract";
 
 const currentPostHandler = async (_req: Request, res: Response) => {
-  const post = await PostHistory.findLatestPost();
+  const post = await postHistoryModel.findLatestPost();
   if (post != null) {
-    return res.send(mapPostSchema.parse(post));
+    return res.send(mapPostSchema(post) satisfies Post);
   } else {
     return res.sendStatus(404);
   }
@@ -14,22 +15,22 @@ const currentPostHandler = async (_req: Request, res: Response) => {
 
 const singlePostHandler = async (req: Request, res: Response) => {
   const { id } = req.params;
-  logger.debug(`loading post ${id}`);
-  const post = await PostHistory.findById(id);
+  logger.debug("loading post %s", id);
+  const post = await postHistoryModel.findById(id);
   if (post != null) {
-    const retval = mapPostSchema.parse(post);
+    const retval = mapPostSchema(post);
     logger.trace({ post: retval }, "returned post data");
-    return res.send(retval);
+    return res.send(retval satisfies Post);
   } else {
     return res.sendStatus(404);
   }
 };
 
 const postListHandler = async (_req: Request, res: Response) => {
-  const posts = await PostHistory.findOrderedPosts();
-  const parsed = mapPostSchema.array().parse(posts);
+  const posts = await postHistoryModel.findOrderedPosts();
+  const parsed = posts.map(mapPostSchema);
   logger.trace({ posts: parsed }, "returned posts");
-  return res.send(parsed);
+  return res.send(parsed satisfies PostList);
 };
 
 export default { currentPostHandler, singlePostHandler, postListHandler };

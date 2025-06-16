@@ -6,16 +6,19 @@ import {
   testRequest,
   TestRequest,
 } from "../../test";
-import { Image, ImageDocument, PostHistory } from "../../database";
+import { imageModel, postHistoryModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
 } from "../../test/data";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { DbImage } from "../../database/types";
+import { ObjectId } from "mongodb";
 
 describe("server process - images", () => {
   let request: TestRequest;
-  let testImageId: string;
+  let testImageId: ObjectId;
 
   setupSuite({
     withDatabase: true,
@@ -33,7 +36,8 @@ describe("server process - images", () => {
   });
 
   beforeEach(async () => {
-    testImageId = await createTestImage();
+    const testImage = await createTestImage();
+    testImageId = testImage._id;
     request = testRequest();
   });
 
@@ -67,14 +71,14 @@ describe("server process - images", () => {
   it("responds to image delete api call", async () => {
     await loginTestAdminUser(request);
 
-    let checkImage = await Image.findById(testImageId);
+    let checkImage = await imageModel.findById(testImageId);
     expect(checkImage).not.toBeNull();
 
     await request
       .delete(`/api/v1/images/${testImageId.toString()}`)
       .expect(200);
 
-    checkImage = await Image.findById(testImageId);
+    checkImage = await imageModel.findById(testImageId);
     expect(checkImage).toBeNull();
   });
 
@@ -86,14 +90,16 @@ describe("server process - images", () => {
     await loginTestAdminUser(request);
 
     // make sure image exists
-    let checkImage = await Image.findById(testImageId);
+    let checkImage = await imageModel.findById(testImageId);
     expect(checkImage).toBeDefined();
-    expect(checkImage).not.toBeNull();
+    if (!checkImage) {
+      throw new Error("Test image not found in database");
+    }
 
-    const createdPostId = await createTestPost(checkImage as ImageDocument);
+    const createdPost = await createTestPost(checkImage);
 
     // ensure post exists and is assigned to the image
-    let checkPost = await PostHistory.findById(createdPostId);
+    let checkPost = await postHistoryModel.findById(createdPost._id);
     expect(checkPost?.image).toBeDefined();
 
     // delete the image
@@ -102,32 +108,30 @@ describe("server process - images", () => {
       .expect(200);
 
     // image should not exist
-    checkImage = await Image.findById(testImageId);
+    checkImage = await imageModel.findById(testImageId);
     expect(checkImage).toBeNull();
 
-    checkPost = await PostHistory.findById(createdPostId);
+    checkPost = await postHistoryModel.findById(createdPost._id);
     expect(checkPost).toBeDefined();
     expect(checkPost?.image).not.toBeDefined();
   });
 
   const createTestImage = async () => {
-    const newImage = new Image({
+    const newImage = await imageModel.insertOne({
       filename: "created.jpg",
       deleted: false,
       description_from_exif: false,
     });
-    await newImage.save();
-    return newImage._id.toString();
+    return newImage;
   };
 
   /** create a test post with the supplied image id */
-  const createTestPost = async (image: ImageDocument) => {
-    const newPost = new PostHistory({
-      image,
+  const createTestPost = async (image: DbImage) => {
+    const inserted = await postHistoryModel.insertOne({
+      image: image._id,
       timestamp: new Date(),
       status: { flag: "pending" },
     });
-    await newPost.save();
-    return newPost._id.toString();
+    return inserted;
   };
 });

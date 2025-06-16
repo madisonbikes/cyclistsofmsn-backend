@@ -6,13 +6,14 @@ import {
   testRequest,
   TestRequest,
 } from "../../test";
-import { PostHistory } from "../../database";
+import { postHistoryModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestPosts,
   createTestUser,
 } from "../../test/data";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("server process - posts", () => {
   let request: TestRequest;
@@ -67,7 +68,7 @@ describe("server process - posts", () => {
       .expect(200)
       .expect(/pending/);
 
-    const checkPost = await PostHistory.findById(goodId);
+    const checkPost = await postHistoryModel.findById(goodId);
     expect(checkPost).toBeDefined();
     expect(checkPost?.status.flag).toEqual("pending");
   });

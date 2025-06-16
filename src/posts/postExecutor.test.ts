@@ -1,21 +1,22 @@
 import { setupSuite } from "../test";
-import { Image } from "../database";
 import postExecutor from "./postExecutor";
 import photoTooter from "../mastodon/post";
 import photoTweeter from "../twitter/post";
 import atproto from "../atproto";
+import { vi, describe, it, expect } from "vitest";
+import { imageModel } from "../database";
 
-jest.mock("../mastodon/post");
-jest.mock("../twitter/post");
-jest.mock("../atproto");
+vi.mock("../mastodon/post");
+vi.mock("../twitter/post");
+vi.mock("../atproto");
 
-const mockPhotoTooter = jest.mocked(photoTooter);
+const mockPhotoTooter = vi.mocked(photoTooter);
 mockPhotoTooter.isEnabled.mockReturnValue(true);
 
-const mockPhotoTweeter = jest.mocked(photoTweeter);
+const mockPhotoTweeter = vi.mocked(photoTweeter);
 mockPhotoTweeter.isEnabled.mockReturnValue(true);
 
-const mockAtproto = jest.mocked(atproto);
+const mockAtproto = vi.mocked(atproto);
 mockAtproto.isEnabled.mockReturnValue(true);
 
 describe("test executor component", () => {
@@ -23,10 +24,15 @@ describe("test executor component", () => {
 
   describe("with images", () => {
     it("should succeed if an image in the repository", async function () {
-      const newImage = new Image();
-      newImage.filename = "blarg";
-      newImage.fs_timestamp = new Date();
-      await newImage.save();
+      const insertedImage = await imageModel.insertOne({
+        filename: "blarg",
+      });
+
+      const newImage = await imageModel.findById(insertedImage._id);
+      expect(newImage).toBeDefined();
+      if (newImage === null) {
+        throw new Error("Image not found");
+      }
 
       await postExecutor.post(newImage);
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { PostHistory } from "../../database";
+import { postHistoryModel } from "../../database";
 import { logger } from "../../utils";
-import { PutPostBody, putPostBodySchema } from "../contract";
+import { Post, PutPostBody, putPostBodySchema } from "../contract";
 import { mapPostSchema } from "./types";
 
 const bodySchema = putPostBodySchema;
@@ -12,9 +12,11 @@ const handler = async (req: Request, res: Response) => {
   const { id } = req.params;
   logger.trace({ id, body }, "put single post");
 
-  const result = await PostHistory.findByIdAndUpdate(id, body, { new: true });
+  const result = await postHistoryModel.updateOne(id, body, {
+    returnDocument: "after",
+  });
   if (result != null) {
-    res.send(mapPostSchema.parse(result));
+    res.send(mapPostSchema(result) satisfies Post);
   } else {
     // not found
     res.sendStatus(404);

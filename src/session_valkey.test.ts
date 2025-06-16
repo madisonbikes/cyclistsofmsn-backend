@@ -1,4 +1,5 @@
 import { urlToValkeyConfiguration } from "./session_valkey";
+import { describe, it, expect } from "vitest";
 
 describe("urlToValkeyGlideClientConfiguration", () => {
   it("should parse a valid valkey URL", () => {

@@ -1,6 +1,7 @@
+import { vi, describe, test, expect } from "vitest";
 import { randomInt } from "./random";
 
-jest.mock("./random");
+vi.mock("./random");
 
 // structure: min, max, randomInt result
 const cases = [

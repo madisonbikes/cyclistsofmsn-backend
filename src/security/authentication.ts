@@ -1,9 +1,10 @@
 import { Strategy as LocalStrategy } from "passport-local";
-import { User, UserDocument } from "../database";
 import { logger } from "../utils";
 import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
+import { userModel } from "../database";
+import { DbUser } from "../database/types";
 
 export enum Roles {
   ADMIN = "admin",
@@ -33,7 +34,7 @@ class Strategies {
       return;
     }
     try {
-      const user = await User.findOne({ username });
+      const user = await userModel.findByUsername(username);
       if (user) {
         success = await this.checkPassword(user.hashed_password, password);
       } else {
@@ -55,7 +56,7 @@ class Strategies {
   }
 
   /** sanitizes user info for export to JWT and into request object */
-  private authenticatedUser(user: UserDocument): AuthenticatedUser {
+  private authenticatedUser(user: DbUser): AuthenticatedUser {
     return authenticatedUserSchema.parse(user);
   }
 }

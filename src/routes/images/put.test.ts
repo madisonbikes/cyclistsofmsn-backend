@@ -6,13 +6,14 @@ import {
   testRequest,
   TestRequest,
 } from "../../test";
-import { Image } from "../../database";
+import { imageModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
   getGoodImageId,
 } from "../../test/data";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("server process - images", () => {
   let request: TestRequest;
@@ -63,12 +64,12 @@ describe("server process - images", () => {
     const goodImageId = await getGoodImageId();
 
     await request
-      .put(`/api/v1/images/${goodImageId?.toString()}`)
+      .put(`/api/v1/images/${goodImageId.toString()}`)
       .send({ description: "blarg" })
       .expect(200)
       .expect(/blarg/);
 
-    const checkImage = await Image.findById(goodImageId);
+    const checkImage = await imageModel.findById(goodImageId);
     expect(checkImage).toBeDefined();
     expect(checkImage?.description).toEqual("blarg");
 
@@ -81,11 +82,11 @@ describe("server process - images", () => {
     const goodImageId = await getGoodImageId();
 
     await request
-      .put(`/api/v1/images/${goodImageId?.toString()}`)
+      .put(`/api/v1/images/${goodImageId.toString()}`)
       .send({ hidden: true })
       .expect(200);
 
-    const checkImage = await Image.findById(goodImageId);
+    const checkImage = await imageModel.findById(goodImageId);
     expect(checkImage).toBeDefined();
     expect(checkImage?.hidden).toBe(true);
   });

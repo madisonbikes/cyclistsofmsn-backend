@@ -6,8 +6,9 @@ import {
 } from "../../test";
 import { imageListSchema } from "../contract";
 import { createTestUser } from "../../test/data";
-import { database } from "../../database";
+import { database, imageModel } from "../../database";
 import fs_cache from "../../utils/persistent_cache";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("server process - images", () => {
   let request: TestRequest;
@@ -90,7 +91,7 @@ describe("server process - images", () => {
     const missingImage = await createMissingImage();
 
     return request
-      .get(`/api/v1/images/${missingImage.insertedId.toString()}/binary`)
+      .get(`/api/v1/images/${missingImage._id.toString()}/binary`)
       .expect(404);
   });
 
@@ -98,7 +99,7 @@ describe("server process - images", () => {
     const missingImage = await createMissingImage();
 
     return request
-      .get(`/api/v1/images/${missingImage.insertedId.toString()}`)
+      .get(`/api/v1/images/${missingImage._id.toString()}`)
       .expect(200)
       .expect((res) => {
         expect(res.body).toEqual(
@@ -167,7 +168,7 @@ describe("server process - images", () => {
   };
 
   const createMissingImage = async () => {
-    const retval = await database.collection("images").insertOne({
+    const retval = await imageModel.insertOne({
       filename: "missing.jpg",
       deleted: false,
       description_from_exif: false,
@@ -176,9 +177,10 @@ describe("server process - images", () => {
   };
 
   const markImageHidden = async (filename: string) => {
-    const retval = await database
-      .collection("images")
-      .updateOne({ filename }, { $set: { hidden: true } });
+    const retval = await database.images.updateOne(
+      { filename },
+      { $set: { hidden: true } },
+    );
     expect(retval.modifiedCount).toBe(1);
     return retval;
   };

@@ -1,4 +1,4 @@
-import { PostHistory, PostHistoryDocument, PostStatus } from "../database";
+import { postHistoryModel } from "../database";
 import {
   differenceInMinutes,
   startOfDay,
@@ -11,8 +11,13 @@ import { randomInt } from "../utils/random";
 import now from "../utils/now";
 import { SchedulePostOptions } from "../routes/contract";
 import imageSelector from "./selection/selector";
+import {
+  DbImage,
+  DbPopulatedPostHistory,
+  DbPostHistory,
+} from "../database/types";
 
-type PostResult = Result<PostHistoryDocument, PostError>;
+type PostResult = Result<DbPopulatedPostHistory, PostError>;
 
 export interface PostError {
   message: string;
@@ -25,34 +30,39 @@ let suppressDuplicateLogMessage: number | undefined;
 export const schedulePost = async ({
   when,
   selectImage,
-  overwrite,
+  overwrite = false,
 }: SchedulePostOptions): Promise<PostResult> => {
-  const matchingPosts = await PostHistory.findScheduledPost(when);
-  if (matchingPosts.length > 0) {
-    if (!(overwrite ?? false)) {
-      if (matchingPosts.length > 1) {
-        logger.warn(
-          {
-            matchingPosts,
-            when,
-          },
-          "More than one post scheduled for timestamp",
-        );
-      }
-      const firstPost = matchingPosts[0];
-      // to reduce log spam, only output this once even though we are polling every 5 minutes or so
-      if (suppressDuplicateLogMessage !== firstPost.timestamp.getTime()) {
-        logger.info(
-          { when: firstPost.timestamp },
-          "Using existing scheduled post",
-        );
-        suppressDuplicateLogMessage = firstPost.timestamp.getTime();
-      }
-      return ok(firstPost);
+  const matchingPosts = await postHistoryModel.findScheduledPost(when);
+  if (overwrite) {
+    // just delete all matching posts and redo them
+    await Promise.all(
+      matchingPosts.map((p) => postHistoryModel.deleteOne(p._id)),
+    );
+  } else if (matchingPosts.length > 1) {
+    logger.warn(
+      {
+        matchingPosts,
+        when,
+      },
+      "More than one post scheduled for timestamp",
+    );
+  } else if (matchingPosts.length === 1) {
+    // normal case, return existing post
+    const firstPost = matchingPosts[0];
+    // to reduce log spam, only output this once even though we are polling every 5 minutes or so
+    if (suppressDuplicateLogMessage !== firstPost.timestamp.getTime()) {
+      logger.info(
+        { when: firstPost.timestamp },
+        "Using existing scheduled post",
+      );
+      suppressDuplicateLogMessage = firstPost.timestamp.getTime();
     }
-    await Promise.all(matchingPosts.map((p) => p.deleteOne()));
+    return ok(firstPost);
+  } else {
+    // no matching posts so we can create a new one
   }
 
+  // now we can create a new post
   const createdPost = await createNewScheduledPost(when, selectImage);
   return createdPost.alsoOnOk((value) => {
     logger.info({ when: value.timestamp }, `Scheduled new post`);
@@ -63,25 +73,29 @@ const createNewScheduledPost = async (
   when: Date,
   selectImage = false,
 ): Promise<PostResult> => {
-  const lastPost = await PostHistory.findLatestPost();
-  const newPost = new PostHistory();
+  const lastPost = await postHistoryModel.findLatestPost();
 
   const selectedTime = selectNextTime(lastPost?.timestamp, when);
   if (selectedTime.isError()) {
     // sometimes we can't schedule a new post today
     return error(selectedTime.value);
   }
-  newPost.timestamp = selectedTime.value;
-  newPost.status.flag = PostStatus.PENDING;
+  const newPost: Omit<DbPostHistory, "_id"> = {
+    status: { flag: "pending" },
+    timestamp: selectedTime.value,
+  };
+  let image: DbImage | undefined;
   if (selectImage) {
     const newImage = await imageSelector.nextImage();
     if (newImage.isOk()) {
-      newPost.image = newImage.value;
+      newPost.image = newImage.value._id;
+      image = newImage.value;
     } else {
       return error(newImage.value);
     }
   }
-  return ok(await newPost.save());
+  const insertedPost = await postHistoryModel.insertOne(newPost);
+  return ok({ ...insertedPost, populatedImage: image });
 };
 
 const selectNextTime = (

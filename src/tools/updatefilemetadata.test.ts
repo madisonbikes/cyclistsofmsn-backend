@@ -1,7 +1,8 @@
 import { setupSuite } from "../test";
-import { Image } from "../database";
+import { imageModel } from "../database";
 import { getGoodImageId } from "../test/data";
 import { updateFileMetadata } from "./updatefilemetadata";
+import { describe, it, expect } from "vitest";
 
 describe("updateFileMetadata", () => {
   setupSuite({
@@ -12,19 +13,19 @@ describe("updateFileMetadata", () => {
 
   it("updates the metadata", async () => {
     const goodImageId = await getGoodImageId();
-    const image = await Image.findById(goodImageId);
+    const image = await imageModel.findById(goodImageId);
     expect(image).toBeDefined();
     if (!image) throw new Error("image is undefined");
     expect(image.description).toBe("blarg");
     expect(image.description_from_exif).toBe(true);
 
-    image.description_from_exif = false;
-    await image.save();
+    // force the image to need to be updated because description_from_exif is false and there's a description
+    await imageModel.updateOne(goodImageId, { description_from_exif: false });
 
     const count = await updateFileMetadata();
     expect(count).toBe(1);
 
-    const image2 = await Image.findById(goodImageId);
+    const image2 = await imageModel.findById(goodImageId);
     expect(image2?.description_from_exif).toBe(true);
   });
 });

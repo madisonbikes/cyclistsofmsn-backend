@@ -1,5 +1,6 @@
+import { imageModel } from "../../database";
+import { DbImage } from "../../database/types";
 import { error, ok, Result, arrayShuffle } from "../../utils";
-import { Image, ImageDocument } from "../../database";
 import {
   RepostCriteria,
   SeasonalityCriteria,
@@ -15,12 +16,10 @@ interface ImageSelectionError {
   critical?: boolean;
 }
 
-async function nextImage(): Promise<
-  Result<ImageDocument, ImageSelectionError>
-> {
-  const allImages = await Image.find({
-    deleted: false,
-    hidden: false,
+async function nextImage(): Promise<Result<DbImage, ImageSelectionError>> {
+  const allImages = await imageModel.findAll({
+    filterDeleted: true,
+    filterHidden: true,
   });
   if (allImages.length === 0) {
     return error({ message: "no images", critical: true });
