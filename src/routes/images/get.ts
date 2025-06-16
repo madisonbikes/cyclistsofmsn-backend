@@ -1,13 +1,13 @@
 import type { Request, Response } from "express";
-import fsRepository from "../../fs_repository/index.ts";
+import fsRepository from "../../fs_repository";
 import { access } from "fs/promises";
 import { constants } from "fs";
 import sharp from "sharp";
-import { logger } from "../../utils/index.ts";
-import { getImageQuerySchema, type GetImageQuery } from "../contract/index.ts";
-import { lenientImageSchema } from "./localTypes.ts";
-import fs_cache from "../../utils/persistent_cache.ts";
-import { imageModel } from "../../database/database.ts";
+import { logger } from "../../utils";
+import { getImageQuerySchema, type GetImageQuery } from "../contract";
+import { lenientImageSchema } from "./localTypes";
+import fs_cache from "../../utils/persistent_cache";
+import { imageModel } from "../../database/database";
 
 class ImageGet {
   // expose for validation

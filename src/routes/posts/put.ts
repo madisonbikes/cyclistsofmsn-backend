@@ -1,12 +1,8 @@
 import type { Request, Response } from "express";
-import { logger } from "../../utils/index.ts";
-import {
-  type Post,
-  type PutPostBody,
-  putPostBodySchema,
-} from "../contract/index.ts";
-import { mapPostSchema } from "./types.ts";
-import { postHistoryModel } from "../../database/database.ts";
+import { logger } from "../../utils";
+import { type Post, type PutPostBody, putPostBodySchema } from "../contract";
+import { mapPostSchema } from "./types";
+import { postHistoryModel } from "../../database/database";
 
 const bodySchema = putPostBodySchema;
 

@@ -1,8 +1,8 @@
 import { Keyv, type KeyvStoreAdapter } from "keyv";
 import KeyvValkey from "@keyv/valkey";
-import { type Lifecycle } from "./lifecycle.ts";
-import { configuration } from "../config.ts";
-import { logger, maskUriPassword } from "./logger.ts";
+import { type Lifecycle } from "./lifecycle";
+import { configuration } from "../config";
+import { logger, maskUriPassword } from "./logger";
 
 /**
  * A class that provides a cache using Keyv with either Valkey (preferred) or in-memory as the storage backend.

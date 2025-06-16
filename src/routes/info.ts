@@ -1,6 +1,6 @@
 import express from "express";
-import { type GetInfo } from "./contract/index.ts";
-import backendVersion from "../backend-version.ts";
+import { type GetInfo } from "./contract";
+import backendVersion from "../backend-version";
 
 function routes() {
   return express.Router().get("/", (_, response) => {

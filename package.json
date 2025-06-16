@@ -17,7 +17,7 @@
     "test-watch": "PINO_PRETTY=true vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint . --max-warnings=0",
-    "register_twitter": "vite-node src/twitter/register.ts",
+    "register_twitter": "vite-node src/twitter/register_main.ts",
     "test_tweet": "vite-node src/twitter/main.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
     "test_toot": "vite-node src/mastodon/main.ts 'this is a test status' test_resources/test_DSC_7020.jpg",
     "test_bsky": "vite-node src/atproto/main.ts 'this is a test status' test_resources/test_DSC_7020.jpg",

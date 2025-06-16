@@ -1,5 +1,5 @@
-import { setupSuite, testRequest, type TestRequest } from "../test/index.ts";
-import { type GetInfo } from "./contract/index.ts";
+import { setupSuite, testRequest, type TestRequest } from "../test";
+import { type GetInfo } from "./contract";
 import { describe, it, expect, beforeEach } from "vitest";
 
 describe("info route", () => {

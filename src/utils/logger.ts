@@ -1,6 +1,6 @@
 import { ConnectionString } from "connection-string";
 import { stdSerializers, pino } from "pino";
-import { initEnv } from "./env.ts";
+import { initEnv } from "./env";
 import pretty from "pino-pretty";
 
 initEnv();

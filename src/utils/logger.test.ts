@@ -1,4 +1,4 @@
-import { maskUriPassword } from "./logger.ts";
+import { maskUriPassword } from "./logger";
 import { describe, it, expect } from "vitest";
 
 describe("tests masking of uris with password", () => {

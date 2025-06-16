@@ -5,15 +5,15 @@ import {
   setupSuite,
   testRequest,
   type TestRequest,
-} from "../../test/index.ts";
+} from "../../test";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
   getGoodImageId,
-} from "../../test/data.ts";
+} from "../../test/data";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { imageModel } from "../../database/database.ts";
+import { imageModel } from "../../database/database";
 
 describe("server process - images", () => {
   let request: TestRequest;

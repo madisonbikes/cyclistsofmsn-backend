@@ -1,5 +1,5 @@
-import { isValidObjectId } from "../database/database.ts";
-import { type ExpressMiddleware } from "./authentication.ts";
+import { isValidObjectId } from "../database/database";
+import { type ExpressMiddleware } from "./authentication";
 
 export const validateId = (): ExpressMiddleware => {
   return (request, response, next) => {

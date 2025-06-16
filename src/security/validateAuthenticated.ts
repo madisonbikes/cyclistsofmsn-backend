@@ -1,6 +1,6 @@
-import { type AuthenticatedUser } from "../routes/contract/index.ts";
-import { logger } from "../utils/index.ts";
-import { type ExpressMiddleware } from "./authentication.ts";
+import { type AuthenticatedUser } from "../routes/contract";
+import { logger } from "../utils";
+import { type ExpressMiddleware } from "./authentication";
 
 export const validateAuthenticated = (): ExpressMiddleware => {
   return (request, response, next) => {

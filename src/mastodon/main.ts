@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { postToot } from "./post.ts";
+import { postToot } from "./post";
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {

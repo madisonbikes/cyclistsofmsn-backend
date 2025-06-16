@@ -1,6 +1,6 @@
 import { Collection, ObjectId } from "mongodb";
-import { type DbImage, dbImageSchema } from "./types.ts";
-import { logger } from "../utils/logger.ts";
+import { type DbImage, dbImageSchema } from "./types";
+import { logger } from "../utils/logger";
 
 export type ImageModelCollectionType = Collection<Omit<DbImage, "_id">>;
 

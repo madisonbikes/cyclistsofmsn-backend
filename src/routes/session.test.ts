@@ -1,5 +1,5 @@
-import { setupSuite, testRequest, type TestRequest } from "../test/index.ts";
-import { createTestUser } from "../test/data.ts";
+import { setupSuite, testRequest, type TestRequest } from "../test";
+import { createTestUser } from "../test/data";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("login route", () => {

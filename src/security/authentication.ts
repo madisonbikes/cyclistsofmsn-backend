@@ -1,12 +1,12 @@
 import { Strategy as LocalStrategy } from "passport-local";
-import { logger } from "../utils/index.ts";
+import { logger } from "../utils";
 import {
   type AuthenticatedUser,
   authenticatedUserSchema,
-} from "../routes/contract/index.ts";
+} from "../routes/contract";
 import bcrypt from "bcryptjs";
-import { userModel } from "../database/database.ts";
-import type { DbUser } from "../database/types.ts";
+import { userModel } from "../database/database";
+import type { DbUser } from "../database/types";
 import type { NextFunction, Request, Response } from "express";
 
 export type Roles = "admin" | "editor";

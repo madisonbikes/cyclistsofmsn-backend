@@ -1,5 +1,5 @@
 import { Collection } from "mongodb";
-import { type DbUser } from "./types.ts";
+import { type DbUser } from "./types";
 
 export type UserModelCollectionType = Collection<Omit<DbUser, "_id">>;
 /**

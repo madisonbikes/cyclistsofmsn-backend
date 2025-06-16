@@ -1,11 +1,11 @@
 import type { Request, Response } from "express";
-import { logger } from "../../utils/index.ts";
-import { putImageBodySchema } from "../contract/index.ts";
-import { lenientImageSchema } from "./localTypes.ts";
-import fsRepository from "../../fs_repository/index.ts";
+import { logger } from "../../utils";
+import { putImageBodySchema } from "../contract";
+import { lenientImageSchema } from "./localTypes";
+import fsRepository from "../../fs_repository";
 import { z } from "zod";
-import type { DbImage } from "../../database/types.ts";
-import { imageModel } from "../../database/database.ts";
+import type { DbImage } from "../../database/types";
+import { imageModel } from "../../database/database";
 
 class ImagePut {
   bodySchema = putImageBodySchema;

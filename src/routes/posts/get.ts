@@ -1,8 +1,8 @@
-import { mapPostSchema } from "./types.ts";
+import { mapPostSchema } from "./types";
 import type { Request, Response } from "express";
-import { logger } from "../../utils/index.ts";
-import { postHistoryModel } from "../../database/database.ts";
-import type { Post, PostList } from "../contract/types.ts";
+import { logger } from "../../utils";
+import { postHistoryModel } from "../../database/database";
+import type { Post, PostList } from "../contract/types";
 
 const currentPostHandler = async (_req: Request, res: Response) => {
   const post = await postHistoryModel.findLatestPost();

@@ -1,10 +1,10 @@
-import { setupSuite } from "../test/index.ts";
-import postExecutor from "./postExecutor.ts";
-import * as photoTooter from "../mastodon/post.ts";
-import * as photoTweeter from "../twitter/post.ts";
-import * as atproto from "../atproto/index.ts";
+import { setupSuite } from "../test";
+import postExecutor from "./postExecutor";
+import * as photoTooter from "../mastodon/post";
+import * as photoTweeter from "../twitter/post";
+import * as atproto from "../atproto";
 import { vi, describe, it, expect } from "vitest";
-import { imageModel } from "../database/database.ts";
+import { imageModel } from "../database/database";
 
 vi.mock("../mastodon/post");
 vi.mock("../twitter/post");

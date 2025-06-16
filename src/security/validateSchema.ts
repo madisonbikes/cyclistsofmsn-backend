@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { logger } from "../utils/index.ts";
-import { type ExpressMiddleware } from "./authentication.ts";
+import { logger } from "../utils";
+import { type ExpressMiddleware } from "./authentication";
 
 interface ValidateOptions<T extends z.ZodTypeAny> {
   schema: T;

@@ -1,5 +1,5 @@
-import { PhotoServer } from "./server.ts";
-import { logger } from "./utils/logger.ts";
+import { PhotoServer } from "./server";
+import { logger } from "./utils/logger";
 
 logger.trace("Starting Cyclists of Madison Backend...");
 console.log("Starting Cyclists of Madison Backend...");

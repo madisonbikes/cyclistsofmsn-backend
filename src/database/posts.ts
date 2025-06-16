@@ -5,8 +5,8 @@ import {
   type DbPostHistory,
   dbPostHistorySchema,
   type DbPostHistoryStatus,
-} from "./types.ts";
-import { type ImageId } from "./images.ts";
+} from "./types";
+import { type ImageId } from "./images";
 
 export type PostHistoryModelCollectionType = Collection<
   Omit<DbPostHistory, "_id">

@@ -2,12 +2,12 @@
  * This has the routes defined.
  */
 import express from "express";
-import postRouter from "./posts/index.ts";
-import imageRouter from "./images/index.ts";
-import sessionRouter from "./session.ts";
-import tasksRouter from "./tasks.ts";
-import infoRouter from "./info.ts";
-import cron from "./cron.ts";
+import postRouter from "./posts";
+import imageRouter from "./images";
+import sessionRouter from "./session";
+import tasksRouter from "./tasks";
+import infoRouter from "./info";
+import cron from "./cron";
 
 /** Provide REST API routes for images, posts */
 function routes() {

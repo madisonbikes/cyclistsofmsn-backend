@@ -1,5 +1,5 @@
-import { type AuthenticatedUser } from "../routes/contract/index.ts";
-import { userHasRole } from "./authentication.ts";
+import { type AuthenticatedUser } from "../routes/contract";
+import { userHasRole } from "./authentication";
 import { describe, it, expect } from "vitest";
 
 describe("authentication", () => {

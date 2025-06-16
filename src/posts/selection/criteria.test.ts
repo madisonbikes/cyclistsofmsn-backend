@@ -1,11 +1,11 @@
-import { imageModel, postHistoryModel } from "../../database/database.ts";
-import type { DbImage } from "../../database/types.ts";
-import { setupSuite } from "../../test/index.ts";
+import { imageModel, postHistoryModel } from "../../database/database";
+import type { DbImage } from "../../database/types";
+import { setupSuite } from "../../test";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
-} from "./criteria.ts";
+} from "./criteria";
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
 import { describe, it, expect } from "vitest";
 

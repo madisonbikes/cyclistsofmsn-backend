@@ -1,8 +1,8 @@
-import { setupSuite } from "../test/index.ts";
-import { getGoodImageId } from "../test/data.ts";
-import { updateFileMetadata } from "./updatefilemetadata.ts";
+import { setupSuite } from "../test";
+import { getGoodImageId } from "../test/data";
+import { updateFileMetadata } from "./updatefilemetadata";
 import { describe, it, expect } from "vitest";
-import { imageModel } from "../database/database.ts";
+import { imageModel } from "../database/database";
 
 describe("updateFileMetadata", () => {
   setupSuite({

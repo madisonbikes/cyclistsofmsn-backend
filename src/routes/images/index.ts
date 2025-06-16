@@ -6,10 +6,10 @@ import {
   validateRole,
   validateId,
   validateAdmin,
-} from "../../security/index.ts";
-import imageGet from "./get.ts";
-import singleImageDelete from "./delete.ts";
-import imagePut from "./put.ts";
+} from "../../security";
+import imageGet from "./get";
+import singleImageDelete from "./delete";
+import imagePut from "./put";
 
 function routes() {
   return (

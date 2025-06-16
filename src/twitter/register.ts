@@ -1,18 +1,8 @@
 import superagent from "superagent";
-import { oauth_signer } from "./oauth.ts";
+import { oauth_signer } from "./oauth";
 import qs from "querystring";
 import readlinesync from "readline-sync";
-import { configuration } from "../config.ts";
-
-/** launches twitter_register. this syntax allows server startup to run as async function */
-Promise.resolve()
-  .then(() => {
-    const main = new TwitterRegisterConfiguration();
-    return main.run();
-  })
-  .catch((error: unknown) => {
-    console.error(error);
-  });
+import { configuration } from "../config";
 
 interface RequestTokenResponse {
   oauth_token: string;
@@ -25,7 +15,7 @@ interface AccessTokenResponse {
   oauth_token_secret: string;
 }
 
-class TwitterRegisterConfiguration {
+export class TwitterRegisterConfiguration {
   async run(): Promise<void> {
     if (
       configuration.twitterApiKey === "" ||

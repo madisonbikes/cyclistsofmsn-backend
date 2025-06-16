@@ -1,7 +1,7 @@
-import { dispatchPostOnSchedule } from "../posts/dispatcher.ts";
-import { populatePostsOnSchedule } from "../posts/populate.ts";
-import { testConfiguration } from "../config.ts";
-import { setupSuite, testRequest } from "../test/index.ts";
+import { dispatchPostOnSchedule } from "../posts/dispatcher";
+import { populatePostsOnSchedule } from "../posts/populate";
+import { testConfiguration } from "../config";
+import { setupSuite, testRequest } from "../test";
 import { vi, describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 vi.mock("../posts/dispatcher");

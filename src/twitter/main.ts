@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
-import { logger } from "../utils/logger.ts";
-import { postTweet } from "./post.ts";
+import { logger } from "../utils/logger";
+import { postTweet } from "./post";
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {

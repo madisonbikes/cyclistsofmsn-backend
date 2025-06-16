@@ -1,20 +1,20 @@
 import http, { Server } from "http";
 import cors from "cors";
-import { type Lifecycle, logger } from "./utils/index.ts";
-import { configuration } from "./config.ts";
-import imageRepositoryScanner from "./scan.ts";
-import { database } from "./database/index.ts";
-import api from "./routes/index.ts";
+import { type Lifecycle, logger } from "./utils";
+import { configuration } from "./config";
+import imageRepositoryScanner from "./scan";
+import { database } from "./database";
+import api from "./routes";
 import express, {
   type NextFunction,
   type Request,
   type Response,
 } from "express";
 import passport from "passport";
-import { strategies } from "./security/index.ts";
-import { valkeySessionStore } from "./session_valkey.ts";
-import { sessionMiddlewareConfigurator } from "./session.ts";
-import persistent_cache from "./utils/persistent_cache.ts";
+import { strategies } from "./security";
+import { valkeySessionStore } from "./session_valkey";
+import { sessionMiddlewareConfigurator } from "./session";
+import persistent_cache from "./utils/persistent_cache";
 
 export class PhotoServer implements Lifecycle {
   constructor() {

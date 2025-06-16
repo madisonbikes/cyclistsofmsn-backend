@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { atPost } from "./index.ts";
+import { atPost } from ".";
 
 /** simple command-line capability for testing */
 const main = async (args: string[]) => {

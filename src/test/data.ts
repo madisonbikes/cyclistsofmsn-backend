@@ -1,4 +1,4 @@
-import { database, imageModel } from "../database/index.ts";
+import { database, imageModel } from "../database";
 import { expect } from "vitest";
 
 /** returns array of inserted post id's */

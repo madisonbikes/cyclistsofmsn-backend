@@ -1,12 +1,9 @@
-import { configuration } from "../config.ts";
-import { logger, maskUriPassword } from "../utils/index.ts";
-import { ImageModel, type ImageModelCollectionType } from "./images.ts";
-import {
-  PostHistoryModel,
-  type PostHistoryModelCollectionType,
-} from "./posts.ts";
-import { UserModel, type UserModelCollectionType } from "./users.ts";
-import { type VersionModelCollectionType, VersionsModel } from "./version.ts";
+import { configuration } from "../config";
+import { logger, maskUriPassword } from "../utils";
+import { ImageModel, type ImageModelCollectionType } from "./images";
+import { PostHistoryModel, type PostHistoryModelCollectionType } from "./posts";
+import { UserModel, type UserModelCollectionType } from "./users";
+import { type VersionModelCollectionType, VersionsModel } from "./version";
 import {
   Db,
   MongoClient,

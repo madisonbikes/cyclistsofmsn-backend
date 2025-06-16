@@ -1,8 +1,8 @@
 import { TwitterClient } from "twitter-api-client";
-import { configuration } from "../config.ts";
+import { configuration } from "../config";
 import sharp from "sharp";
-import fsRepository from "../fs_repository/index.ts";
-import { logger } from "../utils/index.ts";
+import fsRepository from "../fs_repository";
+import { logger } from "../utils";
 
 export function isEnabled() {
   return (

@@ -1,7 +1,7 @@
 import { Collection } from "mongodb";
-import { logger } from "../utils/logger.ts";
-import { type DbVersion } from "./types.ts";
-import { type ImageModelCollectionType } from "./images.ts";
+import { logger } from "../utils/logger";
+import { type DbVersion } from "./types";
+import { type ImageModelCollectionType } from "./images";
 
 /** make sure you update switch statement below when bumping db version */
 const CURRENT_DATABASE_VERSION = 3;

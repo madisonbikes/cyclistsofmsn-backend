@@ -1,9 +1,9 @@
 import fs from "fs-extra";
 import path from "path";
-import { updateImageDescription } from "./exiftool.ts";
+import { updateImageDescription } from "./exiftool";
 import { load } from "exifreader";
 import tempfile from "tempfile";
-import { testResourcesDir } from "./test/index.ts";
+import { testResourcesDir } from "./test";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 describe("exiftool", () => {

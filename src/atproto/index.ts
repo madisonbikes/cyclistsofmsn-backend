@@ -1,6 +1,6 @@
-import { configuration } from "../config.ts";
+import { configuration } from "../config";
 import sharp from "sharp";
-import fsRepository from "../fs_repository/index.ts";
+import fsRepository from "../fs_repository";
 import { AtpAgent } from "@atproto/api";
 
 export function isEnabled() {

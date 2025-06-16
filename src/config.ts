@@ -1,4 +1,4 @@
-import { initEnv } from "./utils/env.ts";
+import { initEnv } from "./utils/env";
 
 initEnv();
 

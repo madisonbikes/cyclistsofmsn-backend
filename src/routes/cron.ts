@@ -1,9 +1,9 @@
 import express from "express";
-import { dispatchPostOnSchedule } from "../posts/dispatcher.ts";
-import { populatePostsOnSchedule } from "../posts/populate.ts";
-import { type ExpressMiddleware } from "../security/index.ts";
-import { logger } from "../utils/index.ts";
-import { configuration } from "../config.ts";
+import { dispatchPostOnSchedule } from "../posts/dispatcher";
+import { populatePostsOnSchedule } from "../posts/populate";
+import { type ExpressMiddleware } from "../security";
+import { logger } from "../utils";
+import { configuration } from "../config";
 
 function routes() {
   return (

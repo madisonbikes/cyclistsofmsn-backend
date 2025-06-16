@@ -5,10 +5,10 @@ import {
   validateBodySchema,
   validateId,
   validateRole,
-} from "../../security/index.ts";
-import singlePostPut from "./put.ts";
-import singlePostDelete from "./delete.ts";
-import postGet from "./get.ts";
+} from "../../security";
+import singlePostPut from "./put";
+import singlePostDelete from "./delete";
+import postGet from "./get";
 
 function validateEditor() {
   return validateRole({ role: "editor" });
