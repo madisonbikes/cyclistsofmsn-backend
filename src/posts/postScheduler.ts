@@ -91,7 +91,7 @@ const createNewScheduledPost = async (
       newPost.image = newImage.value._id;
       image = newImage.value;
     } else {
-      return newImage;
+      return error(newImage.value);
     }
   }
   const insertedPost = await postHistoryModel.insertOne(newPost);

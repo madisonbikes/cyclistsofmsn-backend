@@ -9,9 +9,6 @@ import { UserModel, type UserModelCollectionType } from "./users.js";
 import { type VersionModelCollectionType, VersionsModel } from "./version.js";
 import { Db, MongoClient, ObjectId } from "mongodb";
 
-/** make sure you update switch statement below when bumping db version */
-const CURRENT_DATABASE_VERSION = 3;
-
 /** provide unified access to database connection */
 
 let imageModel: ImageModel;
