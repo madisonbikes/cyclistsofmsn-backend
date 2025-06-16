@@ -1,5 +1,5 @@
 import { imageSchema } from "../contract";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 // database could, in theory, not have fs_timestamp defined
 // but very unlikely because it should only happen with deleted

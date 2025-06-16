@@ -1,13 +1,13 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { logger } from "../utils";
 import { type ExpressMiddleware } from "./authentication";
 
-interface ValidateOptions<T extends z.ZodTypeAny> {
+interface ValidateOptions<T extends z.ZodType> {
   schema: T;
 }
 
 /** validate the request body against the supplied schema, placing validated object into the request.validated property */
-export const validateBodySchema = <T extends z.ZodTypeAny>({
+export const validateBodySchema = <T extends z.ZodType>({
   schema,
 }: ValidateOptions<T>): ExpressMiddleware => {
   return (request, response, next) => {
@@ -25,7 +25,7 @@ export const validateBodySchema = <T extends z.ZodTypeAny>({
 };
 
 /** validate the request query against the supplied schema, placing validated object into the request.validated property */
-export const validateQuerySchema = <T extends z.ZodTypeAny>({
+export const validateQuerySchema = <T extends z.ZodType>({
   schema,
 }: ValidateOptions<T>): ExpressMiddleware => {
   return (request, response, next) => {

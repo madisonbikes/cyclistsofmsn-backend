@@ -3,7 +3,7 @@ import { logger } from "../../utils";
 import { putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 import fsRepository from "../../fs_repository";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { DbImage } from "../../database/types";
 import { imageModel } from "../../database/database";
 

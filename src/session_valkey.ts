@@ -2,7 +2,7 @@ import { configuration } from "./config";
 import { RedisStore as ValkeyStore } from "connect-redis";
 import { logger, maskUriPassword } from "./utils";
 import { Redis as ValKey } from "iovalkey";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 let client: ValKey | undefined;
 let started = false;

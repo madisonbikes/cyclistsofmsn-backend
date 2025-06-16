@@ -38,7 +38,7 @@ describe("server process - tasks", () => {
       .send(options)
       .expect(200);
     const parsed = postSchema.parse(response.body);
-    expect(parsed.status.flag).toEqual(postStatusFlagSchema.Enum.pending);
+    expect(parsed.status.flag).toEqual(postStatusFlagSchema.enum.pending);
     expect(parsed.imageid).not.toBeNull();
   });
 });
