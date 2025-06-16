@@ -4,18 +4,15 @@ import qs from "querystring";
 import readlinesync from "readline-sync";
 import { configuration } from "../config.ts";
 
-/** expose command-line launcher */
-if (require.main === module) {
-  /** launches twitter_register. this syntax allows server startup to run as async function */
-  Promise.resolve()
-    .then(() => {
-      const main = new TwitterRegisterConfiguration();
-      return main.run();
-    })
-    .catch((error: unknown) => {
-      console.error(error);
-    });
-}
+/** launches twitter_register. this syntax allows server startup to run as async function */
+Promise.resolve()
+  .then(() => {
+    const main = new TwitterRegisterConfiguration();
+    return main.run();
+  })
+  .catch((error: unknown) => {
+    console.error(error);
+  });
 
 interface RequestTokenResponse {
   oauth_token: string;
@@ -28,7 +25,7 @@ interface AccessTokenResponse {
   oauth_token_secret: string;
 }
 
-export class TwitterRegisterConfiguration {
+class TwitterRegisterConfiguration {
   async run(): Promise<void> {
     if (
       configuration.twitterApiKey === "" ||

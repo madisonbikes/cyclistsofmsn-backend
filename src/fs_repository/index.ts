@@ -1,4 +1,4 @@
-import { load } from "exifreader";
+import * as ExifReader from "exifreader";
 import { configuration } from "../config.ts";
 import fs from "fs/promises";
 import path from "path";
@@ -22,7 +22,7 @@ async function photoFiles() {
 async function tags(baseFilename: string) {
   const path = photoPath(baseFilename);
   const fileData = await fs.readFile(path);
-  const tags = load(fileData, { expanded: true });
+  const tags = ExifReader.load(fileData, { expanded: true });
   return tags;
 }
 

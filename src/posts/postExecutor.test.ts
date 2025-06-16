@@ -1,8 +1,8 @@
 import { setupSuite } from "../test/index.ts";
 import postExecutor from "./postExecutor.ts";
-import photoTooter from "../mastodon/post.ts";
-import photoTweeter from "../twitter/post.ts";
-import atproto from "../atproto/index.ts";
+import * as photoTooter from "../mastodon/post.ts";
+import * as photoTweeter from "../twitter/post.ts";
+import * as atproto from "../atproto/index.ts";
 import { vi, describe, it, expect } from "vitest";
 import { imageModel } from "../database/database.ts";
 
