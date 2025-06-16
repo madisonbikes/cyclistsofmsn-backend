@@ -2,14 +2,10 @@ import { error, logger, ok, type Result } from "../utils/index.js";
 import now from "../utils/now.js";
 import { type PostError, schedulePost } from "./postScheduler.js";
 import postExecutor from "./postExecutor.js";
-import {
-  type ImageDocument,
-  type PostHistoryDocument,
-  PostStatus,
-  Image,
-} from "../database/index.js";
 import imageSelector from "./selection/selector.js";
 import imageRepositoryScanner from "../scan.js";
+import { postHistoryModel } from "../database/database.js";
+import type { DbImage, DbPostHistory } from "../database/types.js";
 
 // five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;
@@ -37,46 +33,44 @@ export const dispatchPostOnSchedule = async () => {
     }
     return;
   }
-  const nextPost = scheduledResult.value;
-  if (!isTimeToPost(nextPost)) {
+  const nextScheduledPost = scheduledResult.value;
+  if (!isTimeToPost(nextScheduledPost)) {
     // not time to post
     return;
   }
 
-  let postImage: ImageDocument | null = null;
-  if (nextPost.image != null) {
+  if (nextScheduledPost.populatedImage != null) {
     // use existing selected image, if it exists
-    const id = nextPost.image._id;
-    postImage = await Image.findById(id);
-  }
-  if (postImage == null) {
+    await postExecutor.post(nextScheduledPost.populatedImage);
+    await postHistoryModel.updatePostStatus(nextScheduledPost._id, {
+      flag: "complete",
+    });
+  } else {
+    // no image selected, we need to select one
     logger.info("Scanning for new images");
     await imageRepositoryScanner.scan();
 
     // or generate a new image
     const checkImage = await selectImage();
     if (checkImage.isOk()) {
-      postImage = checkImage.value;
+      // execute the post and then if it's sucessful, update the post status
+      await postExecutor.post(checkImage.value);
+      await postHistoryModel.updatePostStatus(nextScheduledPost._id, {
+        flag: "complete",
+      });
     } else {
-      nextPost.status.flag = PostStatus.FAILED;
-      nextPost.status.error = checkImage.value.message;
+      await postHistoryModel.updatePostStatus(nextScheduledPost._id, {
+        flag: "failed",
+        error: checkImage.value.message,
+      });
     }
   }
-
-  if (postImage != null) {
-    // execute the post and then if it's sucessful, update the post status
-    await postExecutor.post(postImage);
-
-    nextPost.image = postImage;
-    nextPost.status.flag = PostStatus.COMPLETE;
-  }
-  await nextPost.save();
 };
 
 /** returns true if it's time to execute this post, false if it's in the future */
-function isTimeToPost(post: PostHistoryDocument) {
+function isTimeToPost(post: DbPostHistory) {
   const when = now() - post.timestamp.getTime();
-  if (post.status.flag !== PostStatus.PENDING.toString()) {
+  if (post.status.flag !== "pending") {
     logger.warn({ post }, "isTimeToPost expects PENDING posts only");
     return false;
   }
@@ -98,7 +92,7 @@ function isTimeToPost(post: PostHistoryDocument) {
   return true;
 }
 
-async function selectImage(): Promise<Result<ImageDocument, PostError>> {
+async function selectImage(): Promise<Result<DbImage, PostError>> {
   // select image
   const retval = await imageSelector.nextImage();
   if (retval.isError()) {

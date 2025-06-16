@@ -2,12 +2,13 @@ import { dispatchPostOnSchedule } from "../posts/dispatcher.js";
 import { populatePostsOnSchedule } from "../posts/populate.js";
 import { testConfiguration } from "../config.js";
 import { setupSuite, testRequest } from "../test/index.js";
+import { vi, describe, it, expect, beforeAll, beforeEach } from "vitest";
 
-jest.mock("../posts/dispatcher");
-jest.mock("../posts/populate");
+vi.mock("../posts/dispatcher");
+vi.mock("../posts/populate");
 
-const dispatchPostOnScheduleMock = jest.mocked(dispatchPostOnSchedule);
-const populatePostsOnScheduleMock = jest.mocked(populatePostsOnSchedule);
+const dispatchPostOnScheduleMock = vi.mocked(dispatchPostOnSchedule);
+const populatePostsOnScheduleMock = vi.mocked(populatePostsOnSchedule);
 
 describe("Cron Routes", () => {
   setupSuite({ withDatabase: true, withPhotoServer: true });
@@ -19,7 +20,7 @@ describe("Cron Routes", () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("POST /dispatchPost", () => {

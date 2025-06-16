@@ -1,4 +1,5 @@
 import { maskUriPassword } from "./logger.js";
+import { describe, it, expect } from "vitest";
 
 describe("tests masking of uris with password", () => {
   it("mask a uri with password", () => {

@@ -1,87 +1,162 @@
-import {
-  type DocumentType,
-  getModelForClass,
-  isDocument,
-  modelOptions,
-  prop,
-  type ReturnModelType,
-  type Ref,
-} from "@typegoose/typegoose";
 import { endOfDay, startOfDay } from "date-fns";
-import { ImageClass } from "./images.js";
+import { Collection, ObjectId } from "mongodb";
+import {
+  dbPopulatedPostHistorySchema,
+  type DbPostHistory,
+  dbPostHistorySchema,
+  type DbPostHistoryStatus,
+} from "./types.js";
+import { type ImageId } from "./images.js";
 
-export enum PostStatus {
-  PENDING = "pending",
-  FAILED = "failed",
-  COMPLETE = "complete",
-}
+export type PostHistoryModelCollectionType = Collection<
+  Omit<DbPostHistory, "_id">
+>;
 
-export class PostHistoryStatus {
-  @prop({
-    enum: [PostStatus.PENDING, PostStatus.FAILED, PostStatus.COMPLETE],
-    required: true,
-    default: PostStatus.PENDING,
-  })
-  public flag!: string;
+type PostId = string | ObjectId;
 
-  @prop()
-  public error?: string;
-
-  @prop()
-  public uri?: string;
-}
-
-@modelOptions({ schemaOptions: { collection: "posts" } })
-export class PostHistoryClass {
-  @prop({ ref: () => ImageClass })
-  public image?: Ref<ImageClass>;
-
-  @prop({ required: true, default: Date.now, index: true })
-  public timestamp!: Date;
-
-  @prop({ default: new PostHistoryStatus(), required: true, _id: false })
-  public status!: PostHistoryStatus;
-
-  public static findLatestPost(this: ReturnModelType<typeof PostHistoryClass>) {
-    return this.findOne()
-      .where({ "status.flag": PostStatus.COMPLETE })
+export class PostHistoryModel {
+  constructor(private collection: PostHistoryModelCollectionType) {}
+  async findLatestPost() {
+    const value = await this.collection
+      .find({ "status.flag": "complete" })
       .sort({ timestamp: -1 })
-      .populate({ path: "image", select: ["deleted"] });
+      .limit(1)
+      .toArray();
+    if (value.length === 0) {
+      return null;
+    }
+    return value[0];
   }
 
-  /** returns sorted by timestamp ascending */
-  public static async findOrderedPosts(
-    this: ReturnModelType<typeof PostHistoryClass>,
-  ) {
-    const posts = await this.find()
-      .sort({ timestamp: 1 })
-      .populate({ path: "image", select: ["deleted"] });
+  async findById(postId: PostId) {
+    const post = await this.collection.findOne({
+      _id: new ObjectId(postId),
+    });
+    return post;
+  }
 
-    return posts.flatMap((post) => {
-      const retval = post;
-      if (isDocument(post.image) && post.image.deleted) {
-        retval.image = undefined;
+  async findByImage(imageId: ImageId) {
+    const posts = await this.collection
+      .find({ image: new ObjectId(imageId) })
+      .toArray();
+    return dbPostHistorySchema.array().parse(posts);
+  }
+
+  async clearImageRefs(imageId: ImageId) {
+    return await this.collection.updateMany(
+      { image: new ObjectId(imageId) },
+      { $unset: { image: "" } },
+    );
+  }
+
+  async findOrderedPosts() {
+    const posts = await this.collection
+      .aggregate([
+        { $sort: { timestamp: 1 } },
+        // populate the populatedImage field with the image document
+        {
+          $lookup: {
+            from: "images",
+            localField: "image",
+            foreignField: "_id",
+            as: "populatedImage",
+          },
+        },
+        // convert the populatedImage array to a single object
+        {
+          $unwind: {
+            path: "$populatedImage",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ])
+      .toArray();
+
+    const typedPosts = dbPopulatedPostHistorySchema.array().parse(posts);
+
+    return typedPosts.flatMap((post) => {
+      if (post.populatedImage?.deleted === true) {
+        post.image = undefined;
+        post.populatedImage = undefined;
       }
-      return retval;
+      return post;
     });
   }
 
-  public static findScheduledPost(
-    this: ReturnModelType<typeof PostHistoryClass>,
-    when: Date,
-  ) {
+  async findScheduledPost(when: Date) {
     const start = startOfDay(when);
     const end = endOfDay(when);
+    const posts = await this.collection
+      .aggregate([
+        {
+          $match: {
+            "status.flag": { $eq: "pending" },
+            timestamp: { $gte: start, $lte: end },
+          },
+        },
+        { $sort: { timestamp: -1 } },
+        // populate the populatedImage field with the image document
+        {
+          $lookup: {
+            from: "images",
+            localField: "image",
+            foreignField: "_id",
+            as: "populatedImage",
+          },
+        },
+        // convert the populatedImage array to a single object
+        {
+          $unwind: {
+            path: "$populatedImage",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ])
+      .toArray();
 
-    return this.find()
-      .where({
-        "status.flag": PostStatus.PENDING,
-        timestamp: { $gte: start, $lte: end },
-      })
-      .populate("image")
-      .sort({ timestamp: -1 });
+    const typedPosts = dbPopulatedPostHistorySchema.array().parse(posts);
+
+    return typedPosts.flatMap((post) => {
+      if (post.populatedImage?.deleted === true) {
+        post.image = undefined;
+        post.populatedImage = undefined;
+      }
+      return post;
+    });
+  }
+
+  updatePostStatus(postId: PostId, status: DbPostHistoryStatus) {
+    return this.collection.updateOne(
+      { _id: new ObjectId(postId) },
+      { $set: { status } },
+    );
+  }
+
+  async insertOne(data: Partial<DbPostHistory>): Promise<DbPostHistory> {
+    const insertedData = dbPostHistorySchema
+      .omit({ _id: true })
+      .strict()
+      .parse(data);
+    const insertedRecord = await this.collection.insertOne(insertedData);
+    return { _id: insertedRecord.insertedId, ...insertedData };
+  }
+
+  /** returns old document by default */
+  updateOne(
+    id: PostId,
+    data: Partial<Omit<DbPostHistory, "_id">>,
+    { returnDocument }: { returnDocument: "after" | "before" } = {
+      returnDocument: "before",
+    },
+  ) {
+    return this.collection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: data },
+      { returnDocument },
+    );
+  }
+
+  deleteOne(id: PostId) {
+    return this.collection.deleteOne({ _id: new ObjectId(id) });
   }
 }
-
-export type PostHistoryDocument = DocumentType<PostHistoryClass>;
-export const PostHistory = getModelForClass(PostHistoryClass);

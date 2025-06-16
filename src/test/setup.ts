@@ -6,7 +6,9 @@ import { PhotoServer } from "../server.js";
 import { Server } from "http";
 import imageRepositoryScanner from "../scan.js";
 import fs from "fs-extra";
+import { beforeAll, afterEach, afterAll } from "vitest";
 
+// This file sets up the test environment for the application, including
 let photoServer: PhotoServer | undefined;
 export let runningPhotoServer: Server | undefined;
 
@@ -77,10 +79,10 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   afterEach(async () => {
     const queries: Promise<unknown>[] = [];
     if (clearPostHistory || withPhotoServer) {
-      queries.push(database.collection("posts").deleteMany({}));
+      queries.push(database.posts.deleteMany({}));
     }
     if (clearImages || withPhotoServer) {
-      queries.push(database.collection("images").deleteMany({}));
+      queries.push(database.images.deleteMany({}));
     }
 
     if (queries.length > 0) {

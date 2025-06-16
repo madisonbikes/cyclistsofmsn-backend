@@ -1,111 +1,112 @@
 import { configuration } from "../config.js";
-import mongoose, { Mongoose } from "mongoose";
 import { logger, maskUriPassword } from "../utils/index.js";
-import { Version } from "./version.js";
-import { Image } from "./images.js";
+import { ImageModel, type ImageModelCollectionType } from "./images.js";
+import {
+  PostHistoryModel,
+  type PostHistoryModelCollectionType,
+} from "./posts.js";
+import { UserModel, type UserModelCollectionType } from "./users.js";
+import { type VersionModelCollectionType, VersionsModel } from "./version.js";
+import { Db, MongoClient, ObjectId } from "mongodb";
 
 /** make sure you update switch statement below when bumping db version */
 const CURRENT_DATABASE_VERSION = 3;
 
 /** provide unified access to database connection */
 
-let connection: Mongoose | undefined;
+let imageModel: ImageModel;
+let postHistoryModel: PostHistoryModel;
+let userModel: UserModel;
 
-/** set to true if db version change should force a rescan of all existing files */
-let _refreshAllMetadata = false;
+class Database {
+  private _images!: ImageModelCollectionType;
+  private _posts!: PostHistoryModelCollectionType;
+  private _users!: UserModelCollectionType;
+  private _versions!: VersionModelCollectionType;
 
-function refreshAllMetadata() {
-  return _refreshAllMetadata;
-}
+  /** set to true if db version change should force a rescan of all existing files */
+  private _refreshAllMetadata = false;
 
-function collection(name: string) {
-  if (connection === undefined) {
-    throw new Error("not connected to mongodb");
-  }
-  return connection.connection.collection(name);
-}
+  private client: MongoClient | undefined;
 
-async function start(): Promise<boolean> {
-  const uri = configuration.mongodbUri;
-  if (connection) {
-    logger.debug({ url: uri }, `Already connected to MongoDB`);
-    return false;
-  }
-  logger.info(`Connecting to MongoDB on ${maskUriPassword(uri)}`);
-
-  // this is the default value from mongoose 7 forward, be explicit to avoid deprecation notice
-  mongoose.set("strictQuery", false);
-
-  connection = await mongoose.connect(uri);
-  await versionCheck();
-  return true;
-}
-
-async function stop(): Promise<void> {
-  if (connection) {
-    await connection.disconnect();
-    connection = undefined;
-  }
-}
-
-/** checks if database is at current version and if not, upgrades it */
-async function versionCheck() {
-  const values = await Version.find();
-  if (values.length > 1) {
-    throw new Error(
-      "Database has multiple versions, cannot proceeed with migration",
-    );
+  get refreshAllMetadata() {
+    return this._refreshAllMetadata;
   }
 
-  if (values.length === 0) {
-    logger.info(`Initializing database version to ${CURRENT_DATABASE_VERSION}`);
-    await setCurrentVersion();
-  } else {
-    let version = values[0].version;
-    if (version === CURRENT_DATABASE_VERSION) {
-      logger.debug("Database version is current");
-    } else {
-      logger.info(
-        { oldVersion: version, currentVersion: CURRENT_DATABASE_VERSION },
-        "Migrating database",
-      );
+  private database: Db | undefined;
 
-      while (version < CURRENT_DATABASE_VERSION) {
-        switch (version) {
-          case 1: {
-            // add the image hidden column
-            await Image.updateMany(
-              { hidden: { $exists: false } },
-              { $set: { hidden: false } },
-            );
-            break;
-          }
-          case 2: {
-            // force refresh to add image dimension metadata to the images
-            triggerMetadataRefresh();
-            break;
-          }
-          default:
-            break;
-        }
-        version++;
-      }
-      await setCurrentVersion();
+  public get images() {
+    return this._images;
+  }
+
+  public get posts() {
+    return this._posts;
+  }
+
+  public get users() {
+    return this._users;
+  }
+
+  public get versions() {
+    return this._versions;
+  }
+
+  async start(): Promise<boolean> {
+    const uri = configuration.mongodbUri;
+    if (this.client) {
+      logger.debug({ url: uri }, `Already connected to MongoDB`);
+      return false;
+    }
+    logger.info("Connecting to MongoDB on %s", maskUriPassword(uri));
+
+    // set ignoreUndefined to true to avoid sending undefined values to MongoDB
+    // which would otherwise result in an error when using strict schema validation using our
+    // zod schemas
+    this.client = new MongoClient(uri);
+    this.database = this.client.db();
+
+    this._images = this.database.collection("images");
+    await this._images.createIndex({ filename: 1 });
+
+    this._posts = this.database.collection("posts");
+    await this._posts.createIndex({ timestamp: 1 });
+
+    this._users = this.database.collection("users");
+    await this._users.createIndex({ username: 1 }, { unique: true });
+
+    this._versions = this.database.collection("schema_version");
+    await this._versions.createIndex({ version: 1 }, { unique: true });
+
+    const versionsModel = new VersionsModel(this._versions, this._images);
+    const { needsMetadataRefresh } = await versionsModel.versionCheck();
+    this._refreshAllMetadata = needsMetadataRefresh;
+
+    imageModel = new ImageModel(this._images);
+    postHistoryModel = new PostHistoryModel(this._posts);
+    userModel = new UserModel(this._users);
+
+    return true;
+  }
+
+  async stop(): Promise<void> {
+    if (this.client) {
+      await this.client.close();
+      this.client = undefined;
+      this.database = undefined;
+    }
+  }
+
+  triggerMetadataRefresh() {
+    if (!this.refreshAllMetadata) {
+      logger.info("Forcing refresh of all metadata due to database upgrade");
+      this._refreshAllMetadata = true;
     }
   }
 }
 
-function triggerMetadataRefresh() {
-  if (!_refreshAllMetadata) {
-    logger.info("Forcing refresh of all metadata due to database upgrade");
-    _refreshAllMetadata = true;
-  }
+export function isValidObjectId(id: string): boolean {
+  return ObjectId.isValid(id);
 }
 
-async function setCurrentVersion() {
-  await Version.deleteMany();
-  const versionRecord = new Version({ version: CURRENT_DATABASE_VERSION });
-  await versionRecord.save();
-}
-
-export const database = { start, stop, collection, refreshAllMetadata };
+export const database = new Database();
+export { imageModel, postHistoryModel, userModel };

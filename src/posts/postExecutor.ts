@@ -1,11 +1,11 @@
-import { type ImageDocument } from "../database/index.js";
 import photoTooter from "../mastodon/post.js";
 import photoTweeter from "../twitter/post.js";
 import atproto from "../atproto/index.js";
 import { logger } from "../utils/index.js";
+import type { DbImage } from "../database/types.js";
 
 /** responsible for actually posting photos */
-async function post(image: ImageDocument) {
+async function post(image: DbImage) {
   if (photoTweeter.isEnabled()) {
     try {
       logger.debug("Twitter enabled");
@@ -18,7 +18,10 @@ async function post(image: ImageDocument) {
   if (photoTooter.isEnabled()) {
     try {
       logger.debug("Mastodon enabled");
-      const result = await photoTooter.post(image.filename, image.description);
+      const result = await photoTooter.post(
+        image.filename,
+        image.description ?? undefined,
+      );
       logger.info({ id: result }, `Posted new Mastodon post`);
     } catch (e) {
       logger.error(e, "Error posting to Mastodon");

@@ -1,4 +1,4 @@
-import { isValidObjectId } from "mongoose";
+import { isValidObjectId } from "../database/database.js";
 import { type ExpressMiddleware } from "./authentication.js";
 
 export const validateId = (): ExpressMiddleware => {

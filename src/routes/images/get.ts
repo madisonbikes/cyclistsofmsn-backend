@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { Image } from "../../database/index.js";
 import fsRepository from "../../fs_repository/index.js";
 import { access } from "fs/promises";
 import { constants } from "fs";
@@ -8,6 +7,7 @@ import { logger } from "../../utils/index.js";
 import { getImageQuerySchema, type GetImageQuery } from "../contract/index.js";
 import { lenientImageSchema } from "./localTypes.js";
 import fs_cache from "../../utils/persistent_cache.js";
+import { imageModel } from "../../database/database.js";
 
 class ImageGet {
   // expose for validation
@@ -15,7 +15,7 @@ class ImageGet {
 
   metadata = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const metadata = await Image.findById(id).and([{ deleted: false }]);
+    const metadata = await imageModel.findById(id);
     if (metadata == null) {
       return res.sendStatus(404);
     }
@@ -26,7 +26,7 @@ class ImageGet {
     const query = req.validated as GetImageQuery;
 
     const { id } = req.params;
-    logger.debug(`loading image ${id}`);
+    logger.debug("loading image %s", id);
 
     const cachedBuffer = await this.loadFromCache(id, query);
     if (cachedBuffer !== undefined) {
@@ -37,8 +37,7 @@ class ImageGet {
         .send(cachedBuffer);
     }
 
-    const filename = (await Image.findById(id).and([{ deleted: false }]))
-      ?.filename;
+    const filename = (await imageModel.findById(id))?.filename;
     if (filename === undefined) {
       return res.sendStatus(404);
     }
@@ -61,7 +60,7 @@ class ImageGet {
       return res.sendStatus(404);
     }
 
-    logger.debug(`resizing image ${id}`);
+    logger.debug("resizing image %s", id);
     const buffer = await sharp(imageFile)
       .resize({ width, height: query.height, withoutEnlargement: true })
       .toFormat("jpeg")
@@ -76,8 +75,15 @@ class ImageGet {
   };
 
   listHandler = async (_req: Request, res: Response) => {
-    const images = await Image.find({ deleted: false });
-    const retval = lenientImageSchema.array().parse(images);
+    const images = await imageModel.findAll({ filterDeleted: true });
+    logger.trace(images, "Found %d images in the database", images.length);
+
+    // map image _id to id
+    const mappedimageList = images.map((image) => {
+      const { _id: id, deleted: _deleted, ...rest } = image;
+      return { id, ...rest };
+    });
+    const retval = lenientImageSchema.strict().array().parse(mappedimageList);
     res.send(retval);
   };
 

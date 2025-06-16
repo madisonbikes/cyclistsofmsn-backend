@@ -17,7 +17,8 @@ class PersistentCache implements Lifecycle {
     let store: KeyvStoreAdapter | Map<unknown, unknown>;
     if (configuration.valkeyCacheUri !== "") {
       logger.info(
-        `Using Valkey cache with URI ${maskUriPassword(configuration.valkeyCacheUri)}`,
+        "Using Valkey cache with URI %s",
+        maskUriPassword(configuration.valkeyCacheUri),
       );
       store = new KeyvValkey(configuration.valkeyCacheUri);
     } else {

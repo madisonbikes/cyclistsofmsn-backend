@@ -1,50 +1,81 @@
-import {
-  type DocumentType,
-  getModelForClass,
-  modelOptions,
-  prop,
-} from "@typegoose/typegoose";
+import { Collection, ObjectId } from "mongodb";
+import { type DbImage, dbImageSchema } from "./types.js";
+import { logger } from "../utils/logger.js";
 
-@modelOptions({ schemaOptions: { collection: "images" } })
-export class ImageClass {
-  @prop({ required: true, unique: true, index: true })
-  public filename!: string;
+export type ImageModelCollectionType = Collection<Omit<DbImage, "_id">>;
 
-  @prop()
-  public fs_timestamp?: Date;
+type FilterProps = {
+  filterDeleted?: boolean;
+  filterHidden?: boolean;
+};
 
-  @prop()
-  public exif_createdon?: Date;
+export type ImageId = string | ObjectId;
 
-  @prop()
-  public width?: number;
+export class ImageModel {
+  constructor(private collection: ImageModelCollectionType) {}
 
-  @prop()
-  public height?: number;
+  findById(id: ImageId, filter?: FilterProps) {
+    const objectId = new ObjectId(id);
+    return this.collection.findOne({
+      _id: objectId,
+      ...this.buildFilterArgs(filter),
+    });
+  }
 
-  @prop()
-  public description?: string;
+  findByFilename(filename: string) {
+    return this.collection.findOne({
+      filename,
+    });
+  }
 
-  /**
-   * this is unused now except for migration, but it used to be used to determine if the description
-   * had been modified in the database but not in the image file.
-   */
-  @prop({ default: true, required: true })
-  public description_from_exif!: boolean;
+  async findAll(filter?: FilterProps) {
+    const images = await this.collection
+      .find(this.buildFilterArgs(filter))
+      .toArray();
+    logger.trace(images, "findAllImages");
+    return images;
+  }
 
-  /**
-   * If a file is deleted from the filesystem, set this to true but don't remove record, to
-   * preserve referential integrity for posts.
-   */
-  @prop({ default: false, required: true })
-  public deleted!: boolean;
+  findByIdAndDelete(id: ImageId) {
+    const objectId = new ObjectId(id);
+    return this.collection.findOneAndDelete({ _id: objectId });
+  }
 
-  /**
-   * If a file is hidden, it will not be used for future posts.
-   */
-  @prop({ default: false, required: true })
-  public hidden!: boolean;
+  async insertOne(data: Partial<DbImage>): Promise<DbImage> {
+    const insertedData = dbImageSchema.omit({ _id: true }).strict().parse(data);
+    const inserted = await this.collection.insertOne(insertedData);
+    logger.trace(
+      insertedData,
+      "Inserted image with id %s",
+      inserted.insertedId,
+    );
+    return { _id: inserted.insertedId, ...insertedData };
+  }
+
+  /** returns old document by default */
+  updateOne(
+    id: ImageId,
+    data: Partial<Omit<DbImage, "_id">>,
+    { returnDocument }: { returnDocument: "after" | "before" } = {
+      returnDocument: "before",
+    },
+  ) {
+    logger.trace(data, "Updating image with id %s", id);
+    return this.collection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: data },
+      { returnDocument },
+    );
+  }
+
+  private buildFilterArgs(filter?: FilterProps) {
+    const args: Record<string, boolean> = {};
+    if (filter?.filterDeleted ?? false) {
+      args.deleted = false;
+    }
+    if (filter?.filterHidden ?? false) {
+      args.hidden = false;
+    }
+    return args;
+  }
 }
-
-export type ImageDocument = DocumentType<ImageClass>;
-export const Image = getModelForClass(ImageClass);

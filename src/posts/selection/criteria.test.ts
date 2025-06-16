@@ -1,67 +1,58 @@
-// noinspection JSUnusedLocalSymbols
-
+import { imageModel, postHistoryModel } from "../../database/database.js";
+import type { DbImage } from "../../database/types.js";
 import { setupSuite } from "../../test/index.js";
-import {
-  Image,
-  type ImageDocument,
-  PostHistory,
-} from "../../database/index.js";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
 } from "./criteria.js";
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
+import { describe, it, expect } from "vitest";
 
 describe("test criteria components", () => {
   setupSuite({ withDatabase: true, clearPostHistory: true, clearImages: true });
 
   describe("seasonality criteria", () => {
     it("before window", async () => {
-      const testImage = await createImage(
-        "testImage",
-        subDays(startOfToday(), 50),
-      );
+      const testImage = await createImage("testImage", {
+        exif_createdon: subDays(startOfToday(), 50),
+      });
 
       const criteria = new SeasonalityCriteria();
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
     it("before window, last year", async () => {
-      const testImage = await createImage(
-        "testImage",
-        subYears(subDays(startOfToday(), 50), 1),
-      );
+      const testImage = await createImage("testImage", {
+        exif_createdon: subYears(subDays(startOfToday(), 50), 1),
+      });
 
       const criteria = new SeasonalityCriteria();
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
     it("after window", async () => {
-      const testImage = await createImage(
-        "testImage",
-        addDays(startOfToday(), 50),
-      );
+      const testImage = await createImage("testImage", {
+        exif_createdon: addDays(startOfToday(), 50),
+      });
 
       const criteria = new SeasonalityCriteria();
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeFalsy();
     });
 
     it("within window", async () => {
-      const testImage = await createImage(
-        "testImage",
-        addDays(startOfToday(), 5),
-      );
+      const testImage = await createImage("testImage", {
+        exif_createdon: addDays(startOfToday(), 5),
+      });
 
       const criteria = new SeasonalityCriteria();
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
     });
 
     it("within window, last year", async () => {
-      const testImage = await createImage(
-        "testImage",
-        subYears(addDays(startOfToday(), 5), 1),
-      );
+      const testImage = await createImage("testImage", {
+        exif_createdon: subYears(addDays(startOfToday(), 5), 1),
+      });
 
       const criteria = new SeasonalityCriteria();
       return expect(criteria.satisfiedBy(testImage)).resolves.toBeTruthy();
@@ -149,17 +140,18 @@ describe("test criteria components", () => {
     });
   });
 
-  const createImage = (name = "testImage", exif_createdon?: Date) => {
-    const image = new Image();
-    image.filename = name;
-    image.exif_createdon = exif_createdon;
-    return image.save();
+  const createImage = (name = "testImage", extra: Partial<DbImage> = {}) => {
+    return imageModel.insertOne({
+      filename: name,
+      ...extra,
+    });
   };
 
-  const createPost = (image: ImageDocument, postDate: Date) => {
-    const post = new PostHistory();
-    post.image = image;
-    post.timestamp = postDate;
-    return post.save();
+  const createPost = (image: DbImage, postDate: Date) => {
+    return postHistoryModel.insertOne({
+      image: image._id,
+      timestamp: postDate,
+      status: { flag: "pending" },
+    });
   };
 });

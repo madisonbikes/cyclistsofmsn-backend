@@ -16,7 +16,7 @@ export const populatePostsOnSchedule = async () => {
   logger.info("Scanning for new images");
   await imageRepositoryScanner.scan();
 
-  logger.info(`Populating ${POPULATE_COUNT} days of posts`);
+  logger.info(`Populating %d days of posts`, POPULATE_COUNT);
 
   const start = startOfDay(now());
   for (let i = 0; i < POPULATE_COUNT; i++) {

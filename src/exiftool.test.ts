@@ -4,6 +4,7 @@ import { updateImageDescription } from "./exiftool.js";
 import { load } from "exifreader";
 import tempfile from "tempfile";
 import { testResourcesDir } from "./test/index.js";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 describe("exiftool", () => {
   const testImageFile = path.resolve(

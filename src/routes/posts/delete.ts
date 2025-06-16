@@ -1,12 +1,12 @@
 import type { Request, Response } from "express";
-import { PostHistory } from "../../database/index.js";
 import { logger } from "../../utils/index.js";
+import { postHistoryModel } from "../../database/database.js";
 
 async function handler(req: Request, res: Response) {
   const { id } = req.params;
   logger.trace({ id }, "delete single post");
 
-  const result = await PostHistory.deleteOne({ _id: id });
+  const result = await postHistoryModel.deleteOne(id);
   if (result.deletedCount === 1) {
     res.sendStatus(200);
   } else {

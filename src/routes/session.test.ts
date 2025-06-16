@@ -1,5 +1,6 @@
 import { setupSuite, testRequest, type TestRequest } from "../test/index.js";
 import { createTestUser } from "../test/data.js";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("login route", () => {
   let request: TestRequest;

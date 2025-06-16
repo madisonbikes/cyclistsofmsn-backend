@@ -1,9 +1,10 @@
-import { database, Image, type ImageDocument } from "./database/index.js";
+import { database, imageModel } from "./database/index.js";
 import fsRepository from "./fs_repository/index.js";
 import { type StringArrayTag } from "exifreader";
 import { parse } from "date-fns/parse";
 import { logger } from "./utils/index.js";
 import pLimit from "p-limit";
+import { type DbImage } from "./database/types.js";
 
 /** expose scanning operation.  requires database connection to be established */
 function start() {
@@ -13,9 +14,9 @@ function start() {
 async function scan() {
   const [files, dbFiles] = await Promise.all([
     fsRepository.photoFiles(),
-    Image.find().exec(),
+    imageModel.findAll(),
   ]);
-  const matchedFiles: ImageDocument[] = [];
+  const matchedFiles: DbImage[] = [];
   const filesToAdd: string[] = [];
 
   // bin files into either files that are in db, or are missing
@@ -56,40 +57,41 @@ async function scan() {
 }
 
 /** update a matched file */
-async function updateMatchedFile(image: ImageDocument) {
+async function updateMatchedFile(image: DbImage) {
   const filename = image.filename;
 
   const newTimestamp = await fsRepository.timestamp(filename);
   if (
     image.fs_timestamp?.getTime() !== newTimestamp.getTime() ||
-    database.refreshAllMetadata()
+    database.refreshAllMetadata
   ) {
-    logger.debug(`updating existing image ${filename}`);
+    logger.debug("updating existing image %s", filename);
     const metadata = await getFileMetadata(filename);
-    Object.assign(image, metadata);
-    image.deleted = false;
-    await image.save();
+    return imageModel.updateOne(image._id, { ...metadata, deleted: false });
+  } else {
+    // no changes, nothing to do
+    return Promise.resolve();
   }
 }
 
 /** insert a newly discovered file */
 async function addNewFile(filename: string) {
-  logger.debug(`adding new image ${filename}`);
+  logger.trace("adding new image %s", filename);
   const metadata = await getFileMetadata(filename);
-  const newImage = new Image({
+  await imageModel.insertOne({
     filename,
     ...metadata,
   });
-  logger.trace(newImage, "image data");
-  await newImage.save();
 }
 
 /** mark a file removed that used to exist */
-async function markFileRemoved(image: ImageDocument) {
-  logger.debug(`marking cruft db image ${image.filename}`);
-  image.deleted = true;
-  image.fs_timestamp = undefined;
-  await image.save();
+function markFileRemoved(image: DbImage) {
+  logger.debug("marking cruft db image %s", image.filename);
+
+  return imageModel.updateOne(image._id, {
+    deleted: true,
+    fs_timestamp: undefined,
+  });
 }
 
 function parseImageDateTimeTag(
@@ -119,7 +121,7 @@ async function getFileMetadata(filename: string) {
   const width = metadata.width;
   const height = metadata.height;
 
-  const retval: Partial<ImageDocument> = {
+  const retval: Partial<DbImage> = {
     fs_timestamp,
     exif_createdon,
     description,

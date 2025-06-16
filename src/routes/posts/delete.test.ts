@@ -6,12 +6,13 @@ import {
   testRequest,
   type TestRequest,
 } from "../../test/index.js";
-import { database, PostHistory } from "../../database/index.js";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
 } from "../../test/data.js";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { database, postHistoryModel } from "../../database/database.js";
 
 describe("server process - posts", () => {
   let request: TestRequest;
@@ -60,17 +61,20 @@ describe("server process - posts", () => {
   it("responds to post delete api call", async () => {
     await loginTestAdminUser(request);
 
-    let checkPost = await PostHistory.findById(testPostId);
+    let checkPost = await postHistoryModel.findById(testPostId);
     expect(checkPost).not.toBeNull();
 
     await request.delete(`/api/v1/posts/${testPostId}`).expect(200);
 
-    checkPost = await PostHistory.findById(testPostId);
+    checkPost = await postHistoryModel.findById(testPostId);
     expect(checkPost).toBeNull();
   });
 
   const createTestPost = async () => {
-    const retval = await database.collection("posts").insertOne({});
+    const retval = await database.posts.insertOne({
+      timestamp: new Date(),
+      status: { flag: "pending" },
+    });
     return retval.insertedId.toHexString();
   };
 });

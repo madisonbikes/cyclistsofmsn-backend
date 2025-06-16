@@ -104,7 +104,7 @@ export class PhotoServer implements Lifecycle {
   async start(): Promise<void> {
     await this.create();
     this.server?.listen(configuration.serverPort);
-    logger.info(`Server is listening on port ${configuration.serverPort}`);
+    logger.info("Server is listening on port %d", configuration.serverPort);
   }
 
   async stop(): Promise<void> {
