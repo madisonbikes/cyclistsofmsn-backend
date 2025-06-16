@@ -7,4 +7,5 @@ export default {
     "src/routes/contract/types.ts",
   ],
   project: ["**/*.{js,ts}", "!**/__mocks__/**"],
+  ignoreExportsUsedInFile: true,
 };
