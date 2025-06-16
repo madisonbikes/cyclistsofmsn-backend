@@ -1,7 +1,7 @@
-import { configuration } from "./config.js";
-import { valkeySessionStore } from "./session_valkey.js";
+import { configuration } from "./config.ts";
+import { valkeySessionStore } from "./session_valkey.ts";
 import session from "express-session";
-import { logger } from "./utils/index.js";
+import { logger } from "./utils/index.ts";
 
 const COOKIE_MAX_AGE_DAYS = 7;
 

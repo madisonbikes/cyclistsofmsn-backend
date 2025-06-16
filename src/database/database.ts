@@ -1,12 +1,12 @@
-import { configuration } from "../config.js";
-import { logger, maskUriPassword } from "../utils/index.js";
-import { ImageModel, type ImageModelCollectionType } from "./images.js";
+import { configuration } from "../config.ts";
+import { logger, maskUriPassword } from "../utils/index.ts";
+import { ImageModel, type ImageModelCollectionType } from "./images.ts";
 import {
   PostHistoryModel,
   type PostHistoryModelCollectionType,
-} from "./posts.js";
-import { UserModel, type UserModelCollectionType } from "./users.js";
-import { type VersionModelCollectionType, VersionsModel } from "./version.js";
+} from "./posts.ts";
+import { UserModel, type UserModelCollectionType } from "./users.ts";
+import { type VersionModelCollectionType, VersionsModel } from "./version.ts";
 import { Db, MongoClient, ObjectId } from "mongodb";
 
 /** provide unified access to database connection */
@@ -63,7 +63,9 @@ class Database {
     this.database = this.client.db();
 
     this._images = this.database.collection("images");
+    //if (!(await this.images.indexExists("filename_1"))) {
     await this._images.createIndex({ filename: 1 });
+    //}
 
     this._posts = this.database.collection("posts");
     await this._posts.createIndex({ timestamp: 1 });

@@ -1,6 +1,6 @@
-import { database, imageModel } from "../database/index.js";
-import fsRepository from "../fs_repository/index.js";
-import { logger } from "../utils/index.js";
+import { database, imageModel } from "../database/index.ts";
+import fsRepository from "../fs_repository/index.ts";
+import { logger } from "../utils/index.ts";
 import pLimit from "p-limit";
 
 if (require.main === module) {

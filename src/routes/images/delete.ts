@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import fsRepository from "../../fs_repository/index.js";
-import { logger } from "../../utils/index.js";
-import { imageModel, postHistoryModel } from "../../database/database.js";
+import fsRepository from "../../fs_repository/index.ts";
+import { logger } from "../../utils/index.ts";
+import { imageModel, postHistoryModel } from "../../database/database.ts";
 
 async function handler(req: Request, res: Response) {
   const id = req.params.id;

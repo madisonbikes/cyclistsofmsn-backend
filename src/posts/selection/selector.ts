@@ -1,11 +1,11 @@
-import { imageModel } from "../../database/database.js";
-import type { DbImage } from "../../database/types.js";
-import { error, ok, type Result, arrayShuffle } from "../../utils/index.js";
+import { imageModel } from "../../database/database.ts";
+import type { DbImage } from "../../database/types.ts";
+import { error, ok, type Result, arrayShuffle } from "../../utils/index.ts";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
-} from "./criteria.js";
+} from "./criteria.ts";
 
 const repostCriteria = new RepostCriteria();
 const seasonalityCriteria = new SeasonalityCriteria();

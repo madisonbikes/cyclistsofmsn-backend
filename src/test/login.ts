@@ -1,4 +1,4 @@
-import { type TestRequest } from "./request.js";
+import { type TestRequest } from "./request.ts";
 
 export const loginTestUser = (request: TestRequest) => {
   return request

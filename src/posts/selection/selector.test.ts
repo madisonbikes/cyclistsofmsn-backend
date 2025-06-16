@@ -1,10 +1,10 @@
-import { assertError, setupSuite } from "../../test/index.js";
-import imageSelector from "./selector.js";
+import { assertError, setupSuite } from "../../test/index.ts";
+import imageSelector from "./selector.ts";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
 import { vi, describe, it, expect } from "vitest";
-import type { DbImage } from "../../database/types.js";
-import { imageModel, postHistoryModel } from "../../database/database.js";
+import type { DbImage } from "../../database/types.ts";
+import { imageModel, postHistoryModel } from "../../database/database.ts";
 
 vi.mock("../../utils/random");
 

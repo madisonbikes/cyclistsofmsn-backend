@@ -1,4 +1,4 @@
-import { getAuthenticateUrl } from "./register.js";
+import { getAuthenticateUrl } from "./register.ts";
 import { describe, it, expect } from "vitest";
 
 describe("registration configuration", () => {

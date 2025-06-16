@@ -1,4 +1,4 @@
-import { urlToValkeyConfiguration } from "./session_valkey.js";
+import { urlToValkeyConfiguration } from "./session_valkey.ts";
 import { describe, it, expect } from "vitest";
 
 describe("urlToValkeyGlideClientConfiguration", () => {

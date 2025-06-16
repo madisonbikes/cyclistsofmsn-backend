@@ -1,3 +1,5 @@
+import type { ViteUserConfig } from "vitest/config";
+
 export default {
   test: {
     environment: "node",
@@ -10,4 +12,4 @@ export default {
     include: ["src/**/*.test.ts"],
     exclude: ["**/node_modules/**", "**/dist/**"],
   },
-};
+} satisfies ViteUserConfig;

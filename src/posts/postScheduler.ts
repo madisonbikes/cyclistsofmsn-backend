@@ -1,21 +1,21 @@
-import { postHistoryModel } from "../database/index.js";
+import { postHistoryModel } from "../database/index.ts";
 import {
   differenceInMinutes,
   startOfDay,
   set as date_set,
   add as date_add,
 } from "date-fns";
-import { configuration } from "../config.js";
-import { error, logger, ok, type Result } from "../utils/index.js";
-import { randomInt } from "../utils/random.js";
-import now from "../utils/now.js";
-import { type SchedulePostOptions } from "../routes/contract/index.js";
-import imageSelector from "./selection/selector.js";
+import { configuration } from "../config.ts";
+import { error, logger, ok, type Result } from "../utils/index.ts";
+import { randomInt } from "../utils/random.ts";
+import now from "../utils/now.ts";
+import { type SchedulePostOptions } from "../routes/contract/index.ts";
+import imageSelector from "./selection/selector.ts";
 import type {
   DbImage,
   DbPopulatedPostHistory,
   DbPostHistory,
-} from "../database/types.js";
+} from "../database/types.ts";
 
 type PostResult = Result<DbPopulatedPostHistory, PostError>;
 

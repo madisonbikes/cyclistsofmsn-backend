@@ -3,11 +3,11 @@ import {
   setupSuite,
   testRequest,
   type TestRequest,
-} from "../../test/index.js";
-import { imageListSchema } from "../contract/index.js";
-import { createTestUser } from "../../test/data.js";
-import { database, imageModel } from "../../database/index.js";
-import fs_cache from "../../utils/persistent_cache.js";
+} from "../../test/index.ts";
+import { imageListSchema } from "../contract/index.ts";
+import { createTestUser } from "../../test/data.ts";
+import { database, imageModel } from "../../database/index.ts";
+import fs_cache from "../../utils/persistent_cache.ts";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("server process - images", () => {

@@ -1,6 +1,5 @@
-import { Roles } from "./authentication.js";
-import { validateRole } from "./validateRole.js";
+import { validateRole } from "./validateRole.ts";
 
 export const validateAdmin = () => {
-  return validateRole({ role: Roles.ADMIN });
+  return validateRole({ role: "admin" });
 };

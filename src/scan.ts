@@ -1,10 +1,10 @@
-import { database, imageModel } from "./database/index.js";
-import fsRepository from "./fs_repository/index.js";
+import { database, imageModel } from "./database/index.ts";
+import fsRepository from "./fs_repository/index.ts";
 import { type StringArrayTag } from "exifreader";
 import { parse } from "date-fns/parse";
-import { logger } from "./utils/index.js";
+import { logger } from "./utils/index.ts";
 import pLimit from "p-limit";
-import { type DbImage } from "./database/types.js";
+import { type DbImage } from "./database/types.ts";
 
 /** expose scanning operation.  requires database connection to be established */
 function start() {

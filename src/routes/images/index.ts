@@ -3,14 +3,13 @@ import {
   validateBodySchema,
   validateQuerySchema,
   validateAuthenticated,
-  Roles,
   validateRole,
   validateId,
   validateAdmin,
-} from "../../security/index.js";
-import imageGet from "./get.js";
-import singleImageDelete from "./delete.js";
-import imagePut from "./put.js";
+} from "../../security/index.ts";
+import imageGet from "./get.ts";
+import singleImageDelete from "./delete.ts";
+import imagePut from "./put.ts";
 
 function routes() {
   return (
@@ -23,7 +22,7 @@ function routes() {
       .put(
         "/:id",
         validateBodySchema({ schema: imagePut.bodySchema }),
-        validateRole({ role: Roles.EDITOR }),
+        validateRole({ role: "editor" }),
         validateId(),
         imagePut.handler,
       )

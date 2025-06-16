@@ -1,33 +1,20 @@
 import http, { Server } from "http";
 import cors from "cors";
-import { type Lifecycle, logger } from "./utils/index.js";
-import { configuration } from "./config.js";
-import imageRepositoryScanner from "./scan.js";
-import { database } from "./database/index.js";
-import api from "./routes/index.js";
+import { type Lifecycle, logger } from "./utils/index.ts";
+import { configuration } from "./config.ts";
+import imageRepositoryScanner from "./scan.ts";
+import { database } from "./database/index.ts";
+import api from "./routes/index.ts";
 import express, {
   type NextFunction,
   type Request,
   type Response,
 } from "express";
 import passport from "passport";
-import { strategies } from "./security/index.js";
-import { valkeySessionStore } from "./session_valkey.js";
-import { sessionMiddlewareConfigurator } from "./session.js";
-import persistent_cache from "./utils/persistent_cache.js";
-
-/** expose command-line launcher */
-if (require.main === module) {
-  /** launches server. this syntax allows server startup to run as async function */
-  Promise.resolve()
-    .then(() => {
-      const server = new PhotoServer();
-      return server.start();
-    })
-    .catch((error: unknown) => {
-      logger.error(error);
-    });
-}
+import { strategies } from "./security/index.ts";
+import { valkeySessionStore } from "./session_valkey.ts";
+import { sessionMiddlewareConfigurator } from "./session.ts";
+import persistent_cache from "./utils/persistent_cache.ts";
 
 export class PhotoServer implements Lifecycle {
   constructor() {

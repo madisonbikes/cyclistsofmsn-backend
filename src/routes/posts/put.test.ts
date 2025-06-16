@@ -5,15 +5,15 @@ import {
   setupSuite,
   testRequest,
   type TestRequest,
-} from "../../test/index.js";
+} from "../../test/index.ts";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestPosts,
   createTestUser,
-} from "../../test/data.js";
+} from "../../test/data.ts";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { postHistoryModel } from "../../database/database.js";
+import { postHistoryModel } from "../../database/database.ts";
 
 describe("server process - posts", () => {
   let request: TestRequest;

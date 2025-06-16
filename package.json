@@ -3,13 +3,13 @@
   "version": "2.1.0",
   "description": "Cyclists of Madison Backend",
   "private": true,
-  "main": "src/server.ts",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
-    "start": "vite-node src/server.ts | pino-pretty -c",
+    "start": "PINO_PRETTY=true node --experimental-strip-types src/main.ts",
     "compile": "tsc --noEmit",
     "dist": "tsc && npm run genversion",
-    "dev": "vite-node --watch src/server.ts | pino-pretty -c",
+    "dev": "PINO_PRETTY=true vite-node --watch src/main.ts",
     "migration:imagedescription": "vite-node src/tools/updatefilemetadata.ts",
     "pm2-start": "pm2 startOrRestart ecosystem.config.js --update-env",
     "pm2-stop": "pm2 stop ecosystem.config.js",
@@ -65,7 +65,7 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.25.1",
-    "@tsconfig/node20": "^20.1.5",
+    "@tsconfig/node22": "^22.0.2",
     "@types/cors": "^2.8.18",
     "@types/express-session": "^1.18.1",
     "@types/fs-extra": "^11.0.4",
@@ -74,8 +74,8 @@
     "@types/passport-local": "^1.0.38",
     "@types/readline-sync": "^1.4.8",
     "@types/supertest": "^6.0.3",
-    "@vitest/coverage-istanbul": "^3.2.0",
-    "@vitest/ui": "^3.2.0",
+    "@vitest/coverage-istanbul": "^3.2.3",
+    "@vitest/ui": "^3.2.3",
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
@@ -93,7 +93,7 @@
     "supertest": "^7.1.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.1",
-    "vite-node": "^3.2.0",
-    "vitest": "^3.2.0"
+    "vite-node": "^3.2.3",
+    "vitest": "^3.2.3"
   }
 }

@@ -1,18 +1,17 @@
 import express from "express";
 import {
-  Roles,
   validateAdmin,
   validateAuthenticated,
   validateBodySchema,
   validateId,
   validateRole,
-} from "../../security/index.js";
-import singlePostPut from "./put.js";
-import singlePostDelete from "./delete.js";
-import postGet from "./get.js";
+} from "../../security/index.ts";
+import singlePostPut from "./put.ts";
+import singlePostDelete from "./delete.ts";
+import postGet from "./get.ts";
 
 function validateEditor() {
-  return validateRole({ role: Roles.EDITOR });
+  return validateRole({ role: "editor" });
 }
 
 function routes() {

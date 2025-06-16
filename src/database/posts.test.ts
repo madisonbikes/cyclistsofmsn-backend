@@ -1,7 +1,7 @@
-import { setupSuite } from "../test/index.js";
-import { createTestPosts } from "../test/data.js";
+import { setupSuite } from "../test/index.ts";
+import { createTestPosts } from "../test/data.ts";
 import { describe, it, expect } from "vitest";
-import { imageModel } from "./database.js";
+import { imageModel } from "./database.ts";
 
 describe("database - posts", () => {
   setupSuite({ withDatabase: true });

@@ -1,17 +1,17 @@
 import { readFile } from "fs/promises";
-import { configuration } from "../config.js";
+import { configuration } from "../config.ts";
 import sharp from "sharp";
-import fsRepository from "../fs_repository/index.js";
+import fsRepository from "../fs_repository/index.ts";
 import request from "superagent";
 import crypto from "crypto";
-import { logger } from "../utils/index.js";
+import { logger } from "../utils/index.ts";
 import {
   mediaUploadResponseSchema,
   type StatusUpdateRequest,
   statusUpdateResponseSchema,
   type StatusUpdateVisibility,
   statusUpdateVisibilitySchema,
-} from "./types.js";
+} from "./types.ts";
 
 interface TootPostImageOptions {
   filename: string;

@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
-import { configuration } from "../config.js";
+import { configuration } from "../config.ts";
 import sharp from "sharp";
-import fsRepository from "../fs_repository/index.js";
+import fsRepository from "../fs_repository/index.ts";
 import { AtpAgent } from "@atproto/api";
 
 function isEnabled() {

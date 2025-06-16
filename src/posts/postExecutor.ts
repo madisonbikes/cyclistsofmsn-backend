@@ -1,8 +1,8 @@
-import photoTooter from "../mastodon/post.js";
-import photoTweeter from "../twitter/post.js";
-import atproto from "../atproto/index.js";
-import { logger } from "../utils/index.js";
-import type { DbImage } from "../database/types.js";
+import photoTooter from "../mastodon/post.ts";
+import photoTweeter from "../twitter/post.ts";
+import atproto from "../atproto/index.ts";
+import { logger } from "../utils/index.ts";
+import type { DbImage } from "../database/types.ts";
 
 /** responsible for actually posting photos */
 async function post(image: DbImage) {

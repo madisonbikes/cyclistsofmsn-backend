@@ -1,4 +1,4 @@
-import { randomInt } from "./random.js";
+import { randomInt } from "./random.ts";
 import { vi, describe, test, expect } from "vitest";
 
 vi.mock("./random");

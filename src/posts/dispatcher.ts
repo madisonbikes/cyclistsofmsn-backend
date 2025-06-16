@@ -1,11 +1,11 @@
-import { error, logger, ok, type Result } from "../utils/index.js";
-import now from "../utils/now.js";
-import { type PostError, schedulePost } from "./postScheduler.js";
-import postExecutor from "./postExecutor.js";
-import imageSelector from "./selection/selector.js";
-import imageRepositoryScanner from "../scan.js";
-import { postHistoryModel } from "../database/database.js";
-import type { DbImage, DbPostHistory } from "../database/types.js";
+import { error, logger, ok, type Result } from "../utils/index.ts";
+import now from "../utils/now.ts";
+import { type PostError, schedulePost } from "./postScheduler.ts";
+import postExecutor from "./postExecutor.ts";
+import imageSelector from "./selection/selector.ts";
+import imageRepositoryScanner from "../scan.ts";
+import { postHistoryModel } from "../database/database.ts";
+import type { DbImage, DbPostHistory } from "../database/types.ts";
 
 // five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;

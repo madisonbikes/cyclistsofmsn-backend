@@ -3,8 +3,8 @@ import passport from "passport";
 import {
   validateBodySchema,
   validateAuthenticated,
-} from "../security/index.js";
-import { loginBodySchema, type AuthenticatedUser } from "./contract/index.js";
+} from "../security/index.ts";
+import { loginBodySchema, type AuthenticatedUser } from "./contract/index.ts";
 
 function routes() {
   return express

@@ -1,8 +1,8 @@
-import { logger } from "../utils/index.js";
-import now from "../utils/now.js";
+import { logger } from "../utils/index.ts";
+import now from "../utils/now.ts";
 import { add as date_add, startOfDay } from "date-fns";
-import { schedulePost } from "./postScheduler.js";
-import imageRepositoryScanner from "../scan.js";
+import { schedulePost } from "./postScheduler.ts";
+import imageRepositoryScanner from "../scan.ts";
 
 /** future-populate every 6 hours */
 //const POPULATE_INTERVAL = 6 * 60 * 60 * 1000;

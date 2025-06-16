@@ -1,6 +1,6 @@
-import { configuration } from "./config.js";
+import { configuration } from "./config.ts";
 import { RedisStore as ValkeyStore } from "connect-redis";
-import { logger, maskUriPassword } from "./utils/index.js";
+import { logger, maskUriPassword } from "./utils/index.ts";
 import { Redis as ValKey } from "iovalkey";
 import { z } from "zod";
 

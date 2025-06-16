@@ -3,14 +3,14 @@ import {
   setupSuite,
   testRequest,
   type TestRequest,
-} from "../test/index.js";
+} from "../test/index.ts";
 import {
   postSchema,
   postStatusFlagSchema,
   type SchedulePostOptions,
-} from "./contract/index.js";
+} from "./contract/index.ts";
 import { startOfTomorrow } from "date-fns";
-import { createTestAdminUser } from "../test/data.js";
+import { createTestAdminUser } from "../test/data.ts";
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 
 describe("server process - tasks", () => {

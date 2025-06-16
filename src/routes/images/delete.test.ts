@@ -5,16 +5,16 @@ import {
   setupSuite,
   testRequest,
   type TestRequest,
-} from "../../test/index.js";
+} from "../../test/index.ts";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
-} from "../../test/data.js";
+} from "../../test/data.ts";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { ObjectId } from "mongodb";
-import { imageModel, postHistoryModel } from "../../database/database.js";
-import type { DbImage } from "../../database/types.js";
+import { imageModel, postHistoryModel } from "../../database/database.ts";
+import type { DbImage } from "../../database/types.ts";
 
 describe("server process - images", () => {
   let request: TestRequest;

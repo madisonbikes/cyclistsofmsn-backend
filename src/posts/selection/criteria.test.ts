@@ -1,11 +1,11 @@
-import { imageModel, postHistoryModel } from "../../database/database.js";
-import type { DbImage } from "../../database/types.js";
-import { setupSuite } from "../../test/index.js";
+import { imageModel, postHistoryModel } from "../../database/database.ts";
+import type { DbImage } from "../../database/types.ts";
+import { setupSuite } from "../../test/index.ts";
 import {
   RepostCriteria,
   SeasonalityCriteria,
   UnpostedCriteria,
-} from "./criteria.js";
+} from "./criteria.ts";
 import { addDays, startOfToday, subDays, subYears } from "date-fns";
 import { describe, it, expect } from "vitest";
 

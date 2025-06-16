@@ -1,7 +1,7 @@
 import { getDayOfYear, startOfDay, subDays } from "date-fns";
-import now from "../../utils/now.js";
-import type { DbImage } from "../../database/types.js";
-import { database, postHistoryModel } from "../../database/database.js";
+import now from "../../utils/now.ts";
+import type { DbImage } from "../../database/types.ts";
+import { database, postHistoryModel } from "../../database/database.ts";
 
 const MINIMUM_REPOST_INTERVAL_IN_DAYS = 180;
 const SEASONALITY_WINDOW = 45;

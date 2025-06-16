@@ -1,10 +1,10 @@
-import { configuration, testConfiguration } from "../config.js";
+import { configuration, testConfiguration } from "../config.ts";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import path from "path";
-import { database } from "../database/index.js";
-import { PhotoServer } from "../server.js";
+import { database } from "../database/index.ts";
+import { PhotoServer } from "../server.ts";
 import { Server } from "http";
-import imageRepositoryScanner from "../scan.js";
+import imageRepositoryScanner from "../scan.ts";
 import fs from "fs-extra";
 import { beforeAll, afterEach, afterAll } from "vitest";
 

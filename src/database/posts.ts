@@ -5,8 +5,8 @@ import {
   type DbPostHistory,
   dbPostHistorySchema,
   type DbPostHistoryStatus,
-} from "./types.js";
-import { type ImageId } from "./images.js";
+} from "./types.ts";
+import { type ImageId } from "./images.ts";
 
 export type PostHistoryModelCollectionType = Collection<
   Omit<DbPostHistory, "_id">
@@ -15,7 +15,10 @@ export type PostHistoryModelCollectionType = Collection<
 type PostId = string | ObjectId;
 
 export class PostHistoryModel {
-  constructor(private collection: PostHistoryModelCollectionType) {}
+  private collection: PostHistoryModelCollectionType;
+  constructor(collection: PostHistoryModelCollectionType) {
+    this.collection = collection;
+  }
   async findLatestPost() {
     const value = await this.collection
       .find({ "status.flag": "complete" })

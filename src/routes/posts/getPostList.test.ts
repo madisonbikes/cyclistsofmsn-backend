@@ -3,9 +3,9 @@ import {
   setupSuite,
   testRequest,
   type TestRequest,
-} from "../../test/index.js";
-import { postListSchema } from "../contract/index.js";
-import { createTestPosts, createTestUser } from "../../test/data.js";
+} from "../../test/index.ts";
+import { postListSchema } from "../contract/index.ts";
+import { createTestPosts, createTestUser } from "../../test/data.ts";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 describe("server process - posts", () => {

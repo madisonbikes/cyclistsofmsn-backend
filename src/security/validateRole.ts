@@ -1,10 +1,10 @@
-import { type AuthenticatedUser } from "../routes/contract/index.js";
-import { logger } from "../utils/index.js";
+import { type AuthenticatedUser } from "../routes/contract/index.ts";
+import { logger } from "../utils/index.ts";
 import {
   type ExpressMiddleware,
-  Roles,
+  type Roles,
   userHasRole,
-} from "./authentication.js";
+} from "./authentication.ts";
 
 interface ValidateOptions {
   role: Roles;
