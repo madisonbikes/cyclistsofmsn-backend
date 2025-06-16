@@ -5,7 +5,6 @@ import pretty from "pino-pretty";
 
 initEnv();
 
-console.log(JSON.stringify(process.env, null, 2));
 const TEST_LOG_LEVEL = process.env.TEST_LOG_LEVEL ?? "fatal";
 const LOG_LEVEL = process.env.LOG_LEVEL;
 
@@ -25,14 +24,11 @@ let sync = false;
 const options: pino.LoggerOptions = { serializers };
 
 if (process.env.NODE_ENV === "test") {
-  console.log("Using test logger");
   sync = true;
   options.level = TEST_LOG_LEVEL;
 } else if (process.env.NODE_ENV === "development") {
-  console.log("Using dev logger");
   options.level = LOG_LEVEL ?? "info";
 } else {
-  console.log("Using prod logger");
   // production
   options.level = LOG_LEVEL ?? "warn";
 }
@@ -44,7 +40,6 @@ if (usePinoPretty) {
   stream = pretty({ colorize: true, sync });
 }
 
-console.log(`Using pino options ${JSON.stringify(options)}`);
 export const logger = pino(options, stream);
 
 export const maskUriPassword = (uri: string) => {
