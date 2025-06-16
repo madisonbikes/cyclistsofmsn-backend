@@ -2,13 +2,9 @@ name: Tests
 
 on:
   pull_request:
-    branches:
-      - main
-      - develop
   push:
     branches:
       - main
-      - develop
 
 jobs:
   buildtest:
@@ -21,10 +17,10 @@ jobs:
       - name: Install exiftool
         run: sudo apt-get install -y exiftool
 
-      - name: Use Node.js 20.x
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: "npm"
       - run: npm ci
       - run: npm run check
