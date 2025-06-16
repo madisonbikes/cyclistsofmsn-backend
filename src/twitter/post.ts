@@ -1,5 +1,4 @@
 import { TwitterClient } from "twitter-api-client";
-import { readFile } from "fs/promises";
 import { configuration } from "../config.ts";
 import sharp from "sharp";
 import fsRepository from "../fs_repository/index.ts";
