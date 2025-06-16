@@ -1,7 +1,7 @@
-import { database, postHistoryModel } from "../../database";
 import { getDayOfYear, startOfDay, subDays } from "date-fns";
 import now from "../../utils/now";
-import { DbImage } from "../../database/types";
+import type { DbImage } from "../../database/types";
+import { database, postHistoryModel } from "../../database/database";
 
 const MINIMUM_REPOST_INTERVAL_IN_DAYS = 180;
 const SEASONALITY_WINDOW = 45;

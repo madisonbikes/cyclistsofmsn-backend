@@ -2,12 +2,12 @@ import {
   loginTestAdminUser,
   setupSuite,
   testRequest,
-  TestRequest,
+  type TestRequest,
 } from "../test";
 import {
   postSchema,
   postStatusFlagSchema,
-  SchedulePostOptions,
+  type SchedulePostOptions,
 } from "./contract";
 import { startOfTomorrow } from "date-fns";
 import { createTestAdminUser } from "../test/data";

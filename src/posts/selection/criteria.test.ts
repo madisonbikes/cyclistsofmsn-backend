@@ -1,7 +1,5 @@
-// noinspection JSUnusedLocalSymbols
-
-import { imageModel, postHistoryModel } from "../../database";
-import { DbImage } from "../../database/types";
+import { imageModel, postHistoryModel } from "../../database/database";
+import type { DbImage } from "../../database/types";
 import { setupSuite } from "../../test";
 import {
   RepostCriteria,

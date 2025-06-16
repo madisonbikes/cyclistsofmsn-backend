@@ -6,12 +6,12 @@ import {
   add as date_add,
 } from "date-fns";
 import { configuration } from "../config";
-import { error, logger, ok, Result } from "../utils";
+import { error, logger, ok, type Result } from "../utils";
 import { randomInt } from "../utils/random";
 import now from "../utils/now";
-import { SchedulePostOptions } from "../routes/contract";
+import { type SchedulePostOptions } from "../routes/contract";
 import imageSelector from "./selection/selector";
-import {
+import type {
   DbImage,
   DbPopulatedPostHistory,
   DbPostHistory,

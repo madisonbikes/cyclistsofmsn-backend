@@ -1,7 +1,7 @@
-import express, { RequestHandler } from "express";
+import express, { type RequestHandler } from "express";
 import passport from "passport";
 import { validateBodySchema, validateAuthenticated } from "../security";
-import { loginBodySchema, AuthenticatedUser } from "./contract";
+import { loginBodySchema, type AuthenticatedUser } from "./contract";
 
 function routes() {
   return express

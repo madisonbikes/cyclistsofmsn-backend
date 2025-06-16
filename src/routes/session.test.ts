@@ -1,4 +1,4 @@
-import { setupSuite, testRequest, TestRequest } from "../test";
+import { setupSuite, testRequest, type TestRequest } from "../test";
 import { createTestUser } from "../test/data";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 

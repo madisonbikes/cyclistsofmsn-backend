@@ -1,6 +1,6 @@
 import { Collection, ObjectId } from "mongodb";
-import { DbImage, dbImageSchema } from "./types";
-import { logger } from "../utils";
+import { type DbImage, dbImageSchema } from "./types";
+import { logger } from "../utils/logger";
 
 export type ImageModelCollectionType = Collection<Omit<DbImage, "_id">>;
 
@@ -12,7 +12,11 @@ type FilterProps = {
 export type ImageId = string | ObjectId;
 
 export class ImageModel {
-  constructor(private collection: ImageModelCollectionType) {}
+  private collection: ImageModelCollectionType;
+
+  constructor(collection: ImageModelCollectionType) {
+    this.collection = collection;
+  }
 
   findById(id: ImageId, filter?: FilterProps) {
     const objectId = new ObjectId(id);

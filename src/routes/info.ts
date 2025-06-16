@@ -1,5 +1,5 @@
 import express from "express";
-import { GetInfo } from "./contract";
+import { type GetInfo } from "./contract";
 import backendVersion from "../backend-version";
 
 function routes() {

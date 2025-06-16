@@ -1,10 +1,10 @@
 import { assertError, setupSuite } from "../../test";
+import imageSelector from "./selector";
 import assert from "assert";
 import { startOfToday, subDays } from "date-fns";
-import imageSelector from "./selector";
 import { vi, describe, it, expect } from "vitest";
-import { imageModel, postHistoryModel } from "../../database";
-import { DbImage } from "../../database/types";
+import type { DbImage } from "../../database/types";
+import { imageModel, postHistoryModel } from "../../database/database";
 
 vi.mock("../../utils/random");
 

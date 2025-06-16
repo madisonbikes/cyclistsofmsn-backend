@@ -9,7 +9,7 @@
   ],
   "settings": {
     "terminal.integrated.env.linux": {
-      "NVM_VERSION_SELECTOR": "lts/iron",
+      "NVM_VERSION_SELECTOR": "v22",
     },
   },
 }

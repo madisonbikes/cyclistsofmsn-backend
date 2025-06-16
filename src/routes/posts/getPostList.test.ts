@@ -2,7 +2,7 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
+  type TestRequest,
 } from "../../test";
 import { postListSchema } from "../contract";
 import { createTestPosts, createTestUser } from "../../test/data";

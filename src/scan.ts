@@ -1,10 +1,10 @@
 import { database, imageModel } from "./database";
 import fsRepository from "./fs_repository";
-import { StringArrayTag } from "exifreader";
+import { type StringArrayTag } from "exifreader";
 import { parse } from "date-fns/parse";
 import { logger } from "./utils";
 import pLimit from "p-limit";
-import { DbImage } from "./database/types";
+import { type DbImage } from "./database/types";
 
 /** expose scanning operation.  requires database connection to be established */
 function start() {

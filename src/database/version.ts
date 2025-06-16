@@ -1,7 +1,7 @@
 import { Collection } from "mongodb";
 import { logger } from "../utils/logger";
-import { DbVersion } from "./types";
-import { ImageModelCollectionType } from "./images";
+import { type DbVersion } from "./types";
+import { type ImageModelCollectionType } from "./images";
 
 /** make sure you update switch statement below when bumping db version */
 const CURRENT_DATABASE_VERSION = 3;
@@ -17,10 +17,16 @@ type VersionCheckResult = {
  * Used to allow for rescans of image metadata or other migration, when necessary.
  */
 export class VersionsModel {
+  private collection: VersionModelCollectionType;
+  private imagesCollection: ImageModelCollectionType;
+
   constructor(
-    private collection: VersionModelCollectionType,
-    private imagesCollection: ImageModelCollectionType,
-  ) {}
+    collection: VersionModelCollectionType,
+    imagesCollection: ImageModelCollectionType,
+  ) {
+    this.collection = collection;
+    this.imagesCollection = imagesCollection;
+  }
 
   findAll() {
     return this.collection.find().toArray();

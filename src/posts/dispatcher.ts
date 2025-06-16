@@ -1,11 +1,11 @@
-import { error, logger, ok, Result } from "../utils";
+import { error, logger, ok, type Result } from "../utils";
 import now from "../utils/now";
-import { PostError, schedulePost } from "./postScheduler";
+import { type PostError, schedulePost } from "./postScheduler";
 import postExecutor from "./postExecutor";
 import imageSelector from "./selection/selector";
 import imageRepositoryScanner from "../scan";
-import { postHistoryModel } from "../database";
-import { DbImage, DbPostHistory } from "../database/types";
+import { postHistoryModel } from "../database/database";
+import type { DbImage, DbPostHistory } from "../database/types";
 
 // five minutes
 const DISPATCH_INTERVAL = 5 * 60 * 1000;

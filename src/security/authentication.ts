@@ -1,20 +1,20 @@
 import { Strategy as LocalStrategy } from "passport-local";
 import { logger } from "../utils";
-import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
-import { Request, Response, NextFunction } from "express";
+import {
+  type AuthenticatedUser,
+  authenticatedUserSchema,
+} from "../routes/contract";
 import bcrypt from "bcryptjs";
-import { userModel } from "../database";
-import { DbUser } from "../database/types";
+import { userModel } from "../database/database";
+import type { DbUser } from "../database/types";
+import type { NextFunction, Request, Response } from "express";
 
-export enum Roles {
-  ADMIN = "admin",
-  EDITOR = "editor",
-}
+export type Roles = "admin" | "editor";
 
 /** check this level every few years, eventually bump to higher hash size to improve security */
 const BCRYPT_HASH_SIZE = 10;
 
-export const userHasRole = (user: AuthenticatedUser, role: string) => {
+export const userHasRole = (user: AuthenticatedUser, role: Roles) => {
   return user.roles.find((r) => r === role) !== undefined;
 };
 

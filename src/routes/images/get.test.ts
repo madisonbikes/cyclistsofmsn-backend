@@ -2,7 +2,7 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
+  type TestRequest,
 } from "../../test";
 import { imageListSchema } from "../contract";
 import { createTestUser } from "../../test/data";

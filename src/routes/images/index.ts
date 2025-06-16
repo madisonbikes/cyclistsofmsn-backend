@@ -3,7 +3,6 @@ import {
   validateBodySchema,
   validateQuerySchema,
   validateAuthenticated,
-  Roles,
   validateRole,
   validateId,
   validateAdmin,
@@ -23,7 +22,7 @@ function routes() {
       .put(
         "/:id",
         validateBodySchema({ schema: imagePut.bodySchema }),
-        validateRole({ role: Roles.EDITOR }),
+        validateRole({ role: "editor" }),
         validateId(),
         imagePut.handler,
       )

@@ -1,7 +1,7 @@
 import express from "express";
 import { dispatchPostOnSchedule } from "../posts/dispatcher";
 import { populatePostsOnSchedule } from "../posts/populate";
-import { ExpressMiddleware } from "../security";
+import { type ExpressMiddleware } from "../security";
 import { logger } from "../utils";
 import { configuration } from "../config";
 

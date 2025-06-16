@@ -1,10 +1,16 @@
 import { configuration } from "../config";
 import { logger, maskUriPassword } from "../utils";
-import { ImageModel, ImageModelCollectionType } from "./images";
-import { PostHistoryModel, PostHistoryModelCollectionType } from "./posts";
-import { UserModel, UserModelCollectionType } from "./users";
-import { VersionModelCollectionType, VersionsModel } from "./version";
-import { Db, MongoClient, ObjectId } from "mongodb";
+import { ImageModel, type ImageModelCollectionType } from "./images";
+import { PostHistoryModel, type PostHistoryModelCollectionType } from "./posts";
+import { UserModel, type UserModelCollectionType } from "./users";
+import { type VersionModelCollectionType, VersionsModel } from "./version";
+import {
+  Db,
+  MongoClient,
+  ObjectId,
+  type CreateIndexesOptions,
+  type IndexSpecification,
+} from "mongodb";
 
 /** provide unified access to database connection */
 
@@ -59,17 +65,26 @@ class Database {
     this.client = new MongoClient(uri);
     this.database = this.client.db();
 
+    logger.debug("Creating indexes if necessary");
     this._images = this.database.collection("images");
-    await this._images.createIndex({ filename: 1 });
+    await this.createIndexIfNecessary("images", { filename: 1 });
 
     this._posts = this.database.collection("posts");
-    await this._posts.createIndex({ timestamp: 1 });
+    await this.createIndexIfNecessary("posts", { timestamp: 1 });
 
     this._users = this.database.collection("users");
-    await this._users.createIndex({ username: 1 }, { unique: true });
+    await this.createIndexIfNecessary(
+      "users",
+      { username: 1 },
+      { unique: true },
+    );
 
     this._versions = this.database.collection("schema_version");
-    await this._versions.createIndex({ version: 1 }, { unique: true });
+    await this.createIndexIfNecessary(
+      "schema_version",
+      { version: 1 },
+      { unique: true },
+    );
 
     const versionsModel = new VersionsModel(this._versions, this._images);
     const { needsMetadataRefresh } = await versionsModel.versionCheck();
@@ -94,6 +109,24 @@ class Database {
     if (!this.refreshAllMetadata) {
       logger.info("Forcing refresh of all metadata due to database upgrade");
       this._refreshAllMetadata = true;
+    }
+  }
+
+  private async createIndexIfNecessary(
+    collection: string,
+    indexSpec: IndexSpecification,
+    options?: CreateIndexesOptions,
+  ) {
+    // create index and ignore errors if index already exists
+    try {
+      await this.database
+        ?.collection(collection)
+        .createIndex(indexSpec, options);
+    } catch (_err) {
+      logger.debug(
+        { collection, indexSpec },
+        "Index already exists, skipping creation",
+      );
     }
   }
 }

@@ -1,5 +1,5 @@
-import { DbPopulatedPostHistory } from "../../database/types";
-import { Post, postSchema } from "../contract";
+import { type Post, postSchema } from "../contract";
+import type { DbPopulatedPostHistory } from "../../database/types";
 
 function mapPostSchema(p: DbPopulatedPostHistory): Post {
   let post: Post;

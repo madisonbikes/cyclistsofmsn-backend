@@ -4,17 +4,17 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
+  type TestRequest,
 } from "../../test";
-import { imageModel, postHistoryModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
 } from "../../test/data";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { DbImage } from "../../database/types";
 import { ObjectId } from "mongodb";
+import { imageModel, postHistoryModel } from "../../database/database";
+import type { DbImage } from "../../database/types";
 
 describe("server process - images", () => {
   let request: TestRequest;

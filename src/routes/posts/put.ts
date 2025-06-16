@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { postHistoryModel } from "../../database";
+import type { Request, Response } from "express";
 import { logger } from "../../utils";
-import { Post, PutPostBody, putPostBodySchema } from "../contract";
+import { type Post, type PutPostBody, putPostBodySchema } from "../contract";
 import { mapPostSchema } from "./types";
+import { postHistoryModel } from "../../database/database";
 
 const bodySchema = putPostBodySchema;
 

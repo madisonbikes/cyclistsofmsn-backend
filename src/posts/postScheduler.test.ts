@@ -1,5 +1,5 @@
 import { assertError, assertOk, setupSuite } from "../test";
-import { PostError, schedulePost } from "./postScheduler";
+import { type PostError, schedulePost } from "./postScheduler";
 import {
   add as date_add,
   set as date_set,
@@ -8,12 +8,12 @@ import {
   startOfYesterday,
 } from "date-fns";
 import { configuration } from "../config";
-import { SchedulePostOptions } from "../routes/contract";
+import { type SchedulePostOptions } from "../routes/contract";
 import now from "../utils/now";
 import { ObjectId } from "mongodb";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { DbPostHistory } from "../database/types";
-import { database, imageModel, postHistoryModel } from "../database";
+import { database, imageModel, postHistoryModel } from "../database/database";
+import type { DbPostHistory } from "../database/types";
 
 vi.mock("../utils/random");
 vi.mock("../utils/now");

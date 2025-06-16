@@ -1,13 +1,12 @@
-import { AuthenticatedUser } from "../routes/contract";
-import { Roles, userHasRole } from "./authentication";
+import { type AuthenticatedUser } from "../routes/contract";
+import { userHasRole } from "./authentication";
 import { describe, it, expect } from "vitest";
 
 describe("authentication", () => {
   it("plain user lacks role", () => {
     const user: AuthenticatedUser = { username: "plain", roles: [] };
-    expect(userHasRole(user, Roles.ADMIN)).toBeFalsy();
-    expect(userHasRole(user, Roles.EDITOR)).toBeFalsy();
-    expect(userHasRole(user, "")).toBeFalsy();
+    expect(userHasRole(user, "admin")).toBeFalsy();
+    expect(userHasRole(user, "editor")).toBeFalsy();
   });
 
   it("admin user has role", () => {
@@ -15,8 +14,7 @@ describe("authentication", () => {
       username: "admin",
       roles: ["admin"],
     };
-    expect(userHasRole(user, Roles.ADMIN)).toBeTruthy();
-    expect(userHasRole(user, Roles.EDITOR)).toBeFalsy();
-    expect(userHasRole(user, "")).toBeFalsy();
+    expect(userHasRole(user, "admin")).toBeTruthy();
+    expect(userHasRole(user, "editor")).toBeFalsy();
   });
 });

@@ -1,4 +1,3 @@
-import { readFile } from "fs/promises";
 import { configuration } from "../config";
 import sharp from "sharp";
 import fsRepository from "../fs_repository";
@@ -7,9 +6,9 @@ import crypto from "crypto";
 import { logger } from "../utils";
 import {
   mediaUploadResponseSchema,
-  StatusUpdateRequest,
+  type StatusUpdateRequest,
   statusUpdateResponseSchema,
-  StatusUpdateVisibility,
+  type StatusUpdateVisibility,
   statusUpdateVisibilitySchema,
 } from "./types";
 
@@ -26,13 +25,16 @@ interface TootPostOptions {
   image?: TootPostImageOptions;
 }
 
-function isEnabled() {
+export function isEnabled() {
   return (
     configuration.mastodonUri !== "" && configuration.mastodonAccessToken !== ""
   );
 }
 
-async function post(filename: string, description?: string): Promise<string> {
+export async function post(
+  filename: string,
+  description?: string,
+): Promise<string> {
   const photoFilename = fsRepository.photoPath(filename);
   const buffer = await sharp(photoFilename)
     .resize({ width: 1600, withoutEnlargement: true })
@@ -49,7 +51,7 @@ async function post(filename: string, description?: string): Promise<string> {
   });
 }
 
-async function postToot(options: TootPostOptions): Promise<string> {
+export async function postToot(options: TootPostOptions): Promise<string> {
   let mediaId: string[] = [];
   if (options.image != null) {
     const mediaRequest = buildAuthorizedMastodonPostRequest(
@@ -108,39 +110,4 @@ function buildAuthorizedMastodonPostRequest(api: string) {
   return request
     .post(`${configuration.mastodonUri}/${api}`)
     .set("Authorization", `Bearer ${configuration.mastodonAccessToken}`);
-}
-
-export default { isEnabled, post };
-
-/** simple command-line capability for testing */
-const main = async (args: string[]) => {
-  const fileBuffer = await readFile(args[1]);
-
-  console.log("loaded file");
-  return postToot({
-    status: args[0],
-    visibility: "direct",
-    image: {
-      filename: args[1],
-      buffer: fileBuffer,
-      description: "useful alt tag description",
-      focus: undefined,
-    },
-  });
-};
-
-if (require.main === module) {
-  if (process.argv.length !== 4) {
-    console.log("Requires a status and an image filename for arguments.");
-  } else {
-    const args = process.argv.slice(2);
-    /** launches test post */
-    Promise.resolve()
-      .then(() => {
-        return main(args);
-      })
-      .catch((error: unknown) => {
-        console.error(error);
-      });
-  }
 }

@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
-import { imageModel } from "../../database";
+import type { Request, Response } from "express";
 import { logger } from "../../utils";
 import { putImageBodySchema } from "../contract";
 import { lenientImageSchema } from "./localTypes";
 import fsRepository from "../../fs_repository";
 import { z } from "zod";
-import { DbImage } from "../../database/types";
+import type { DbImage } from "../../database/types";
+import { imageModel } from "../../database/database";
 
 class ImagePut {
   bodySchema = putImageBodySchema;

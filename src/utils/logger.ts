@@ -1,7 +1,7 @@
 import { ConnectionString } from "connection-string";
-import pino, { stdSerializers } from "pino";
-import pretty from "pino-pretty";
+import { stdSerializers, pino } from "pino";
 import { initEnv } from "./env";
+import pretty from "pino-pretty";
 
 initEnv();
 

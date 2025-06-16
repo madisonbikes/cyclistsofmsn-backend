@@ -4,9 +4,8 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
+  type TestRequest,
 } from "../../test";
-import { imageModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
@@ -14,6 +13,7 @@ import {
   getGoodImageId,
 } from "../../test/data";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { imageModel } from "../../database/database";
 
 describe("server process - images", () => {
   let request: TestRequest;

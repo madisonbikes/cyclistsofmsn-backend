@@ -1,15 +1,21 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
+  "extends": "@tsconfig/node22/tsconfig.json",
 
   "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+
     "preserveConstEnums": true,
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noImplicitOverride": true,
     "isolatedModules": true,
-    "outDir": "dist",
     "typeRoots": ["@types", "./node_modules/@types"],
-    "noErrorTruncation": true
+    "verbatimModuleSyntax": true,
+    "noErrorTruncation": true,
+    "moduleResolution": "bundler",
+    "module": "preserve"
   }
 }

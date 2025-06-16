@@ -1,5 +1,5 @@
 import { isValidObjectId } from "../database/database";
-import { ExpressMiddleware } from "./authentication";
+import { type ExpressMiddleware } from "./authentication";
 
 export const validateId = (): ExpressMiddleware => {
   return (request, response, next) => {

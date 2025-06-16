@@ -1,7 +1,10 @@
 import express from "express";
 import { schedulePost } from "../posts/postScheduler";
 import { validateAdmin, validateBodySchema } from "../security";
-import { SchedulePostOptions, schedulePostOptionsSchema } from "./contract";
+import {
+  type SchedulePostOptions,
+  schedulePostOptionsSchema,
+} from "./contract";
 import { mapPostSchema } from "./posts/types";
 
 function routes() {

@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  Roles,
   validateAdmin,
   validateAuthenticated,
   validateBodySchema,
@@ -12,7 +11,7 @@ import singlePostDelete from "./delete";
 import postGet from "./get";
 
 function validateEditor() {
-  return validateRole({ role: Roles.EDITOR });
+  return validateRole({ role: "editor" });
 }
 
 function routes() {

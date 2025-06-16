@@ -4,15 +4,15 @@ import {
   loginTestUser,
   setupSuite,
   testRequest,
-  TestRequest,
+  type TestRequest,
 } from "../../test";
-import { database, postHistoryModel } from "../../database";
 import {
   createTestAdminUser,
   createTestEditorUser,
   createTestUser,
 } from "../../test/data";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { database, postHistoryModel } from "../../database/database";
 
 describe("server process - posts", () => {
   let request: TestRequest;

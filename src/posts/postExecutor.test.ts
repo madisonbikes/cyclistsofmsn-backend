@@ -1,10 +1,10 @@
 import { setupSuite } from "../test";
 import postExecutor from "./postExecutor";
-import photoTooter from "../mastodon/post";
-import photoTweeter from "../twitter/post";
-import atproto from "../atproto";
+import * as photoTooter from "../mastodon/post";
+import * as photoTweeter from "../twitter/post";
+import * as atproto from "../atproto";
 import { vi, describe, it, expect } from "vitest";
-import { imageModel } from "../database";
+import { imageModel } from "../database/database";
 
 vi.mock("../mastodon/post");
 vi.mock("../twitter/post");

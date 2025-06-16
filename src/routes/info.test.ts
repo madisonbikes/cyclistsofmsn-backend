@@ -1,5 +1,5 @@
-import { setupSuite, testRequest, TestRequest } from "../test";
-import { GetInfo } from "./contract";
+import { setupSuite, testRequest, type TestRequest } from "../test";
+import { type GetInfo } from "./contract";
 import { describe, it, expect, beforeEach } from "vitest";
 
 describe("info route", () => {

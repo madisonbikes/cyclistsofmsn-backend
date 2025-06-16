@@ -1,6 +1,6 @@
-import { Keyv, KeyvStoreAdapter } from "keyv";
+import { Keyv, type KeyvStoreAdapter } from "keyv";
 import KeyvValkey from "@keyv/valkey";
-import { Lifecycle } from "./lifecycle";
+import { type Lifecycle } from "./lifecycle";
 import { configuration } from "../config";
 import { logger, maskUriPassword } from "./logger";
 

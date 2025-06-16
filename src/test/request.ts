@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import TestAgent from "supertest/lib/agent";
+import TestAgent from "supertest/lib/agent.js";
 import { Server } from "http";
 import { runningPhotoServer } from "./setup";
 

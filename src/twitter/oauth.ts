@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import OAuth from "oauth-1.0a";
-import { Plugin } from "superagent";
+import { type Plugin } from "superagent";
 
 export const oauth_signer = (
   apiKey: string,

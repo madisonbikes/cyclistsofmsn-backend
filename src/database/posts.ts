@@ -1,12 +1,12 @@
-import { Collection, ObjectId } from "mongodb";
 import { endOfDay, startOfDay } from "date-fns";
+import { Collection, ObjectId } from "mongodb";
 import {
   dbPopulatedPostHistorySchema,
-  DbPostHistory,
+  type DbPostHistory,
   dbPostHistorySchema,
-  DbPostHistoryStatus,
+  type DbPostHistoryStatus,
 } from "./types";
-import { ImageId } from "./images";
+import { type ImageId } from "./images";
 
 export type PostHistoryModelCollectionType = Collection<
   Omit<DbPostHistory, "_id">
@@ -15,7 +15,10 @@ export type PostHistoryModelCollectionType = Collection<
 type PostId = string | ObjectId;
 
 export class PostHistoryModel {
-  constructor(private collection: PostHistoryModelCollectionType) {}
+  private collection: PostHistoryModelCollectionType;
+  constructor(collection: PostHistoryModelCollectionType) {
+    this.collection = collection;
+  }
   async findLatestPost() {
     const value = await this.collection
       .find({ "status.flag": "complete" })

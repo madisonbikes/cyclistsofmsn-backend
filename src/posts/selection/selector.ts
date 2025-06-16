@@ -1,6 +1,6 @@
-import { imageModel } from "../../database";
-import { DbImage } from "../../database/types";
-import { error, ok, Result, arrayShuffle } from "../../utils";
+import { imageModel } from "../../database/database";
+import type { DbImage } from "../../database/types";
+import { error, ok, type Result, arrayShuffle } from "../../utils";
 import {
   RepostCriteria,
   SeasonalityCriteria,
