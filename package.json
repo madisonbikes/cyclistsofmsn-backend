@@ -45,7 +45,7 @@
     "express-session": "^1.18.1",
     "fs-extra": "^11.3.0",
     "iovalkey": "^0.3.2",
-    "keyv": "^5.3.3",
+    "keyv": "^5.3.4",
     "mongodb": "^6.17.0",
     "oauth-1.0a": "^2.2.6",
     "p-limit": "~3.1.0",
