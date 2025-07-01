@@ -58,7 +58,7 @@
     "superagent": "^10.2.1",
     "tempfile": "^3.0.0",
     "twitter-api-client": "^1.6.1",
-    "zod": "^3.25.64"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
