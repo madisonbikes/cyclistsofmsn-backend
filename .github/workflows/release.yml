@@ -13,7 +13,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Use Node.js 22.x
         uses: actions/setup-node@v4
@@ -40,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./output/build.tar.gz
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: tag major and minor versions
         if: ${{ steps.release.outputs.release_created }}
         run: |
